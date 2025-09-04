@@ -1,0 +1,12 @@
+
+# Ignore all JS files
+*.js
+
+# But keep this one
+!main.js
+
+# Ignore node_modules folder
+node_modules/
+
+# Ignore build output
+dist/

@@ -1,0 +1,845 @@
+<!DOCTYPE html>
+
+<!-- 
+    ParserSweet v2.0.html
+    Features
+    - AXL response parser
+    - POS Data Code DE22 parser for EFTEX
+    - CBA MTI parser
+	  - New UI
+	  - New Name
+-->
+
+<!-- 
+    Parser v1.5.html
+    Version: 1.5
+    Last Updated: July 22, 2025
+    Changes:
+    - Fixed posDataDefinitions initialization error
+    - Improved displayDefinitions formatting
+    - Added toggle button for showing/hiding definitions
+	  - Improved Request and Response output display
+-->
+
+<!-- 
+    ParserSweet v2.0.html
+    Version: 2.0
+    Last Updated: July 24, 2025
+    Changes:
+    - New UI
+	  - New Tool Name
+-->
+
+<!-- 
+    ParserSweet v2.1.html
+    Version: 2.1
+    Last Updated: July 26, 2025
+    Changes:
+    - Added Paymark Host Record parser
+	  - Added Message Alert
+	  - Changed Request and Response output display
+	  - Added logo and icon
+-->
+
+<!-- 
+    ParserSweet v3.0.html
+    Version: 3.0
+    Last Updated: July 29, 2025
+    Changes:
+    - Add popup info for parse successfully
+    - Move script.js to script.js
+-->
+
+<!-- 
+    ParserSweet v3.1.html
+    Version: 3.1
+    Last Updated: August 29, 2025
+    Changes:
+    - Rename from AXL Parser to Json Parser
+    - Support for Json with createdAt key
+-->
+
+<!-- 
+    ParserSweet v3.2.html
+    Version: 3.2
+    Last Updated: September 03, 2025
+    Changes:
+    - Rework JSON parser when iccdata is null
+    - Rework customdata to display as a new table in value column
+-->
+
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+
+  <!-- <link rel="icon" type="image/png" href="data:image/png;base64,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">
+  -->
+
+  <link rel="icon" type="image/png" href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAtFBMVEX///8AAAD8/Pxvb2///v6VlZVgYGD4+PigoKB6enr/NDSOjo5paGh4eHj/OTlWVlZZWFgGBgakpKRMTEz/MTEhICAqKiq2tra9vb3+RUVDQ0MQDg4fFhb/8/Po6Oj/UFD/6enFxcX/+fn/19f/XV3w8PD/mJj/bGz/pqaBf3+urq7/d3dAMzP9j4/9zMyHh4f8hYXPzMz/r6/i4uKbm5v/3t7Y2dmmLCz/urr/v7/hLi6IVlZOwAOuAAAEI0lEQVRo3u2ZDXOqOhCGg6LUKNEoKigIAoqCiJ+1vff//68bErRw5tweCOmZTscdZzQZhsd3d7P5AuBpT3sav53DpEms96mFjToIpTWRStj8ItdgdDCeqd3PLRnXo1zwvLv600ONmbTD8wuvxxY73CohdyZdOtK8xalFx7s/6gAygbwoTULh09KS2nIpJS9gpWJOylZqgpIQkiOcWtTyEBmsOCmlIUMCAcqWy2MdApFLQzgpFSDsF6F0FQ4IqAABSoJxonwxJNWCK2qpDgGNZF6RUgqSjnhVn94tnEl4q3yFkl8MTwVCXMtyiYe6o6KZOffVhFhvh8D3g3hvAaVoo7TMiIC4bz7SoKZpEAXvxQHY6AuCWDEiBMM2DAg1FFtfAXFjqEF/4znX/donPyOHH/K/BXKDIIqzFztrA8FDTktjIATiGRrakEA0XFrZ3tKmaEjjoGlxA1inKDi8pxJOCNpXwe7yDOg7wIlgGvQ0HO4BobVgyBoS78gxRNBAmhY41H++IxTiBprhAceGxsY72SQDZOBG0NgLhTi25ltgj7TgerrujZTIxImEXA0YuNRDAXHSQYMnkmAIrgVDEIFYAUQI2c4Gpq9/R1oscsTLJBo2ifLehpDk1BpC4qgT5Fby+7Ji+RCd0kyOo43lkAYJ+YF1CaxdawRZwsrAOiAYWCQXkO2JhVxJ3gYeKSuuFyFkvKe1DEWuKEiDrcI2BtSMKN7+eyPj8QRkz0boTVSpP7bbSzocN4YG/zHJZH7z32R9sLvByBIEOZL94/hIg7GPjFu6ZDCPYJnu5m6eoElrSfeoWY+731HIK+il32NdDIQxJDVrvprp2meyj6miPKXifJKH6GP6stE5aw9pc2ejNDbEJsv6SjJG/86QqZfwDULjMCtSuJVMGaO9eBxUUOeZhr/2wHlUoPBCQsbofeyFL7RjcKWZW6RwQkLqdtz8YKyoi3B419VnlCM/ZMpCq+bW6iGmLz0/jhUoBVMKHyRL3nZOCPNP7yNtO+wgJ+R3V0YZLIpCPnYISod2mEO5RuAzSn+Rj4j0OBNZNRkjrJVd8nKcp1zoO6XkzqBj5s6osYLMD3g2RqTxaxb0AWtO6y9TGQWPFumRC7Umm1yyQfJg1FoLZ1oSsCgKUWsWyOKSiFGarP5KUjfrpgGZ6KJW9SnFXGa5dRcCdDNfgutPv/qoT/6xnFbL3GngtD84itzOKayyHJOtntuMNr5oY/rp6erPgQy+H0T9xpD+j4EMnpBnCn8TJT+nCnPHZPg3YvLtIJ2/AemWugL81ZQR1is8ruPJojrkPDZfyz8tr3aPlXsFb6nSqNItzbDMBXPRVlts6tXcm6RX5a0Kpu6k+UvFa0DlUurSP38LtJtWv9A8h9teu7T1kilHqrAM+L0B+il2Pe1pP9j+AwW3ZdTixUYKAAAAAElFTkSuQmCC
+  ">
+
+
+  <title>ParserSweet</title> 
+  <!-- <title>Parser </title>-->
+  <style>
+    * {
+      box-sizing: border-box;
+    }
+
+    body,
+    html {
+      margin: 0;
+      padding: 0;
+      height: 100%;
+      font-family: 'Segoe UI', sans-serif;
+      background: #00AFDA;
+      /* background: linear-gradient(135deg, #B3F1FF 0%, #00AFDA 100%); */
+
+    }
+
+    .screen {
+      display: none;
+      height: 100vh;
+      width: 100vw;
+      position: absolute;
+      top: 0;
+      left: 0;
+      background: #00AFDA;
+      /* background: linear-gradient(135deg, #B3F1FF 0%, #00AFDA 100%); */
+      flex-direction: column;
+      padding: 40px;
+      animation: fadeIn 0.6s ease-in-out;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    /* Centered Home Screen */
+    #home {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .card {
+      background: white;
+      padding: 40px;
+      border-radius: 20px;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      text-align: center;
+      max-width: 800px;
+      margin: auto;
+      animation: fadeIn 1.5s ease-in-out;
+    }
+
+    h1 {
+      font-size: 2.8em;
+      /* background: linear-gradient(135deg, #B3F1FF 0%, #00AFDA 100%); */
+      background: #B3F1FF;
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      margin-bottom: 20px;
+    }
+
+    q {
+      font-size: 1.5em;
+      font-weight: bold;
+      color: #999;
+    }
+
+    p {
+      font-size: 1.2em;
+      color: #B3F1FF;
+    }
+
+    pp {
+      font-size: 1.2em;
+      color:  #999;
+    }
+
+    ft {
+      color: white;
+      margin: 0 0 20px 0;
+      line-height: 1.6;
+      flex-grow: 1;
+    }
+
+    .buttons {
+      margin-top: 30px;
+      display: flex;
+      justify-content: center;
+      gap: 15px;
+      flex-wrap: wrap;
+    }
+
+    .btn {
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      background: #00AFDA;
+      color: white;
+      font-size: 1em;
+      cursor: pointer;
+      transition: transform 0.2s ease, background 0.3s ease;
+    }
+
+    .btn:hover {
+      background: #007A99;
+      transform: scale(1.05);
+    }
+
+    .back-btn {
+      margin-top: 30px;
+      background: #006B8F;
+
+      bottom: 30px;
+      right: 30px;
+      position: fixed;
+      cursor: pointer;
+
+    }
+
+    .back-btn:hover {
+      background: #004F6B;
+    }
+
+
+    .container {
+      display: none;
+      padding: 20px;
+      border: 1px solid #ccc;
+      border-top: none;
+    }
+
+    .container.active {
+      display: block;
+    }
+
+    .flex-container {
+      display: flex;
+      gap: 20px;
+      /* Increased gap between input and output */
+    }
+
+    .input-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 50%;
+      /* Set width to half */
+    }
+
+    .output-container {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 20px;
+      width: 50%;
+      /* Set width to half */
+      margin-bottom: 90px;
+    }
+
+    textarea,
+    pre,
+    table {
+      width: 100%;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ddd;
+      font-family: monospace;
+    }
+
+    textarea {
+      height: 200px;
+      width: 100%;
+    }
+
+    #ParsedTables {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 30px;
+    }
+
+    table {
+      border-collapse: collapse;
+      background-color: #f4f4f4;
+
+    }
+
+    th,
+    td {
+      border: 1px solid #ddd;
+      padding: 8px;
+      text-align: left;
+      width: 100%;
+    }
+
+    th {
+      background-color: #00AFDA;
+      color: white;
+    }
+
+    th.key-column {
+      width: 25%;
+      /* Fixed width for key column */
+    }
+
+    th.value-column {
+      width: 75%;
+      /* Fixed width for value column */
+    }
+
+    tr:nth-child(even) {
+      background-color: #f2f2f2;
+      /* Color for even rows */
+    }
+
+    tr:nth-child(odd) {
+      background-color: #e9e9e9;
+      /* Color for odd rows */
+    }
+
+    button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      /* background-color: #007BFF; */
+      background-color: #006B8F;
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    button:hover {
+      background-color: #004F6B;
+      transform: scale(1.05);
+    }
+
+    #copy-button {
+      display: none;
+      /* Initially hide the copy button */
+    }
+
+    .de22-input-container {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+    }
+
+    #DefinitionsOutput {
+      border: 1px solid #000;
+      padding: 10px;
+      margin-top: 10px;
+      width: 100%;
+      height: 150px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+      white-space: pre-wrap;
+      resize: none;
+      display: none;
+      margin-left: 0;
+      margin-right: 40px;
+      font-size: 10px;
+      /* Adjust the font size as needed */
+      column-count: 3;
+      /* Create two columns 	*/
+      column-gap: 5px;
+      /* Add */
+      flex-direction: column;
+    }
+
+    #parsedDataOutput {
+      border: 1px solid #ccc;
+      padding: 10px;
+      margin-top: 10px;
+      width: 45%;
+      height: 200px;
+      overflow-y: auto;
+      background-color: #f9f9f9;
+      white-space: pre-wrap;
+      resize: none;
+      bottom: 60px;
+
+    }
+
+    .tables-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      margin-bottom: 40px;
+    }
+
+    .table-box {
+
+      min-width: 300px;
+      max-width: 100%;
+      resize: horizontal;
+      overflow: auto;
+      border: 1px solid #ccc;
+      padding: 10px;
+
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      table-layout: fixed;
+      word-wrap: break-word;
+    }
+
+    th,
+    td {
+      border: 1px solid #ccc;
+      padding: 8px;
+      text-align: left;
+    }
+
+    h2 {
+      margin-top: 20px;
+      color: #B3F1FF;
+    }
+
+
+    .field-column-fixed {
+      width: 65px;
+    }
+
+    .tag-column-fixed {
+      width: 250px;
+    }
+
+
+    .section {
+      width: 100%;
+      margin-top: 20px;
+      border-radius: 8px;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    .section-header {
+      /* background: #0078D7;*/
+      background: #4682B4;
+
+      color: white;
+      padding: 10px;
+      cursor: pointer;
+      border-radius: 6px;
+      width: 100%;
+      display: block;
+      box-sizing: border-box;
+      font-family: 'Consolas', 'Roboto Mono', 'Courier New', monospace;
+      margin: 0;
+      font-weight: bold;
+    }
+
+    .section-content {
+      display: none;
+      padding: 10px;
+    }
+
+    .record {
+      margin-bottom: 10px;
+      background: #f9f9f9;
+    }
+
+    .record-header {
+      cursor: pointer;
+      padding: 10px;
+      background: #e6f0ff;
+      font-weight: bold;
+      color: #6C757D;
+      border-top-left-radius: 8px;
+      border-top-right-radius: 8px;
+      font-family: 'Consolas', 'Roboto Mono', 'Courier New', monospace;
+    }
+
+    .record-content {
+      display: none;
+      padding: 10px;
+      font-family: 'Consolas', 'Roboto Mono', 'Courier New', monospace;
+      font-size: 14px;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    .wrap-modulus {
+      word-break: break-all;
+      white-space: normal;
+    }
+
+    .key {
+      color: #6C757D;
+      font-weight: bold;
+    }
+
+    .value {
+      color: #007BFF;
+    }
+
+
+
+    .record-content {
+      max-width: 100%;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+    }
+
+    .wrap-modulus .value {
+      display: block;
+      overflow-wrap: break-word;
+      word-break: break-word;
+      white-space: normal;
+      max-width: 100%;
+    }
+
+
+
+
+    .field-content {
+      margin-top: 10px;
+      padding-left: 15px;
+      border-left: 2px solid #ccc;
+    }
+
+    .record-field {
+      margin-bottom: 6px;
+    }
+
+
+
+    label {
+      font-family: 'Segoe UI', sans-serif;
+      color: #B3F1FF;
+    }
+
+    .tab-container {
+      font-family: Arial, sans-serif;
+      background: transparent;
+    }
+
+    .tabs {
+      list-style: none;
+      padding: 0;
+      display: flex;
+      border-bottom: 2px solid #ccc;
+      margin-bottom: 10px;
+    }
+
+    .tab {
+      padding: 10px 20px;
+      cursor: pointer;
+      border: none;
+      border-bottom: none;
+      background: #f1f1f1;
+      margin-right: 5px;
+
+      border-top-left-radius: 20px;
+      border-top-right-radius: 20px;
+
+    }
+
+    .tab.active {
+      background: #fff;
+      font-weight: bold;
+      border-top: 2px solid #0078D7;
+      border-left: 2px solid #0078D7;
+      border-right: 2px solid #0078D7;
+    }
+
+    .tab-content {
+      border: none;
+      padding: 15px;
+      background: transparent;
+    }
+
+
+    .tabs .tab {
+      color: white;
+      /* Makes the tab text white */
+      background-color: #006B8F;
+      /* Optional: dark background for contrast */
+      padding: 10px 20px;
+      cursor: pointer;
+      display: inline-block;
+      border: none;
+    }
+
+    .tabs .tab.active {
+      background-color: #004F6B;
+      /* Highlight active tab */
+      color: white;
+    }
+
+
+
+    #customAlert {
+      display: none;
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      background-color: rgba(255, 255, 255, 0.6);
+      /* semi-transparent white */
+      color: #000;
+      font-family: 'Segoe UI', sans-serif;
+      padding: 20px 30px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+      z-index: 9999;
+      min-width: 300px;
+      text-align: center;
+      justify-content: center;
+      align-items: center;
+      backdrop-filter: blur(10px);
+    }
+
+    #customAlert button {
+      margin-top: 30px;
+      padding: 12px 24px;
+      border: none;
+      border-radius: 30px;
+      /* background-color: #007BFF; */
+      background-color: #006B8F;
+      color: white;
+      cursor: pointer;
+      font-size: 1em;
+    }
+
+    #blurWrapper.blurred {
+      filter: blur(5px);
+      pointer-events: none;
+      user-select: none;
+    }
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0, 0, 0, 0.3);
+      backdrop-filter: blur(5px);
+      /* optional: blur the background */
+      -webkit-backdrop-filter: blur(5px);
+      z-index: 1000;
+      display: none;
+    }
+
+    #parserlogo {
+      background: transparent;
+      background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAtFBMVEX///8AAAD8/Pxvb2///v6VlZVgYGD4+PigoKB6enr/NDSOjo5paGh4eHj/OTlWVlZZWFgGBgakpKRMTEz/MTEhICAqKiq2tra9vb3+RUVDQ0MQDg4fFhb/8/Po6Oj/UFD/6enFxcX/+fn/19f/XV3w8PD/mJj/bGz/pqaBf3+urq7/d3dAMzP9j4/9zMyHh4f8hYXPzMz/r6/i4uKbm5v/3t7Y2dmmLCz/urr/v7/hLi6IVlZOwAOuAAAEI0lEQVRo3u2ZDXOqOhCGg6LUKNEoKigIAoqCiJ+1vff//68bErRw5tweCOmZTscdZzQZhsd3d7P5AuBpT3sav53DpEms96mFjToIpTWRStj8ItdgdDCeqd3PLRnXo1zwvLv600ONmbTD8wuvxxY73CohdyZdOtK8xalFx7s/6gAygbwoTULh09KS2nIpJS9gpWJOylZqgpIQkiOcWtTyEBmsOCmlIUMCAcqWy2MdApFLQzgpFSDsF6F0FQ4IqAABSoJxonwxJNWCK2qpDgGNZF6RUgqSjnhVn94tnEl4q3yFkl8MTwVCXMtyiYe6o6KZOffVhFhvh8D3g3hvAaVoo7TMiIC4bz7SoKZpEAXvxQHY6AuCWDEiBMM2DAg1FFtfAXFjqEF/4znX/donPyOHH/K/BXKDIIqzFztrA8FDTktjIATiGRrakEA0XFrZ3tKmaEjjoGlxA1inKDi8pxJOCNpXwe7yDOg7wIlgGvQ0HO4BobVgyBoS78gxRNBAmhY41H++IxTiBprhAceGxsY72SQDZOBG0NgLhTi25ltgj7TgerrujZTIxImEXA0YuNRDAXHSQYMnkmAIrgVDEIFYAUQI2c4Gpq9/R1oscsTLJBo2ifLehpDk1BpC4qgT5Fby+7Ji+RCd0kyOo43lkAYJ+YF1CaxdawRZwsrAOiAYWCQXkO2JhVxJ3gYeKSuuFyFkvKe1DEWuKEiDrcI2BtSMKN7+eyPj8QRkz0boTVSpP7bbSzocN4YG/zHJZH7z32R9sLvByBIEOZL94/hIg7GPjFu6ZDCPYJnu5m6eoElrSfeoWY+731HIK+il32NdDIQxJDVrvprp2meyj6miPKXifJKH6GP6stE5aw9pc2ejNDbEJsv6SjJG/86QqZfwDULjMCtSuJVMGaO9eBxUUOeZhr/2wHlUoPBCQsbofeyFL7RjcKWZW6RwQkLqdtz8YKyoi3B419VnlCM/ZMpCq+bW6iGmLz0/jhUoBVMKHyRL3nZOCPNP7yNtO+wgJ+R3V0YZLIpCPnYISod2mEO5RuAzSn+Rj4j0OBNZNRkjrJVd8nKcp1zoO6XkzqBj5s6osYLMD3g2RqTxaxb0AWtO6y9TGQWPFumRC7Umm1yyQfJg1FoLZ1oSsCgKUWsWyOKSiFGarP5KUjfrpgGZ6KJW9SnFXGa5dRcCdDNfgutPv/qoT/6xnFbL3GngtD84itzOKayyHJOtntuMNr5oY/rp6erPgQy+H0T9xpD+j4EMnpBnCn8TJT+nCnPHZPg3YvLtIJ2/AemWugL81ZQR1is8ruPJojrkPDZfyz8tr3aPlXsFb6nSqNItzbDMBXPRVlts6tXcm6RX5a0Kpu6k+UvFa0DlUurSP38LtJtWv9A8h9teu7T1kilHqrAM+L0B+il2Pe1pP9j+AwW3ZdTixUYKAAAAAElFTkSuQmCC);
+      background-repeat: no-repeat;
+      background-position: center center;
+      padding: 75px 0px 55px 100px;
+    }
+
+
+
+    .header-container {
+
+      display: flex;
+      justify-content: center;
+      /* centers the group horizontally */
+      align-items: center;
+      /* aligns text and logo vertically */
+      gap: 10px;
+      text-align: center;
+
+    }
+
+    #parserlogo img {
+      width: 40px;
+      /* adjust as needed */
+      height: auto;
+    }
+
+    footer {
+      color: #666;
+      text-align: center;
+      border-top: 1px solid#ddd;
+      padding-top: 1rem;
+      margin-top: 3rem;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .info-alert {
+      position: fixed;
+      bottom: 30px;
+      right: 140px;
+      transform: translate(-50%);
+      transform: translateY(20px);
+      background-color: rgba(255, 255, 255, 0.6);
+      color: #00796b;
+      padding: 12px 20px;
+      border-radius: 8px;
+      text-align: center;
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+      font-family: sans-serif;
+      font-size: 14px;
+      opacity: 0;
+      max-width: 80%;
+      transition: opacity 0.5s ease, transform 0.5s ease;
+      z-index: 9999;
+    }
+
+    .info-alert.show {
+      opacity: 1;
+      transform: translateY(0);
+    }
+
+
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(30px);
+      }
+
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <!-- Home Screen -->
+  <div id="home" class="screen active">
+    <div class="card">
+      <div class="header-container">
+        <h1>Welcome to ParserSweet</h1>
+        <!-- <h1>Welcome</h1> -->
+        <div id="parserlogo"> </div>
+      </div>
+      <q>Parsing made sweet and simple. </q>
+      <div style="height: 5px;"></div>
+      <pp>Your data has stories to tell — let ParserSweet help you read them. </pp>
+      <div class="buttons">
+        <button class="btn" data-screen="json-parser">JSON</button>        
+        <button class="btn" data-screen="cba-mti-parser">CBA MTI</button> 
+        <button class="btn" data-screen="paymark-host-record-parser">Paymark Host Record</button>
+        <button class="btn" data-screen="de22-eftex-parser">DE22 for EFTEX</button>
+      </div>
+    </div>
+    <footer>
+      <ft id="app-version"></ft>
+    </footer>
+
+  </div>
+
+  <!-- Json Parser Section -->
+  <div id="json-parser" class="screen">
+    <h1>JSON Transform</h1>
+    <p>This tool supports AXL events as well as Pay360 API requests and responses. It transforms JSON data into a structured table format, making it easier to analyze and visualize.</p>
+    <div class="flex-container">
+      <div class="input-container">
+        <textarea id="json-input" placeholder="Paste your JSON data here..."></textarea>
+        <div style="display: flex; align-items: left; margin-top: 10px;">
+          <button id="pasteButton" style="width: 250px;">📋 Paste from clipboard</button>
+          <button id="copy-button" style=" margin-left: 20px;"> Copy Table</button>
+        </div>
+        <div id="json-output" style="width: 80%;margin-bottom: 80px;align-content: center;"></div>
+      </div>
+    </div>
+    <button class="btn back-btn" data-screen="home">Back</button>
+  </div>
+
+  <!-- DE22 EFTEXT Parser Section -->
+  <div id="de22-eftex-parser" class="screen">
+    <h1>POS Data Code (DE22) Parser for EFTEX</h1>
+    <div class="input-container">
+      <div class="de22-input-container">
+        <label for="de22-input">DE22 Data:</label>
+        <input type="text" id="de22-input" placeholder="A1010151334C101" maxlength="15">
+        <button id="defButton" style="position: fixed; bottom: 30px; left: 30px;">Show Definitions</button>
+      </div>
+      <textarea id="parse-output" placeholder="Parsed CAD data will appear here..."
+        style="white-space: pre-wrap;"> </textarea>
+    </div>
+    <div id="DefinitionsOutput"></div>
+    <button class="btn back-btn" data-screen="home">Back</button>
+  </div>
+
+  <!-- CBA MTI Parser Section -->
+  <div id="cba-mti-parser" class="screen" style="margin-bottom: 30px;">
+    <h1>CBA MTI Parser</h1>
+    <textarea id="mti-data-input" placeholder='Paste your MTI data with "Breakdown :" markers'></textarea>
+    <div id="isoTables" class="tables-container">
+      <div id="tabWrapper" style="display: none;">
+        <ul class="tabs">
+          <li class="tab active" data-tab="request">Request</li>
+          <li class="tab" data-tab="response">Response</li>
+        </ul>
+        <div class="tab-content" id="request" style="display: block;">
+          <div id="requestTable" style="overflow: visible; height: auto; margin-bottom: 80px;"></div>
+        </div>
+        <div class="tab-content" id="response" style="display: none;">
+          <div id="responseTable" style="overflow: visible; height: 100%; margin-bottom: 80px;"></div>
+        </div>
+      </div>
+    </div>
+    <button class="btn back-btn" data-screen="home">Back</button>
+  </div>
+
+  <!-- Paymark Host Record Parser -->
+  <div id="paymark-host-record-parser" class="screen" style="margin-bottom: 30px;">
+    <h1>Paymark Host Record Parser</h1>
+    <div style="display: flex; gap: 20px; align-items: flex-start;">
+      <div style="flex: 1;">
+        <textarea id="inputRecord" placeholder='Paste your host record here'></textarea>
+        <br />
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-top: 10px;">
+          <div>
+            <label for="recordSelect">Records:</label>
+            <select id="recordSelect" style="width: 150px;">
+              <!-- empty option first -->
+            </select>
+            <label for="tagSelect">Tags:</label>
+            <select id="tagSelect" style="width: 150px;">&gt;</select>
+
+            <label for="valueSelect">Value:</label>
+            <select id="valueSelect" style="width: 150px;margin-right: 50px; "></select>
+
+            <button id="findButton">🔍 Find</button>
+            <button id="refreshButton" title="Refresh">🔄 Refresh</button>
+
+            <input type="file" id="fileInput" accept=".txt,.json" style="display:none">
+            <button id="openFileButton">📂 Open</button>
+
+            <button id="saveHostRecordButton">💾 Save</button>
+          </div>
+        </div>
+        <br />
+        <div id="host-record-output" style="margin-top: 20px;  margin-bottom: 80px;"></div>
+      </div>
+    </div>
+    <button class="btn back-btn" data-screen="home">Back</button>
+  </div>
+  <div id="overlay"></div>
+  <div id="customAlert">
+    <div id="alertText"></div>
+    <button id="alert-ok-button">OK</button>
+  </div>
+
+  <div id="infoAlert" class="info-alert"></div>
+
+  <script type="module" src="script.js"></script>
+
+</body>
+
+
+</html>

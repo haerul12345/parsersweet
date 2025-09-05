@@ -1256,7 +1256,6 @@ function generateISOTable(json, isRequest) {
         value = hexToAscii(String(value));
       }
 
-
       // If key is DE55, include raw value first, then TLV table
       if (key === "055") {
         let rawValue = String(value);

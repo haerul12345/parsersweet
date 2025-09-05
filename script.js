@@ -1311,7 +1311,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
 }
 
 function createTableFromObject(obj) {
-  let table = '<table border="1" cellpadding="5" cellspacing="0">';
+  let table = '<table style="width: 75%; border="1" cellpadding="5" cellspacing="0">';
   table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
 
   for (const key in obj) {

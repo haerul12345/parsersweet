@@ -1377,6 +1377,7 @@ function parseMTI() {
   } catch (e) {
     output.textContent = 'Invalid JSON: ' + e.message;
   }
+  document.getElementById('tabWrapper').style.display = 'block'
 }
 
 // Function to parse MTI data from input and generate tables

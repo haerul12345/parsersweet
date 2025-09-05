@@ -1319,7 +1319,7 @@ function createTableFromObject(obj) {
 
     if (key === "055" && value !== null) {
       const tlvTable = parseTLV(value.slice(6));
-      const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
+      const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="width: 100%; style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
       table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
     }
     else if (key === "035" && typeof value === "string" && value.length > 2) {

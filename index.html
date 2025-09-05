@@ -74,6 +74,7 @@
     Last Updated: September 05, 2025
     Changes:
     - Rework CBA MTI parser using new JSON format in datadog
+    - Rework CBA MTI parser to display output in separate tables and make nested tables full width
 -->
 
 <html lang="en">
@@ -416,7 +417,7 @@
 
 
     .field-column-fixed {
-      width: 100px;
+      width: 80px;
     }
 
     .tag-column-fixed {
@@ -777,7 +778,7 @@
         <input type="text" id="de22-input" placeholder="A1010151334C101" maxlength="15">
         <button id="defButton" style="position: fixed; bottom: 30px; left: 30px;">Show Definitions</button>
       </div>
-      <textarea id="parse-output" placeholder="Parsed CAD data will appear here..."
+      <textarea id="parse-output" placeholder="Parsed POS DATA code will appear here..."
         style="white-space: pre-wrap;"> </textarea>
     </div>
     <div id="DefinitionsOutput"></div>
@@ -787,7 +788,7 @@
   <!-- CBA MTI Parser Section -->
   <div id="cba-mti-parser" class="screen" style="margin-bottom: 30px;">
     <h1>CBA MTI Parser</h1>
-    <textarea id="mti-data-input" placeholder='Paste your MTI data with "Breakdown :" markers'></textarea>
+    <textarea id="mti-data-input" placeholder='Paste your JSON data here...'></textarea>
     <div id="isoTables" class="tables-container">
       <div id="tabWrapper" style="display: none;">
         <ul class="tabs">

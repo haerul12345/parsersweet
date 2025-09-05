@@ -1313,7 +1313,7 @@ function createTableFromObject(obj, isNested = false) {
 
   // Use 75% for top-level, 100% for nested tables
   let tableWidth = isNested ? '100%' : '75%';
-  let table = '<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">';
+  let table = `<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">`;
   table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
 
   for (const key in obj) {
@@ -1393,13 +1393,13 @@ function parseMTI() {
     jsonArray.forEach(parsed => {
       if (parsed.custom_field) {
         parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
-        requestHTML += createTableFromObject(parsed, false);
+        requestHTML += createTableFromObject(parsed);
         requestHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
 
       if (parsed.breakdown) {
         parsed.breakdown = rearrangeObject(parsed.breakdown, true);
-        responseHTML += createTableFromObject(parsed, false);
+        responseHTML += createTableFromObject(parsed);
         responseHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
     });

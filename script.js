@@ -1313,8 +1313,12 @@ function createTableFromObject(obj, isNested = false) {
 
   // Use 75% for top-level, 100% for nested tables
   let tableWidth = isNested ? '100%' : '85%';
+  // Set key column width based on nesting
+  let keyColumnStyle = isNested ? 'width: 80px;' : 'width: 130px;';
+
+
   let table = `<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">`;
-  table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
+  table += `<thead><tr><th style="${keyColumnStyle}" class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>`;
 
   for (const key in obj) {
     const value = obj[key];

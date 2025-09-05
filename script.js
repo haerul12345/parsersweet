@@ -1309,8 +1309,11 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
 
 }
 
-function createTableFromObject(obj) {
-  let table = '<table style="width: 100%; border="1" cellpadding="5" cellspacing="0">';
+function createTableFromObject(obj, isNested = false) {
+
+  // Use 75% for top-level, 100% for nested tables
+  let tableWidth = isNested ? '100%' : '75%';
+  let table = '<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">';
   table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
 
   for (const key in obj) {
@@ -1334,7 +1337,7 @@ function createTableFromObject(obj) {
       table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
     }
     else if (key === "custom_field" || key === "breakdown") {
-      const subTable = createTableFromObject(value);
+      const subTable = createTableFromObject(value, true);
       table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
     } else {
       table += `<tr><td>${key}</td><td>${value}</td></tr>`;
@@ -1390,13 +1393,13 @@ function parseMTI() {
     jsonArray.forEach(parsed => {
       if (parsed.custom_field) {
         parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
-        requestHTML += createTableFromObject(parsed);
+        requestHTML += createTableFromObject(parsed, false);
         requestHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
 
       if (parsed.breakdown) {
         parsed.breakdown = rearrangeObject(parsed.breakdown, true);
-        responseHTML += createTableFromObject(parsed);
+        responseHTML += createTableFromObject(parsed, false);
         responseHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
     });
@@ -1408,9 +1411,9 @@ function parseMTI() {
     if (!requestHTML && !responseHTML) {
       showAlert('No valid request or response data found.', 'warning');
     } else if (!requestHTML) {
-      showInfoAlert('Only response data parsed successfully.');
+      showInfoAlert('Response data parsed successfully.');
     } else if (!responseHTML) {
-      showInfoAlert('Only request data parsed successfully.');
+      showInfoAlert('Request data parsed successfully.');
     } else {
       showInfoAlert('Request and response data parsed successfully!');
     }

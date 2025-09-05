@@ -1,4 +1,3 @@
-
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
@@ -60,14 +59,6 @@ document.addEventListener("DOMContentLoaded", function () {
   if (mtiInput) {
     mtiInput.addEventListener("input", parseMTI);
     console.log("Data entered, input:", mtiInput); // Add this line
-  }
-
-  const darkModeToggle = document.getElementById("darkModeToggle");
-  if (darkModeToggle) {
-    darkModeToggle.addEventListener("click", function () {
-      document.body.classList.toggle("dark-mode");
-      darkModeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
-    });
   }
 
   // Tab EventListener
@@ -132,6 +123,13 @@ document.addEventListener("DOMContentLoaded", function () {
     saveButton.addEventListener("click", validateAndSaveJSON);
   }
 
+  const darkModeToggle = document.getElementById("darkModeToggle");
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener("click", function () {
+      document.body.classList.toggle("dark-mode");
+      darkModeToggle.textContent = document.body.classList.contains("dark-mode") ? "☀️ Light Mode" : "🌙 Dark Mode";
+    });
+  }
 });
 
 // Record Header Click EventListener
@@ -156,35 +154,6 @@ document.getElementById("pasteButton").addEventListener("click", async () => {
     console.error("Failed to read clipboard contents: ", err);
   }
 });
-
-// Add dark mode styles
-const darkModeStyles = `
-  body.dark-mode {
-    background: #181818 !important;
-    color: #e0e0e0 !important;
-  }
-  body.dark-mode table, body.dark-mode .section, body.dark-mode .record, body.dark-mode .tab-content {
-    background: #232323 !important;
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-  }
-  body.dark-mode th, body.dark-mode td {
-    border-color: #444 !important;
-  }
-  body.dark-mode .btn, body.dark-mode button {
-    background: #333 !important;
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-  }
-  body.dark-mode .show, body.dark-mode .infoAlert, body.dark-mode #customAlert {
-    background: #232323 !important;
-    color: #e0e0e0 !important;
-    border-color: #444 !important;
-  }
-`;
-const styleTag = document.createElement("style");
-styleTag.textContent = darkModeStyles;
-document.head.appendChild(styleTag);
 
 
 // Screen handling
@@ -1632,7 +1601,7 @@ function populateDropdownsFromSections() {
       const option = document.createElement('option');
       option.value = opt.value;
       option.textContent = opt.text;
-      selector.appendChild(option);
+      
     });
   }
 
@@ -2040,3 +2009,32 @@ function validateAndSaveJSON() {
   });
 
 }
+
+// Add dark mode styles
+const darkModeStyles = `
+  body.dark-mode {
+    background: #181818 !important;
+    color: #e0e0e0 !important;
+  }
+  body.dark-mode table, body.dark-mode .section, body.dark-mode .record, body.dark-mode .tab-content {
+    background: #232323 !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+  }
+  body.dark-mode th, body.dark-mode td {
+    border-color: #444 !important;
+  }
+  body.dark-mode .btn, body.dark-mode button {
+    background: #333 !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+  }
+  body.dark-mode .show, body.dark-mode .infoAlert, body.dark-mode #customAlert {
+    background: #232323 !important;
+    color: #e0e0e0 !important;
+    border-color: #444 !important;
+  }
+`;
+const styleTag = document.createElement("style");
+styleTag.textContent = darkModeStyles;
+document.head.appendChild(styleTag);

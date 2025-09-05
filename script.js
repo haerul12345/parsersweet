@@ -1307,7 +1307,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
     });
 
   return reordered;
-  
+
 }
 
 function createTableFromObject(obj) {
@@ -1333,6 +1333,7 @@ function createTableFromObject(obj) {
   return table;
 }
 
+// new flow
 function parseMTI() {
   const input = document.getElementById('mti-data-input');
   const output = document.getElementById('requestTable');

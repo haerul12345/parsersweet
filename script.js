@@ -789,7 +789,7 @@ function displayDefinitions() {
   }
 }
 
-// CBA MTI Request and Response Parser
+// Tags List for TLV parsing
 var tagsList = {
   _06: "Object Identifier (OID)",
   _41: "Country code and national data",
@@ -1312,7 +1312,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
 function createTableFromObject(obj, isNested = false) {
 
   // Use 75% for top-level, 100% for nested tables
-  let tableWidth = isNested ? '100%' : '75%';
+  let tableWidth = isNested ? '100%' : '85%';
   let table = `<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">`;
   table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
 
@@ -1348,7 +1348,7 @@ function createTableFromObject(obj, isNested = false) {
   return table;
 }
 
-// new flow
+// new parseMTI function
 function parseMTI() {
   const input = document.getElementById('mti-data-input');
   const requestOutput = document.getElementById('requestTable');

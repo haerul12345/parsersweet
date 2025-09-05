@@ -1390,10 +1390,22 @@ function parseMTI() {
     requestOutput.innerHTML = requestHTML || '<p>No request data found.</p>';
     responseOutput.innerHTML = responseHTML || '<p>No response data found.</p>';
 
+    // Show alert based on parsing result
+    if (!requestHTML && !responseHTML) {
+      showAlert('No valid request or response data found.', 'warning');
+    } else if (!requestHTML) {
+      showInfoAlert('Only response data parsed successfully.');
+    } else if (!responseHTML) {
+      showInfoAlert('Only request data parsed successfully.');
+    } else {
+      showInfoAlert('Request and response data parsed successfully!');
+    }
+
   } catch (e) {
     requestOutput.textContent = 'Invalid JSON: ' + e.message;
     responseOutput.textContent = 'Invalid JSON: ' + e.message;
     document.getElementById('tabWrapper').style.display = 'none';
+    showAlert('Invalid JSON: ' + e.message, 'error');
   }
 }
 

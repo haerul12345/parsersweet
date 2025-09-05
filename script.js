@@ -1321,7 +1321,14 @@ function createTableFromObject(obj) {
       const tlvTable = parseTLV(value.slice(6));
       const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
       table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
-    } else if (key === "custom_field" || key === "breakdown") {
+    }
+    else if (key === "035" && typeof value === "string" && value.length > 2) {
+      const length = value.slice(0, 2);
+      const track2 = value.slice(2);
+      const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>Track2:</strong> ${track2}</div>`;
+      table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+    }
+    else if (key === "custom_field" || key === "breakdown") {
       const subTable = createTableFromObject(value);
       table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
     } else {

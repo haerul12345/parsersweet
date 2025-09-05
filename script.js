@@ -1307,6 +1307,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
     });
 
   return reordered;
+  
 }
 
 function createTableFromObject(obj) {

@@ -1283,114 +1283,208 @@ function generateISOTable(json, isRequest) {
 // Variable to track data MTI
 let dataMTIwasPreviouslyFilled = false;
 
+function rearrangeObject(obj, skipAsciiConversion = false) {
+  if (!obj || typeof obj !== 'object') return obj;
+
+  const reordered = {};
+  const asciiKeys = ["037", "041", "042", "043", "047"];
+
+  if ('MTI' in obj) {
+    reordered['MTI'] = obj['MTI'];
+  }
+
+  Object.keys(obj)
+    .filter(key => key !== 'MTI')
+    .sort((a, b) => parseInt(a) - parseInt(b))
+    .forEach(key => {
+      const value = obj[key];
+
+      if (asciiKeys.includes(key) && !skipAsciiConversion) {
+        reordered[key] = hexToAscii(value);
+      } else {
+        reordered[key] = value;
+      }
+    });
+
+  return reordered;
+}
+
+function createTableFromObject(obj) {
+  let table = '<table border="1" cellpadding="5" cellspacing="0">';
+  table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
+
+  for (const key in obj) {
+    const value = obj[key];
+
+    if (key === "055" && value !== null) {
+      const tlvTable = parseTLV(value.slice(6));
+      const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
+      table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
+    } else if (key === "custom_field" || key === "breakdown") {
+      const subTable = createTableFromObject(value);
+      table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
+    } else {
+      table += `<tr><td>${key}</td><td>${value}</td></tr>`;
+    }
+  }
+
+  table += '</tbody></table>';
+  return table;
+}
+
+function parseMTI() {
+  const input = document.getElementById('mti-data-input');
+  const output = document.getElementById('requestTable');
+
+  try {
+    let raw = input.value.trim();
+    let jsonArray;
+
+    // Try parsing directly
+    try {
+      const parsed = JSON.parse(raw);
+      jsonArray = Array.isArray(parsed) ? parsed : [parsed];
+    } catch {
+      // If parsing fails, try to wrap two root-level JSONs
+      const split = raw
+        .replace(/}\s*{/g, '}|{') // Add a delimiter between objects
+        .split('|')
+        .map(str => str.trim())
+        .filter(Boolean);
+
+      jsonArray = split.map(str => JSON.parse(str));
+    }
+
+    let html = '';
+
+    jsonArray.forEach(parsed => {
+      if (parsed.custom_field) {
+        parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
+      }
+
+      if (parsed.breakdown) {
+        parsed.breakdown = rearrangeObject(parsed.breakdown, true);
+      }
+
+      html += createTableFromObject(parsed);
+	  html += '<hr>'; // Separator between tables
+      html += '<div style="margin-top: 40px;"></div>'; // Adds vertical space between tables
+    });
+
+    output.innerHTML = html;
+  } catch (e) {
+    output.textContent = 'Invalid JSON: ' + e.message;
+  }
+}
+
 // Function to parse MTI data from input and generate tables
 // This function extracts request and response JSON from the input, parses them, and generates corresponding tables
-function parseMTI() {
-  const input = document.getElementById('mti-data-input').value;
+// function parseMTI() {
+//   const input = document.getElementById('mti-data-input').value;
 
-  if (!input) {
-    if (!dataMTIwasPreviouslyFilled) {
-      showAlert("MTI data is empty. Please enter the data.", 'warning');
-    }
+//   if (!input) {
+//     if (!dataMTIwasPreviouslyFilled) {
+//       showAlert("MTI data is empty. Please enter the data.", 'warning');
+//     }
 
-    const tableResponse = document.getElementById('responseTable');
-    const tableRequest = document.getElementById('requestTable');
-    if (tableResponse) {
-      tableResponse.innerHTML = '';
-    }
-    if (tableRequest) {
-      tableRequest.innerHTML = '';
-    }
-    document.getElementById('mti-data-input').value = '';
-    showInfoAlert('MTI Data cleared. Please enter new data.');
-    return;
-  }
-  dataMTIwasPreviouslyFilled = true;
+//     const tableResponse = document.getElementById('responseTable');
+//     const tableRequest = document.getElementById('requestTable');
+//     if (tableResponse) {
+//       tableResponse.innerHTML = '';
+//     }
+//     if (tableRequest) {
+//       tableRequest.innerHTML = '';
+//     }
+//     document.getElementById('mti-data-input').value = '';
+//     showInfoAlert('MTI Data cleared. Please enter new data.');
+//     return;
+//   }
+//   dataMTIwasPreviouslyFilled = true;
 
-  const requestMatch = input.match(/Request\s*:\s*.*?Breakdown\s*:\s*(\{[\s\S]*?\})/i);
-  const responseMatch = input.match(/Response\s*:\s*.*?Breakdown\s*:\s*(\{[\s\S]*?\})/i);
+//   const requestMatch = input.match(/Request\s*:\s*.*?Breakdown\s*:\s*(\{[\s\S]*?\})/i);
+//   const responseMatch = input.match(/Response\s*:\s*.*?Breakdown\s*:\s*(\{[\s\S]*?\})/i);
 
-  const requestTable = document.getElementById('requestTable');
-  const responseTable = document.getElementById('responseTable');
+//   const requestTable = document.getElementById('requestTable');
+//   const responseTable = document.getElementById('responseTable');
 
-  requestTable.innerHTML = '';
-  responseTable.innerHTML = '';
+//   requestTable.innerHTML = '';
+//   responseTable.innerHTML = '';
 
-  let isRequestJSONvalid = true;
-  let isResponseJSONvalid = true;
+//   let isRequestJSONvalid = true;
+//   let isResponseJSONvalid = true;
 
-  let isRequestJSONparsedOK = true;
-  let isResponseJsonparsedOK = true;
+//   let isRequestJSONparsedOK = true;
+//   let isResponseJsonparsedOK = true;
 
-  try {
-    // Attempt to parse the request JSON from the matched string
-    const requestJSON = requestMatch ? JSON.parse(requestMatch[1]) : null;
+//   try {
+//     // Attempt to parse the request JSON from the matched string
+//     const requestJSON = requestMatch ? JSON.parse(requestMatch[1]) : null;
 
-    // Check if the parsed JSON is valid and generate the table
-    if (requestJSON) {
-      requestTable.innerHTML = generateISOTable(requestJSON, true); // true indicates it's a request
-      document.getElementById('tabWrapper').style.display = 'block'
-    } else {
-      //showAlert('No valid request JSON found.', 'error');      
-      //requestTable.innerHTML = '<p>No valid request JSON found.</p>';
-      //requestTable.innerHTML = '';
-      isRequestJSONvalid = false;
-    }
-  } catch (error) {
-    // Handle any parsing errors
-    //requestTable.innerHTML = '<p>Invalid JSON in request.</p>';
-    isRequestJSONparsedOK = false;
-    console.error('Error parsing request JSON:', error);
-  }
+//     // Check if the parsed JSON is valid and generate the table
+//     if (requestJSON) {
+//       requestTable.innerHTML = generateISOTable(requestJSON, true); // true indicates it's a request
+//       document.getElementById('tabWrapper').style.display = 'block'
+//     } else {
+//       //showAlert('No valid request JSON found.', 'error');      
+//       //requestTable.innerHTML = '<p>No valid request JSON found.</p>';
+//       //requestTable.innerHTML = '';
+//       isRequestJSONvalid = false;
+//     }
+//   } catch (error) {
+//     // Handle any parsing errors
+//     //requestTable.innerHTML = '<p>Invalid JSON in request.</p>';
+//     isRequestJSONparsedOK = false;
+//     console.error('Error parsing request JSON:', error);
+//   }
 
-  try {
-    // Attempt to parse the response JSON from the matched string
-    const responseJSON = responseMatch ? JSON.parse(responseMatch[1]) : null;
+//   try {
+//     // Attempt to parse the response JSON from the matched string
+//     const responseJSON = responseMatch ? JSON.parse(responseMatch[1]) : null;
 
-    // Check if the parsed JSON is valid and generate the table
-    if (responseJSON) {
-      responseTable.innerHTML = generateISOTable(responseJSON, false); // false indicates it's a response
-      document.getElementById('tabWrapper').style.display = 'block'
-    } else {
-      //responseTable.innerHTML = '<p>No valid response JSON found.</p>';
-      //responseTable.innerHTML = '';
-      isResponseJSONvalid = false;
-    }
-  } catch (error) {
-    // Handle any parsing errors
-    //responseTable.innerHTML = '<p>Invalid JSON in response.</p>';    
-    isResponseJsonparsedOK = false;
-    console.error('Error parsing response JSON:', error);
-  }
+//     // Check if the parsed JSON is valid and generate the table
+//     if (responseJSON) {
+//       responseTable.innerHTML = generateISOTable(responseJSON, false); // false indicates it's a response
+//       document.getElementById('tabWrapper').style.display = 'block'
+//     } else {
+//       //responseTable.innerHTML = '<p>No valid response JSON found.</p>';
+//       //responseTable.innerHTML = '';
+//       isResponseJSONvalid = false;
+//     }
+//   } catch (error) {
+//     // Handle any parsing errors
+//     //responseTable.innerHTML = '<p>Invalid JSON in response.</p>';    
+//     isResponseJsonparsedOK = false;
+//     console.error('Error parsing response JSON:', error);
+//   }
 
-  if ((!isRequestJSONvalid || !isRequestJSONparsedOK) && (!isResponseJSONvalid || !isResponseJsonparsedOK)) {
-    showAlert('Invalid or missing request and response JSON.', 'error');
-  } else {
-    if (!isRequestJSONvalid || !isRequestJSONparsedOK) {
-      showAlert(
-        'Invalid or missing request JSON.',
-        'warning',
-        () => showInfoAlert('Only Response data parsed successfully')
-      );
-    } else if (!isResponseJSONvalid || !isResponseJsonparsedOK) {
-      /*
-      showAlert(
-        'Invalid or missing response JSON.',
-        'warning',
-        () => showInfoAlert('Only Request data parsed successfully')
-      );
-`     */
-    } else {
-      showInfoAlert('Request and response data parsed successfully');
-    }
-  }
+//   if ((!isRequestJSONvalid || !isRequestJSONparsedOK) && (!isResponseJSONvalid || !isResponseJsonparsedOK)) {
+//     showAlert('Invalid or missing request and response JSON.', 'error');
+//   } else {
+//     if (!isRequestJSONvalid || !isRequestJSONparsedOK) {
+//       showAlert(
+//         'Invalid or missing request JSON.',
+//         'warning',
+//         () => showInfoAlert('Only Response data parsed successfully')
+//       );
+//     } else if (!isResponseJSONvalid || !isResponseJsonparsedOK) {
+//       /*
+//       showAlert(
+//         'Invalid or missing response JSON.',
+//         'warning',
+//         () => showInfoAlert('Only Request data parsed successfully')
+//       );
+// `     */
+//     } else {
+//       showInfoAlert('Request and response data parsed successfully');
+//     }
+//   }
 
-  // Show all elements with class "table-box"
-  const tableBoxes = document.querySelectorAll('.table-box');
-  tableBoxes.forEach(box => {
-    box.style.display = 'block';
-  });
-}
+//   // Show all elements with class "table-box"
+//   const tableBoxes = document.querySelectorAll('.table-box');
+//   tableBoxes.forEach(box => {
+//     box.style.display = 'block';
+//   });
+// }
 
 // Paymark Host Record Parser code
 const recordTagValues = {

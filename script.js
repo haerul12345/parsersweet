@@ -1328,6 +1328,12 @@ function createTableFromObject(obj) {
       const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>Track2:</strong> ${track2}</div>`;
       table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
     }
+    else if (key === "047" && typeof value === "string" && value.length > 3) {
+      const length = value.slice(0, 3);
+      const data = value.slice(3);
+      const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>Data:</strong> ${data}</div>`;
+      table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+    }
     else if (key === "custom_field" || key === "breakdown") {
       const subTable = createTableFromObject(value);
       table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;

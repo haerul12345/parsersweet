@@ -1351,6 +1351,20 @@ function parseMTI() {
   const requestOutput = document.getElementById('requestTable');
   const responseOutput = document.getElementById('responseTable');
 
+  // Check for empty input
+  if (!input.value.trim()) {
+    if (!dataMTIwasPreviouslyFilled) {
+      showAlert("JSON data is empty. Please enter the data.", 'warning');
+    }
+    requestOutput.innerHTML = '';
+    responseOutput.innerHTML = '';
+    input.value = '';
+    document.getElementById('tabWrapper').style.display = 'none';
+    showInfoAlert('JSON Data cleared. Please enter new data.');
+    return;
+  }
+  dataMTIwasPreviouslyFilled = true;
+
   try {
     let raw = input.value.trim();
     let jsonArray;

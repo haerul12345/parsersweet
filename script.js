@@ -1311,7 +1311,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
 }
 
 function createTableFromObject(obj) {
-  let table = '<table style="width: 75%; border="1" cellpadding="5" cellspacing="0">';
+  let table = '<table style="width: 100%; border="1" cellpadding="5" cellspacing="0">';
   table += '<thead><tr><th class="field-column-fixed">Key</th><th>Value</th></tr></thead><tbody>';
 
   for (const key in obj) {
@@ -1336,7 +1336,7 @@ function createTableFromObject(obj) {
     }
     else if (key === "custom_field" || key === "breakdown") {
       const subTable = createTableFromObject(value);
-      table += `<tr><td>${key}</td><td><div style="width: 100%;">${subTable}</div></td></tr>`;
+      table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
     } else {
       table += `<tr><td>${key}</td><td>${value}</td></tr>`;
     }

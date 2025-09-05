@@ -1336,49 +1336,55 @@ function createTableFromObject(obj) {
 // new flow
 function parseMTI() {
   const input = document.getElementById('mti-data-input');
-  const output = document.getElementById('requestTable');
+  const requestOutput = document.getElementById('requestTable');
+  const responseOutput = document.getElementById('responseTable');
 
   try {
     let raw = input.value.trim();
     let jsonArray;
 
-    // Try parsing directly
     try {
       const parsed = JSON.parse(raw);
       jsonArray = Array.isArray(parsed) ? parsed : [parsed];
+      document.getElementById('tabWrapper').style.display = 'block';
     } catch {
-      // If parsing fails, try to wrap two root-level JSONs
       const split = raw
-        .replace(/}\s*{/g, '}|{') // Add a delimiter between objects
+        .replace(/}\s*{/g, '}|{')
         .split('|')
         .map(str => str.trim())
         .filter(Boolean);
 
       jsonArray = split.map(str => JSON.parse(str));
+      document.getElementById('tabWrapper').style.display = 'block';
     }
 
-    let html = '';
+    let requestHTML = '';
+    let responseHTML = '';
 
     jsonArray.forEach(parsed => {
       if (parsed.custom_field) {
         parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
+        requestHTML += createTableFromObject(parsed);
+        requestHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
 
       if (parsed.breakdown) {
         parsed.breakdown = rearrangeObject(parsed.breakdown, true);
+        responseHTML += createTableFromObject(parsed);
+        responseHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
-
-      html += createTableFromObject(parsed);
-	  html += '<hr>'; // Separator between tables
-      html += '<div style="margin-top: 40px;"></div>'; // Adds vertical space between tables
     });
 
-    output.innerHTML = html;
+    requestOutput.innerHTML = requestHTML || '<p>No request data found.</p>';
+    responseOutput.innerHTML = responseHTML || '<p>No response data found.</p>';
+
   } catch (e) {
-    output.textContent = 'Invalid JSON: ' + e.message;
+    requestOutput.textContent = 'Invalid JSON: ' + e.message;
+    responseOutput.textContent = 'Invalid JSON: ' + e.message;
+    document.getElementById('tabWrapper').style.display = 'none';
   }
-  document.getElementById('tabWrapper').style.display = 'block'
 }
+
 
 // Function to parse MTI data from input and generate tables
 // This function extracts request and response JSON from the input, parses them, and generates corresponding tables

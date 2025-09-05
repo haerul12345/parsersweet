@@ -1314,7 +1314,7 @@ function createTableFromObject(obj, isNested = false) {
   // Use 75% for top-level, 100% for nested tables
   let tableWidth = isNested ? '100%' : '85%';
   // Set key column width based on nesting
-  let keyColumnStyle = isNested ? 'width: 80px;' : 'width: 130px;';
+  let keyColumnStyle = isNested ? 'width: 80px;' : 'width: 150px;';
 
 
   let table = `<table style="width: ${tableWidth}; border="1" cellpadding="5" cellspacing="0">`;

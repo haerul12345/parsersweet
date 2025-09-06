@@ -1282,20 +1282,20 @@ function parseTLV(hex) {
 
       let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<div><strong>${aucLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}><label>${aucLabels1[k]}</label></div>`;
       }
       tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<div><strong>${aucLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}><label>${aucLabels2[k]}</label></div>`;
       }
       tooltipHtml += `</div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-      onmouseover="showCVMTooltip(this, event)" 
-      onmouseout="hideCVMTooltip(this)">
-      ${value}
-      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-      </span>`;
+  onmouseover="showCVMTooltip(this, event)" 
+  onmouseout="hideCVMTooltip(this)">
+  ${value}
+  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+  </span>`;
     }
 
     // Tooltip for 9F34 (CVM Results)
@@ -1355,23 +1355,23 @@ function parseTLV(hex) {
 
       let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<div><strong>${tsiLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}><label>${tsiLabels1[k]}</label></div>`;
       }
       tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<div><strong>${tsiLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}><label>${tsiLabels2[k]}</label></div>`;
       }
       tooltipHtml += `</div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-      onmouseover="showCVMTooltip(this, event)" 
-      onmouseout="hideCVMTooltip(this)">
-      ${value}
-      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-      </span>`;
+  onmouseover="showCVMTooltip(this, event)" 
+  onmouseout="hideCVMTooltip(this)">
+  ${value}
+  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+  </span>`;
     }
 
-        // Tooltip for 95 (Terminal Verification Results, TVR)
+    // Tooltip for 95 (Terminal Verification Results, TVR)
     if (tag.toUpperCase() === "95" && value.length === 10) {
       const bytes = [
         value.slice(0, 2),
@@ -1567,20 +1567,20 @@ function parseTLV(hex) {
 
       let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<div><strong>${bitLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}><label>${bitLabels1[k]}</label></div>`;
       }
       tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<div><strong>${bitLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}><label>${bitLabels2[k]}</label></div>`;
       }
       tooltipHtml += `</div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-      onmouseover="showCVMTooltip(this, event)" 
-      onmouseout="hideCVMTooltip(this)">
-      ${value}
-      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-    </span>`;
+  onmouseover="showCVMTooltip(this, event)" 
+  onmouseout="hideCVMTooltip(this)">
+  ${value}
+  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+  </span>`;
     }
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
   }

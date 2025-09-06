@@ -1286,8 +1286,8 @@ function parseTLV(hex) {
           <div style="height: 8px;"></div>
            <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px; margin-bottom: 8px;">`
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml +=
-          `<input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""} style="accent-color: black;>
+        tooltipHtml += `
+        <input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""} style="accent-color: black;>
         <label style="color: black; font-size:12px;>${aucLabels1[k]}</label>`;
       }
       tooltipHtml += `</div>`;
@@ -1296,18 +1296,18 @@ function parseTLV(hex) {
           <div style="height: 8px;"></div>
           <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px;">`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml +=
-          `<input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="accent-color: black;>
+        tooltipHtml += `
+        <input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="accent-color: black;>
         <label style="color: black; font-size:12px;>${aucLabels2[k]}</label>`;
       }
       tooltipHtml += `</div></div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-  onmouseover="showCVMTooltip(this, event)" 
-  onmouseout="hideCVMTooltip(this)">
-  ${value}
-  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-  </span>`;
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
     }
 
     // Tooltip for 9F34 (CVM Results)

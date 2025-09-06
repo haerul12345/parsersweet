@@ -91,7 +91,7 @@
   ">
 
 
-  <title>ParserSweet</title> 
+  <title>ParserSweet</title>
   <!-- <title>Parser </title>-->
   <style>
     * {
@@ -167,7 +167,7 @@
 
     pp {
       font-size: 1.2em;
-      color:  #999;
+      color: #999;
     }
 
     ft {
@@ -709,6 +709,11 @@
       transform: translateY(0);
     }
 
+    .cvm-tooltip {
+      cursor: pointer;
+      border-bottom: 1px dotted #333;
+    }
+
 
     @keyframes fadeIn {
       from {
@@ -725,7 +730,7 @@
 </head>
 
 <body>
-  
+
   <!-- Home Screen -->
   <div id="home" class="screen active">
     <div class="card">
@@ -738,8 +743,8 @@
       <div style="height: 5px;"></div>
       <pp>Your data has stories to tell — let ParserSweet help you read them. </pp>
       <div class="buttons">
-        <button class="btn" data-screen="json-parser">JSON</button>        
-        <button class="btn" data-screen="cba-mti-parser">CBA MTI</button> 
+        <button class="btn" data-screen="json-parser">JSON</button>
+        <button class="btn" data-screen="cba-mti-parser">CBA MTI</button>
         <!-- <button class="btn" data-screen="paymark-host-record-parser">Paymark Host Record</button> -->
         <!-- <button class="btn" data-screen="de22-eftex-parser">DE22 for EFTEX</button> -->
         <button class="btn">Paymark Host Record</button>
@@ -755,7 +760,8 @@
   <!-- Json Parser Section -->
   <div id="json-parser" class="screen">
     <h1>JSON Transform</h1>
-    <p>This tool supports AXL events as well as Pay360 API requests and responses. It transforms JSON data into a structured table format, making it easier to analyze and visualize.</p>
+    <p>This tool supports AXL events as well as Pay360 API requests and responses. It transforms JSON data into a
+      structured table format, making it easier to analyze and visualize.</p>
     <div class="flex-container">
       <div class="input-container">
         <textarea id="json-input" placeholder="Paste your JSON data here..."></textarea>

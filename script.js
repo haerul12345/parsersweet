@@ -1220,7 +1220,7 @@ function parseTLV(hex) {
     //table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${value}</td></tr>`;
     let valueDisplay = value;
 
-    // If tag is 9F34, run parseCVM and append its result below the value
+    // If tag is 9F34, add tooltip with parseCVM result
     if (tag.toUpperCase() === "9F34" && value.length === 6) {
       const byte1 = value.slice(0, 2);
       const byte2 = value.slice(2, 4);
@@ -1228,19 +1228,16 @@ function parseTLV(hex) {
       const b1 = parseByte1(byte1);
       const b2 = parseByte2(byte2);
       const b3 = parseByte3(byte3);
-      const cvmHtml = `
-        <div style="margin-top:8px;padding:6px;background:#f5f5f5;border-radius:4px;">
-          <span class="label">CVM</span> ${b1.method}<br>
-          <span class="label">If unsuccessful</span> ${b1.handling}<br>
-          <span class="label">Condition</span> ${b2}<br>
-          <span class="label">Result of CVM</span> ${b3}
-        </div>
-      `;
-      valueDisplay = `${value}<br>${cvmHtml}`;
+      // Tooltip content (plain text, no HTML tags)
+      const tooltipText =
+        `CVM: ${b1.method}\n` +
+        `If unsuccessful: ${b1.handling}\n` +
+        `Condition: ${b2}\n` +
+        `Result of CVM: ${b3}`;
+      valueDisplay = `<span class="cvm-tooltip" title="${tooltipText}">${value}</span>`;
     }
 
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
-  
   
   }
   table += '</table>';

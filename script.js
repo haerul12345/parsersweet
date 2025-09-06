@@ -1392,7 +1392,7 @@ function parseTLV(hex) {
           "Bit 5: Card appears on terminal exception file",
           "Bit 4: DDA failed",
           "Bit 3: CDA failed",
-          "Bit 2: RFU",
+          "Bit 2: SDA Selected",
           "Bit 1: RFU"
         ],
         [
@@ -1425,17 +1425,34 @@ function parseTLV(hex) {
           "Bit 2: RFU",
           "Bit 1: RFU"
         ],
-        [
-          "Bit 8: Default TDOL used",
-          "Bit 7: Issuer authentication failed",
-          "Bit 6: Script processing failed before final GENERATE AC",
-          "Bit 5: Script processing failed after final GENERATE AC",
-          "Bit 4: RFU",
-          "Bit 3: RFU",
-          "Bit 2: RFU",
-          "Bit 1: RFU"
-        ]
+        // Byte 5: PayPass-specific if scheme is paypass
+        scheme === "paypass"
+          ? [
+            "Bit 8: Default TDOL was used",
+            "Bit 7: Issuer authentication failed",
+            "Bit 6: Script processing failed before final GENERATE AC",
+            "Bit 5: Script processing failed after final GENERATE AC",
+            "Bit 4: Relay resistance threshold exceeded",
+            "Bit 3: Relay resistance time limits exceeded",
+            "Bit 2: Relay Resistance Protocol flags meaning:",
+            "Bit 1: > 00: RRP NOT PERFORMED" // will be updated below if needed
+          ]
+          : [
+            "Bit 8: Default TDOL used",
+            "Bit 7: Issuer authentication failed",
+            "Bit 6: Script processing failed before final GENERATE AC",
+            "Bit 5: Script processing failed after final GENERATE AC",
+            "Bit 4: RFU",
+            "Bit 3: RFU",
+            "Bit 2: RFU",
+            "Bit 1: RFU"
+          ]
       ];
+
+      // --- PayPass: If Byte 5 Bit 2 is set, update Bit 1 label ---
+      if (scheme === "paypass" && bins[4][6] === "1") {
+        tvrLabels[4][7] = "Bit 1: > 10: RRP PERFORMED";
+      }
 
       let tooltipHtml = `<div style="font-family:monospace;">`;
       for (let i = 0; i < 5; i++) {

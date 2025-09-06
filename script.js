@@ -1228,13 +1228,19 @@ function parseTLV(hex) {
       const b1 = parseByte1(byte1);
       const b2 = parseByte2(byte2);
       const b3 = parseByte3(byte3);
-      // Tooltip content (plain text, no HTML tags)
-      const tooltipText =
-        `CVM: ${b1.method}\n` +
-        `If unsuccessful: ${b1.handling}\n` +
-        `Condition: ${b2}\n` +
-        `Result of CVM: ${b3}`;
-      valueDisplay = `<span class="cvm-tooltip" title="${tooltipText}">${value}</span>`;
+      // Tooltip content (HTML, formatted)
+      const tooltipHtml = `
+        <div style="font-family:monospace;">
+          <div><strong style="display:inline-block;width:140px;">CVM</strong> ${b1.method}</div>
+          <div><strong style="display:inline-block;width:140px;">If unsuccessful</strong> ${b1.handling}</div>
+          <div><strong style="display:inline-block;width:140px;">Condition</strong> ${b2}</div>
+          <div><strong style="display:inline-block;width:140px;">Result of CVM</strong> ${b3}</div>
+        </div>
+      `;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
+        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);min-width:320px;">${tooltipHtml}</span>
+      </span>`;
     }
 
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;

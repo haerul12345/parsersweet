@@ -1217,7 +1217,30 @@ function parseTLV(hex) {
     const value = hex.substr(i, length * 2);
     i += length * 2;
 
-    table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${value}</td></tr>`;
+    //table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${value}</td></tr>`;
+    
+    // If tag is 9F34, run parseCVM and append its result below the value
+    if (tag.toUpperCase() === "9F34" && value.length === 6) {
+      const byte1 = value.slice(0, 2);
+      const byte2 = value.slice(2, 4);
+      const byte3 = value.slice(4, 6);
+      const b1 = parseByte1(byte1);
+      const b2 = parseByte2(byte2);
+      const b3 = parseByte3(byte3);
+      const cvmHtml = `
+        <div style="margin-top:8px;padding:6px;background:#f5f5f5;border-radius:4px;">
+          <span class="label">CVM</span> ${b1.method}<br>
+          <span class="label">If unsuccessful</span> ${b1.handling}<br>
+          <span class="label">Condition</span> ${b2}<br>
+          <span class="label">Result of CVM</span> ${b3}
+        </div>
+      `;
+      valueDisplay = `${value}<br>${cvmHtml}`;
+    }
+
+    table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
+  
+  
   }
   table += '</table>';
   return table;
@@ -1232,6 +1255,99 @@ function hexToAscii(hex) {
   }
   return ascii;
 }
+
+// CVM Parsing Functions Byte 1
+function parseByte1(hex) {
+  const bin = parseInt(hex, 16).toString(2).padStart(8, '0');
+  const b8 = bin[0];
+  const b7 = bin[1];
+  const b6to1 = bin.slice(2);
+
+  let method = "";
+  let handling = b7 === "0"
+    ? "Fail cardholder verification"
+    : "Apply next CV Rule";
+
+  switch (b6to1) {
+    case "000000": method = "Fail CVM processing"; break;
+    case "000001": method = "Plaintext PIN verification by ICC"; break;
+    case "000010": method = "Enciphered PIN verified online"; break;
+    case "000011": method = "Plaintext PIN by ICC + signature"; break;
+    case "000100": method = "Enciphered PIN by ICC"; break;
+    case "000101": method = "Enciphered PIN by ICC + signature"; break;
+    case "011110": method = "Signature (paper)"; break;
+    case "011111": method = "No CVM required"; break;
+    default:
+      if (b8 === "0" && parseInt(b6to1, 2) >= 6 && parseInt(b6to1, 2) <= 29) {
+        method = "Reserved for future use by specification";
+      } else if (b8 === "1" && parseInt(b6to1, 2) <= 31) {
+        method = "Reserved for individual payment systems";
+      } else if (b8 === "1" && parseInt(b6to1, 2) <= 62) {
+        method = "Reserved for issuer use";
+      } else if (bin === "11111111") {
+        method = "Not available for use";
+      } else {
+        method = "Unknown or RFU";
+      }
+  }
+
+  return { method, handling };
+}
+
+// CVM Parsing Functions Byte 2 
+function parseByte2(hex) {
+  const conditions = {
+    "00": "Always",
+    "01": "If unattended cash",
+    "02": "If not unattended/manual cash or cashback",
+    "03": "If terminal supports CVM",
+    "04": "If manual cash",
+    "05": "If purchase with cashback",
+    "06": "If transaction is in the application currency and is under X value",
+    "07": "If transaction is in the application currency and is over X value",
+    "08": "If transaction is in the application currency and is under Y value",
+    "09": "If transaction is in the application currency and is over Y value"
+  };
+  return conditions[hex] || "RFU or Reserved";
+}
+
+// CVM Parsing Functions Byte 3
+function parseByte3(hex) {
+  const results = {
+    "00": "Unknown (e.g., signature)",
+    "01": "Failed",
+    "02": "Success"
+  };
+  return results[hex] || "Unknown";
+}
+
+// Parsing CVM from 6-digit hex code
+function parseCVM(CVMR) {
+  //const input = document.getElementById("cvmInput").value.toUpperCase();
+  const output = document.getElementById("output");
+  output.innerHTML = "";
+
+  if (!/^[0-9A-F]{6}$/.test(CVMR)) {
+    output.innerHTML = "Please enter a valid 6-digit hex code.";
+    return;
+  }
+
+  const byte1 = input.slice(0, 2);
+  const byte2 = input.slice(2, 4);
+  const byte3 = input.slice(4, 6);
+
+  const b1 = parseByte1(byte1);
+  const b2 = parseByte2(byte2);
+  const b3 = parseByte3(byte3);
+
+  output.innerHTML = `
+<span class="label">CVM</span>${b1.method}
+<span class="label">If unsuccessful</span>${b1.handling}
+<span class="label">Condition</span>${b2}
+<span class="label">Result of CVM</span>${b3}
+      `;
+}
+
 
 // Function to generate ISO 8583 table from JSON data
 // This function generates an HTML table from a JSON object representing ISO 8583 data

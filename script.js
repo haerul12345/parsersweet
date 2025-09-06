@@ -1250,6 +1250,55 @@ function parseTLV(hex) {
 
     let valueDisplay = value;
 
+    // Tooltip for 9F07 (Application Usage Control)
+    if (tag.toUpperCase() === "9F07" && value.length === 4) {
+      const byte1 = value.slice(0, 2);
+      const byte2 = value.slice(2, 4);
+      const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
+      const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
+
+      // Bit labels for byte 1 (first byte)
+      const aucLabels1 = [
+        "Bit 8: Valid for domestic cash transactions",
+        "Bit 7: Valid for international cash transactions",
+        "Bit 6: Valid for domestic goods",
+        "Bit 5: Valid for international goods",
+        "Bit 4: Valid for domestic services",
+        "Bit 3: Valid for international services",
+        "Bit 2: Valid at ATMs",
+        "Bit 1: Valid at terminals other than ATMs"
+      ];
+
+      // Bit labels for byte 2 (second byte)
+      const aucLabels2 = [
+        "Bit 8: Domestic cashback allowed",
+        "Bit 7: International cashback allowed",
+        "Bit 6: RFU",
+        "Bit 5: RFU",
+        "Bit 4: RFU",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
+      for (let k = 0; k < bin1.length; k++) {
+        tooltipHtml += `<div><strong>${aucLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
+      for (let k = 0; k < bin2.length; k++) {
+        tooltipHtml += `<div><strong>${aucLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 9F34 (CVM Results)
     if (tag.toUpperCase() === "9F34" && value.length === 6) {
       const byte1 = value.slice(0, 2);
@@ -1267,11 +1316,11 @@ function parseTLV(hex) {
         </div>
       `;
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-  onmouseover="showCVMTooltip(this, event)" 
-  onmouseout="hideCVMTooltip(this)">
-  ${value}
-  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-</span>`;
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
     }
 
     // Tooltip for 82 (AIP) with scheme-specific byte 2
@@ -1355,11 +1404,11 @@ function parseTLV(hex) {
       tooltipHtml += `</div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
-  onmouseover="showCVMTooltip(this, event)" 
-  onmouseout="hideCVMTooltip(this)">
-  ${value}
-  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-</span>`;
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+    </span>`;
     }
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
   }

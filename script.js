@@ -1323,6 +1323,55 @@ function parseTLV(hex) {
       </span>`;
     }
 
+    // Tooltip for 9B (Transaction Status Information)
+    if (tag.toUpperCase() === "9B" && value.length === 4) {
+      const byte1 = value.slice(0, 2);
+      const byte2 = value.slice(2, 4);
+      const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
+      const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
+
+      // Bit labels for byte 1
+      const tsiLabels1 = [
+        "Bit 8: Offline data authentication was performed",
+        "Bit 7: Cardholder verification was performed",
+        "Bit 6: Card risk management was performed",
+        "Bit 5: Issuer authentication was performed",
+        "Bit 4: Terminal risk management was performed",
+        "Bit 3: Script processing was performed",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      // Bit labels for byte 2 (usually all RFU)
+      const tsiLabels2 = [
+        "Bit 8: RFU",
+        "Bit 7: RFU",
+        "Bit 6: RFU",
+        "Bit 5: RFU",
+        "Bit 4: RFU",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
+      for (let k = 0; k < bin1.length; k++) {
+        tooltipHtml += `<div><strong>${tsiLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
+      for (let k = 0; k < bin2.length; k++) {
+        tooltipHtml += `<div><strong>${tsiLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 82 (AIP) with scheme-specific byte 2
     if (tag.toUpperCase() === "82" && value.length === 4) {
       const byte1 = value.slice(0, 2);

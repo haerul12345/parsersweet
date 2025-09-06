@@ -1239,8 +1239,8 @@ function parseTLV(hex) {
       `;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
-        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);min-width:320px;">${tooltipHtml}</span>
-      </span>`;
+        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+        </span>`;
     }
 
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;

@@ -1250,6 +1250,16 @@ function parseTLV(hex) {
   return table;
 }
 
+// Add these helper functions at the end of your script.js
+function showCVMTooltip(el) {
+  const box = el.querySelector('.cvm-tooltip-box');
+  if (box) box.style.display = 'block';
+}
+function hideCVMTooltip(el) {
+  const box = el.querySelector('.cvm-tooltip-box');
+  if (box) box.style.display = 'none';
+}
+
 // Helper function to convert hex string to ASCII
 function hexToAscii(hex) {
   let ascii = '';
@@ -2121,14 +2131,4 @@ function validateAndSaveJSON() {
       if (valueSpan) valueSpan.style.color = '';
     });
   });
-
-  // Add these helper functions at the end of your script.js
-  function showCVMTooltip(el) {
-    const box = el.querySelector('.cvm-tooltip-box');
-    if (box) box.style.display = 'block';
-  }
-  function hideCVMTooltip(el) {
-    const box = el.querySelector('.cvm-tooltip-box');
-    if (box) box.style.display = 'none';
-  }
 }

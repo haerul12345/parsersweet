@@ -1266,9 +1266,12 @@ function parseTLV(hex) {
           <div><strong style="display:inline-block;width:140px;">Result of CVM</strong> ${b3}</div>
         </div>
       `;
-      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
-        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-        </span>`;
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+  onmouseover="showCVMTooltip(this, event)" 
+  onmouseout="hideCVMTooltip(this)">
+  ${value}
+  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+</span>`;
     }
 
     // Tooltip for 82 (AIP) with scheme-specific byte 2
@@ -1351,9 +1354,12 @@ function parseTLV(hex) {
       }
       tooltipHtml += `</div>`;
 
-      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
-        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
-        </span>`;
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+  onmouseover="showCVMTooltip(this, event)" 
+  onmouseout="hideCVMTooltip(this)">
+  ${value}
+  <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+</span>`;
     }
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
   }
@@ -2235,15 +2241,18 @@ function validateAndSaveJSON() {
 }
 
 // Add these helper functions at the end of your script.js
-function showCVMTooltip(el) {
+function showCVMTooltip(el, evt) {
   const box = el.querySelector('.cvm-tooltip-box');
-  if (box) box.style.display = 'block';
+  if (box) {
+    box.style.display = 'block';
+    // Position the tooltip near the mouse
+    box.style.left = (evt.clientX + 10) + 'px';
+    box.style.top = (evt.clientY + 10) + 'px';
+  }
 }
 function hideCVMTooltip(el) {
   const box = el.querySelector('.cvm-tooltip-box');
   if (box) box.style.display = 'none';
 }
-
-// Make them global for inline event handlers
 window.showCVMTooltip = showCVMTooltip;
 window.hideCVMTooltip = hideCVMTooltip;

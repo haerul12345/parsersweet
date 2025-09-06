@@ -1280,13 +1280,22 @@ function parseTLV(hex) {
         "Bit 1: RFU"
       ];
 
-      let tooltipHtml = `<div style="font-family:monospace; font-size:12px;"><strong>Byte 1 (${byte1}):</strong><br>`;
+      let tooltipHtml = `<div style="font-family:monospace; font-size:12px;"> `;
+      
+      tooltipHtml += `<strong>Byte 1 (${byte1}):</strong>
+          <div style="height: 8px;"></div>
+           <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px; margin-bottom: 8px;">`
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}><label>${aucLabels1[k]}</label></div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}>
+        <label style="color: black; font-size:12px;>${aucLabels1[k]}</label></div>`;
       }
-      tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
+
+      tooltipHtml += `<strong>Byte 2 (${byte2}):</strong>
+          <div style="height: 8px;"></div>
+          <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px;">`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}><label>${aucLabels2[k]}</label></div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}>
+        <label style="color: black; font-size:12px;>${aucLabels2[k]}</label></div>`;
       }
       tooltipHtml += `</div>`;
 

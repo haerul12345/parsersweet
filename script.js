@@ -1372,6 +1372,91 @@ function parseTLV(hex) {
       </span>`;
     }
 
+        // Tooltip for 95 (Terminal Verification Results, TVR)
+    if (tag.toUpperCase() === "95" && value.length === 10) {
+      const bytes = [
+        value.slice(0, 2),
+        value.slice(2, 4),
+        value.slice(4, 6),
+        value.slice(6, 8),
+        value.slice(8, 10)
+      ];
+      const bins = bytes.map(b => parseInt(b, 16).toString(2).padStart(8, '0'));
+
+      // Bit labels for each byte (EMV Book 3)
+      const tvrLabels = [
+        [
+          "Bit 8: Offline data authentication was not performed",
+          "Bit 7: SDA failed",
+          "Bit 6: ICC data missing",
+          "Bit 5: Card appears on terminal exception file",
+          "Bit 4: DDA failed",
+          "Bit 3: CDA failed",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        [
+          "Bit 8: ICC and terminal have different application versions",
+          "Bit 7: Expired application",
+          "Bit 6: Application not yet effective",
+          "Bit 5: Requested service not allowed for card product",
+          "Bit 4: New card",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        [
+          "Bit 8: Cardholder verification was not successful",
+          "Bit 7: Unrecognised CVM",
+          "Bit 6: PIN try limit exceeded",
+          "Bit 5: PIN entry required and PIN pad not present or not working",
+          "Bit 4: PIN entry required, PIN pad present, but PIN was not entered",
+          "Bit 3: Online PIN entered",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        [
+          "Bit 8: Transaction exceeds floor limit",
+          "Bit 7: Lower consecutive offline limit exceeded",
+          "Bit 6: Upper consecutive offline limit exceeded",
+          "Bit 5: Transaction selected randomly for online processing",
+          "Bit 4: Merchant forced transaction online",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        [
+          "Bit 8: Default TDOL used",
+          "Bit 7: Issuer authentication failed",
+          "Bit 6: Script processing failed before final GENERATE AC",
+          "Bit 5: Script processing failed after final GENERATE AC",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ]
+      ];
+
+      let tooltipHtml = `<div style="font-family:monospace;">`;
+      for (let i = 0; i < 5; i++) {
+        tooltipHtml += `<strong>Byte ${i + 1} (${bytes[i]}):</strong><br>`;
+        for (let k = 0; k < 8; k++) {
+          if (bins[i][k] === "1") {
+            tooltipHtml += `<div><strong>${tvrLabels[i][k]}</strong></div>`;
+          }
+        }
+        tooltipHtml += `<br>`;
+      }
+      tooltipHtml += `</div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+      onmouseover="showCVMTooltip(this, event)" 
+      onmouseout="hideCVMTooltip(this)">
+      ${value}
+      <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 82 (AIP) with scheme-specific byte 2
     if (tag.toUpperCase() === "82" && value.length === 4) {
       const byte1 = value.slice(0, 2);

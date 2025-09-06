@@ -2054,17 +2054,6 @@ function resetView() {
   });
 }
 
-// Add these helper functions at the end of your script.js
-function showCVMTooltip(el) {
-  const box = el.querySelector('.cvm-tooltip-box');
-  if (box) box.style.display = 'block';
-}
-function hideCVMTooltip(el) {
-  const box = el.querySelector('.cvm-tooltip-box');
-  if (box) box.style.display = 'none';
-}
-
-
 // Funtion to validate JSON input and save it to a file
 // This function checks the input for valid JSON, generates a timestamped filename, and triggers a
 function validateAndSaveJSON() {
@@ -2133,3 +2122,14 @@ function validateAndSaveJSON() {
     });
   });
 }
+
+// Add these helper functions at the end of your script.js
+function showCVMTooltip(el) {
+  const box = el.querySelector('.cvm-tooltip-box');
+  if (box) box.style.display = 'block';
+}
+function hideCVMTooltip(el) {
+  const box = el.querySelector('.cvm-tooltip-box');
+  if (box) box.style.display = 'none';
+}
+

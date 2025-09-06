@@ -1278,17 +1278,31 @@ function parseTLV(hex) {
       const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
       const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
 
-      // Default bit labels for byte 1
-      const bitLabels1 = [
-        "Bit 8: Offline Data Authentication",
-        "Bit 7: Cardholder Verification",
-        "Bit 6: Terminal Risk Management",
-        "Bit 5: Issuer Authentication",
-        "Bit 4: Terminal Action Analysis",
-        "Bit 3: Default TDOL Used",
-        "Bit 2: CDA Supported",
-        "Bit 1: RFU"
-      ];
+      // Scheme-specific bit labels for byte 1
+      let bitLabels1;
+      if (scheme === "paypass") {
+        bitLabels1 = [
+          "Bit 8: Reserved for Future Use (RFU)",
+          "Bit 7: SDA Supported",
+          "Bit 6: DDA Supported",
+          "Bit 5: Cardholder Verification Supported",
+          "Bit 4: Terminal Risk Management to be Performed",
+          "Bit 3: Issuer Authentication Supported",
+          "Bit 2: On-Device Cardholder Verification Supported",
+          "Bit 1: Combined DDA/Application Cryptogram Generation (CDA) Supported"
+        ];
+      } else {
+        bitLabels1 = [
+          "Bit 8: Reserved for Future Use (RFU)",
+          "Bit 7: Static Data Authentication (SDA) Supported",
+          "Bit 6: Dynamic Data Authentication (DDA) Supported",
+          "Bit 5: Cardholder Verification Supported",
+          "Bit 4: Terminal Risk Management to be Performed",
+          "Bit 3: Issuer Authentication Supported",
+          "Bit 2: RFU",
+          "Bit 1: Combined DDA/Application Cryptogram Generation (CDA) Supported"
+        ];
+      }
 
       // Scheme-specific bit labels for byte 2
       let bitLabels2;
@@ -1301,13 +1315,13 @@ function parseTLV(hex) {
           "Bit 4: RFU",
           "Bit 3: RFU",
           "Bit 2: RFU",
-          "Bit 1: RFU"
+          "Bit 1: Relay resistance protocol supported"
         ];
       } else if (scheme === "expresspay") {
         bitLabels2 = [
-          "Bit 8: ExpressPay Magstripe Supported",
-          "Bit 7: ExpressPay EMV Supported",
-          "Bit 6: RFU",
+          "Bit 8: EMV Mode Supported",
+          "Bit 7: Expresspay Mobile Supported",
+          "Bit 6: Expresspay HCE (Host Card Emulation) Supported",
           "Bit 5: RFU",
           "Bit 4: RFU",
           "Bit 3: RFU",

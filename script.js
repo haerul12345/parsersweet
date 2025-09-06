@@ -1286,7 +1286,8 @@ function parseTLV(hex) {
           <div style="height: 8px;"></div>
            <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px; margin-bottom: 8px;">`
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}>
+        tooltipHtml += 
+        `<input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}style="accent-color: black;>
         <label style="color: black; font-size:12px;>${aucLabels1[k]}</label>`;
       }
       tooltipHtml += `</div>`;  
@@ -1295,7 +1296,8 @@ function parseTLV(hex) {
           <div style="height: 8px;"></div>
           <div style="display: grid; grid-template-columns: auto 1fr; gap: 6px;">`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}>
+        tooltipHtml += 
+        `<input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="accent-color: black;>
         <label style="color: black; font-size:12px;>${aucLabels2[k]}</label>`;
       }
       tooltipHtml += `</div></div>`;

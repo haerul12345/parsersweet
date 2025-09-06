@@ -2133,3 +2133,6 @@ function hideCVMTooltip(el) {
   if (box) box.style.display = 'none';
 }
 
+// Make them global for inline event handlers
+window.showCVMTooltip = showCVMTooltip;
+window.hideCVMTooltip = hideCVMTooltip;

@@ -1280,13 +1280,13 @@ function parseTLV(hex) {
         "Bit 1: RFU"
       ];
 
-      let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
+      let tooltipHtml = `<div style="font-family:monospace; color:black;"><strong>Byte 1 (${byte1}):</strong><br>`;
       for (let k = 0; k < bin1.length; k++) {
-        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}><label>${aucLabels1[k]}</label></div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""} style="transform: scale(1.2);><label color:black;>${aucLabels1[k]}</label></div>`;
       }
       tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
       for (let k = 0; k < bin2.length; k++) {
-        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}><label>${aucLabels2[k]}</label></div>`;
+        tooltipHtml += `<div><input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="transform: scale(1.2);><label color:black;>${aucLabels2[k]}</label></div>`;
       }
       tooltipHtml += `</div>`;
 

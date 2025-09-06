@@ -1218,7 +1218,8 @@ function parseTLV(hex) {
     i += length * 2;
 
     //table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${value}</td></tr>`;
-    
+    let valueDisplay = value;
+
     // If tag is 9F34, run parseCVM and append its result below the value
     if (tag.toUpperCase() === "9F34" && value.length === 6) {
       const byte1 = value.slice(0, 2);

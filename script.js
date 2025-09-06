@@ -1435,7 +1435,7 @@ function parseTLV(hex) {
             "Bit 4: Relay resistance threshold exceeded",
             "Bit 3: Relay resistance time limits exceeded",
             "Bit 2: Relay Resistance Protocol flags meaning:",
-            "Bit 1: > 00: RRP NOT PERFORMED" // will be updated below if needed
+            "Bit 1: See flags below"
           ]
           : [
             "Bit 8: Default TDOL used",
@@ -1449,9 +1449,31 @@ function parseTLV(hex) {
           ]
       ];
 
-      // --- PayPass: If Byte 5 Bit 2 is set, update Bit 1 label ---
+      // --- PayPass: If Byte 5 Bit 2 is set, show RRP flags meaning ---
+      let rrpFlagsHtml = "";
       if (scheme === "paypass" && bins[4][6] === "1") {
-        tvrLabels[4][7] = "Bit 1: > 10: RRP PERFORMED";
+        // Bits 3-1 of Byte 5
+        const b3 = bins[4][5];
+        const b2 = bins[4][6];
+        const b1 = bins[4][7];
+        // Actually, bits 3-1 are bins[4][5], bins[4][6], bins[4][7]
+        const rrpBits = bins[4].slice(5, 8); // bits 3-1
+
+        let rrpMeaning = "";
+        switch (rrpBits) {
+          case "000": rrpMeaning = "RRP not supported"; break;
+          case "001": rrpMeaning = "RRP supported but not performed"; break;
+          case "010": rrpMeaning = "RRP performed successfully"; break;
+          case "011": rrpMeaning = "RRP failed"; break;
+          default: rrpMeaning = "Reserved for future or proprietary use"; break;
+        }
+
+        rrpFlagsHtml = `
+          <div style="margin-top:8px;">
+            <strong>Relay Resistance Protocol flags (bits 3-1):</strong> ${rrpBits}
+            <br><strong>Meaning:</strong> ${rrpMeaning}
+          </div>
+        `;
       }
 
       let tooltipHtml = `<div style="font-family:monospace;">`;
@@ -1461,6 +1483,10 @@ function parseTLV(hex) {
           if (bins[i][k] === "1") {
             tooltipHtml += `<div><strong>${tvrLabels[i][k]}</strong></div>`;
           }
+        }
+        // Only for Byte 5, after bit 2, show RRP flags meaning if PayPass and bit 2 is set
+        if (i === 4 && rrpFlagsHtml) {
+          tooltipHtml += rrpFlagsHtml;
         }
         tooltipHtml += `<br>`;
       }

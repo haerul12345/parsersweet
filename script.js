@@ -395,16 +395,6 @@ function closeAlert() {
   }
 }
 
-// Add these helper functions at the end of your script.js
-function showCVMTooltip(el) {
-  const box = el.querySelector('.cvm-tooltip-box');
-  if (box) box.style.display = 'block';
-}
-function hideCVMTooltip(el) {
-  const box = el.querySelector('.cvm-tooltip-box');
-  if (box) box.style.display = 'none';
-}
-
 // DE22 Parser code
 function resizeparsedDataOutput() {
   const parsedDataOutput = document.getElementById('parse-output');
@@ -1254,7 +1244,7 @@ function parseTLV(hex) {
     }
 
     table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
-  
+
   }
   table += '</table>';
   return table;
@@ -2132,4 +2122,13 @@ function validateAndSaveJSON() {
     });
   });
 
+  // Add these helper functions at the end of your script.js
+  function showCVMTooltip(el) {
+    const box = el.querySelector('.cvm-tooltip-box');
+    if (box) box.style.display = 'block';
+  }
+  function hideCVMTooltip(el) {
+    const box = el.querySelector('.cvm-tooltip-box');
+    if (box) box.style.display = 'none';
+  }
 }

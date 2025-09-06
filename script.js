@@ -1449,14 +1449,10 @@ function parseTLV(hex) {
           ]
       ];
 
-      // --- PayPass: If Byte 5 Bit 2 is set, show RRP flags meaning ---
+      // --- Always show RRP flags meaning for PayPass Byte 5 ---
       let rrpFlagsHtml = "";
-      if (scheme === "paypass" && bins[4][6] === "1") {
+      if (scheme === "paypass") {
         // Bits 3-1 of Byte 5
-        const b3 = bins[4][5];
-        const b2 = bins[4][6];
-        const b1 = bins[4][7];
-        // Actually, bits 3-1 are bins[4][5], bins[4][6], bins[4][7]
         const rrpBits = bins[4].slice(5, 8); // bits 3-1
 
         let rrpMeaning = "";
@@ -1484,11 +1480,11 @@ function parseTLV(hex) {
             tooltipHtml += `<div><strong>${tvrLabels[i][k]}</strong></div>`;
           }
         }
-        // Only for Byte 5, after bit 2, show RRP flags meaning if PayPass and bit 2 is set
-        if (i === 4 && rrpFlagsHtml) {
-          tooltipHtml += rrpFlagsHtml;
-        }
         tooltipHtml += `<br>`;
+      }
+      // Always show RRP flags meaning for PayPass
+      if (rrpFlagsHtml) {
+        tooltipHtml += rrpFlagsHtml;
       }
       tooltipHtml += `</div>`;
 

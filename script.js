@@ -1500,7 +1500,7 @@ function parseTLV(hex) {
         tooltipHtml += `<strong>Byte ${i + 1} (${bytes[i]}):</strong><br>`;
         for (let k = 0; k < 8; k++) {
           if (bins[i][k] === "1") {
-            tooltipHtml += `<div><strong>${tvrLabels[i][k]}</strong></div>`;
+            tooltipHtml += `<div>${tvrLabels[i][k]}</div>`;
           }
         }
         tooltipHtml += `<br>`;

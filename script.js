@@ -1182,9 +1182,41 @@ var tagsList = {
 // This function assumes the input is a valid hex string representing TLV data
 function parseTLV(hex) {
   let i = 0;
-  let table = '<table style="width: 100%; border-collapse: collapse; "  border="1">';
-  table += '<tr><th class="tag-column-fixed">Tag</th><th class="field-column-fixed">Length (Byte) </th><th>Value</th></tr>';
+  let table = '<table style="width: 100%; border-collapse: collapse;" border="1">';
+  table += '<tr><th class="tag-column-fixed">Tag</th><th class="field-column-fixed">Length (Byte)</th><th>Value</th></tr>';
 
+  // --- Scheme detection using 4F or 84 ---
+  let scheme = "default";
+  let aidValue = null;
+  let hexCopy = hex;
+  let j = 0;
+  while (j < hexCopy.length) {
+    let tag = hexCopy.substr(j, 2);
+    j += 2;
+    if ((parseInt(tag, 16) & 0x1F) === 0x1F) {
+      tag += hexCopy.substr(j, 2);
+      j += 2;
+    }
+    let lengthByte = parseInt(hexCopy.substr(j, 2), 16);
+    j += 2;
+    let length = lengthByte;
+    if (lengthByte & 0x80) {
+      const numBytes = lengthByte & 0x7F;
+      length = parseInt(hexCopy.substr(j, numBytes * 2), 16);
+      j += numBytes * 2;
+    }
+    const value = hexCopy.substr(j, length * 2);
+    j += length * 2;
+    if (tag.toUpperCase() === "4F" || tag.toUpperCase() === "84") {
+      aidValue = value.toUpperCase();
+      if (aidValue.startsWith("A000000004")) scheme = "paypass";
+      else if (aidValue.startsWith("A000000025")) scheme = "expresspay";
+      else if (aidValue.startsWith("A000000003")) scheme = "visa";
+      break;
+    }
+  }
+
+  i = 0; // Reset for main TLV parsing
   while (i < hex.length) {
     // Parse Tag
     let tag = hex.substr(i, 2);
@@ -1197,19 +1229,18 @@ function parseTLV(hex) {
     // Lookup tag name and format display
     const tagKey = "_" + tag.toUpperCase();
     const tagName = tagsList[tagKey];
-    //const tagDisplay = tagName ? `${tag}<br><small>${tagName}</small>` : tag;	
     const tagDisplay = tagName ? `${tag}<br><small><i>${tagName}</i></small>` : tag;
 
     // Parse Length
     let lengthByte = parseInt(hex.substr(i, 2), 16);
-    let lengthDisplay = hex.substr(i, 2); // Keep original hex string for display
+    let lengthDisplay = hex.substr(i, 2);
     i += 2;
 
     let length = lengthByte;
     if (lengthByte & 0x80) {
       const numBytes = lengthByte & 0x7F;
       length = parseInt(hex.substr(i, numBytes * 2), 16);
-      lengthDisplay = hex.substr(i, numBytes * 2); // Update display value
+      lengthDisplay = hex.substr(i, numBytes * 2);
       i += numBytes * 2;
     }
 
@@ -1217,10 +1248,9 @@ function parseTLV(hex) {
     const value = hex.substr(i, length * 2);
     i += length * 2;
 
-    //table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${value}</td></tr>`;
     let valueDisplay = value;
 
-    // If tag is 9F34, add tooltip with parseCVM result
+    // Tooltip for 9F34 (CVM Results)
     if (tag.toUpperCase() === "9F34" && value.length === 6) {
       const byte1 = value.slice(0, 2);
       const byte2 = value.slice(2, 4);
@@ -1228,7 +1258,6 @@ function parseTLV(hex) {
       const b1 = parseByte1(byte1);
       const b2 = parseByte2(byte2);
       const b3 = parseByte3(byte3);
-      // Tooltip content (HTML, formatted)
       const tooltipHtml = `
         <div style="font-family:monospace;">
           <div><strong style="display:inline-block;width:140px;">CVM</strong> ${b1.method}</div>
@@ -1237,14 +1266,82 @@ function parseTLV(hex) {
           <div><strong style="display:inline-block;width:140px;">Result of CVM</strong> ${b3}</div>
         </div>
       `;
-
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
         <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
         </span>`;
     }
 
-    table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
+    // Tooltip for 82 (AIP) with scheme-specific byte 2
+    if (tag.toUpperCase() === "82" && value.length === 4) {
+      const byte1 = value.slice(0, 2);
+      const byte2 = value.slice(2, 4);
+      const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
+      const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
 
+      // Default bit labels for byte 1
+      const bitLabels1 = [
+        "Bit 8: Offline Data Authentication",
+        "Bit 7: Cardholder Verification",
+        "Bit 6: Terminal Risk Management",
+        "Bit 5: Issuer Authentication",
+        "Bit 4: Terminal Action Analysis",
+        "Bit 3: Default TDOL Used",
+        "Bit 2: CDA Supported",
+        "Bit 1: RFU"
+      ];
+
+      // Scheme-specific bit labels for byte 2
+      let bitLabels2;
+      if (scheme === "paypass") {
+        bitLabels2 = [
+          "Bit 8: Magstripe Mode Supported",
+          "Bit 7: EMV Mode Supported",
+          "Bit 6: RFU",
+          "Bit 5: RFU",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ];
+      } else if (scheme === "expresspay") {
+        bitLabels2 = [
+          "Bit 8: ExpressPay Magstripe Supported",
+          "Bit 7: ExpressPay EMV Supported",
+          "Bit 6: RFU",
+          "Bit 5: RFU",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ];
+      } else {
+        bitLabels2 = [
+          "Bit 8: RFU",
+          "Bit 7: RFU",
+          "Bit 6: RFU",
+          "Bit 5: RFU",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ];
+      }
+
+      let tooltipHtml = `<div style="font-family:monospace;"><strong>Byte 1 (${byte1}):</strong><br>`;
+      for (let k = 0; k < bin1.length; k++) {
+        tooltipHtml += `<div><strong>${bitLabels1[k]}</strong>: ${bin1[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
+      for (let k = 0; k < bin2.length; k++) {
+        tooltipHtml += `<div><strong>${bitLabels2[k]}</strong>: ${bin2[k] === "1" ? "Yes" : "No"}</div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" onmouseover="showCVMTooltip(this)" onmouseout="hideCVMTooltip(this)">${value}
+        <span class="cvm-tooltip-box" style="display:none;position:absolute;left:0;top:22px;z-index:999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+        </span>`;
+    }
+    table += `<tr><td>${tagDisplay}</td><td>${lengthDisplay}</td><td>${valueDisplay}</td></tr>`;
   }
   table += '</table>';
   return table;

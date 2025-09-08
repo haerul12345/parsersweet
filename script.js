@@ -1842,8 +1842,16 @@ function createTableFromObject(obj, isNested = false) {
     else if (key === "047" && typeof value === "string" && value.length > 3) {
       const length = value.slice(0, 3);
       const data = value.slice(3);
-      const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>Data:</strong> ${data}</div>`;
-      table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+
+      // Check if length is a valid decimal number
+      if (!isNaN(length) && /^\d+$/.test(length)) {
+        const formattedValue = `
+      <div><strong>Length:</strong> ${length}</div><div><strong>Data:</strong> ${data}</div>`;
+        table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+      } else {
+        // Just show the full value if length is not a valid number
+        table += `<tr><td>${key}</td><td>${value}</td></tr>`;
+      }
     }
     else if (key === "custom_field" || key === "breakdown") {
       const subTable = createTableFromObject(value, true);

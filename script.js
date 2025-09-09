@@ -1814,7 +1814,7 @@ function rearrangeObject(obj, skipAsciiConversion = false) {
 
 }
 
-function createTableFromObject(obj, isNested = false) {
+function createTableFromObject(obj, isNested = false, isBreakdown = false) {
 
   // Use 75% for top-level, 100% for nested tables
   let tableWidth = isNested ? '100%' : '85%';
@@ -1829,9 +1829,17 @@ function createTableFromObject(obj, isNested = false) {
     const value = obj[key];
 
     if (key === "055" && value !== null) {
-      const tlvTable = parseTLV(value.slice(6));
-      const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
-      table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
+
+      if (!isBreakdown) {
+        const tlvTable = parseTLV(value.slice(6));
+        const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
+        table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
+      } else {
+        const tlvTable = parseTLV(value);
+        const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
+        table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
+      }
+      ;
     }
     else if (key === "035" && typeof value === "string" && value.length > 2) {
       const length = value.slice(0, 2);
@@ -1910,13 +1918,13 @@ function parseMTI() {
     jsonArray.forEach(parsed => {
       if (parsed.custom_field) {
         parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
-        requestHTML += createTableFromObject(parsed);
+        requestHTML += createTableFromObject(parsed,false,false);
         requestHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
 
       if (parsed.breakdown) {
         parsed.breakdown = rearrangeObject(parsed.breakdown, true);
-        responseHTML += createTableFromObject(parsed);
+        responseHTML += createTableFromObject(parsed,false,true);
         responseHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
     });

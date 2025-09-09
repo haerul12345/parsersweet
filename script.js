@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "3.4";
+  const appVersion = "3.5";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 
@@ -62,7 +62,6 @@ document.addEventListener("DOMContentLoaded", function () {
   }
 
   // Tab EventListener
-
   const tabs = document.querySelectorAll(".tabs .tab");
   const contents = document.querySelectorAll(".tab-content");
 
@@ -80,6 +79,36 @@ document.addEventListener("DOMContentLoaded", function () {
       document.getElementById(selectedTab).style.display = "block";
     });
   });
+
+  // Paste JSON Button EventListener
+  const pasteButton = document.getElementById("paste-json-btn");
+  if (pasteButton) {
+    pasteButton.addEventListener("click", async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById("mti-data-input").value = text;
+        console.log("Paste Button clicked");
+      } catch (err) {
+        console.error("Failed to paste from clipboard:", err);
+      }
+    });
+  }
+
+  // Append JSON Button EventListener
+  const appendButton = document.getElementById("append-json-btn");
+  if (appendButton) {
+    appendButton.addEventListener("click", async () => {
+      try {
+        const text = await navigator.clipboard.readText();
+        const input = document.getElementById("mti-data-input");
+        input.value += input.value ? '\n' + text : text;
+        console.log("Append Button clicked");
+      } catch (err) {
+        console.error("Failed to append from clipboard:", err);
+      }
+    });
+  }
+
 
   // Record Input or Change EventListener
   const inputRecord = document.getElementById("inputRecord");
@@ -1489,7 +1518,7 @@ function parseTLV(hex) {
 
         rrpFlagsHtml = `
           <div style="margin-top:8px;">
-            <strong>Relay Resistance Protocol flags (bits 3-1):</strong> ${rrpBits}
+            <strong>Relay Resistance Protocol flags (Byte 5 bits 3-1):</strong> ${rrpBits}
             <br><strong>Meaning:</strong> ${rrpMeaning}
           </div>
         `;

@@ -88,9 +88,10 @@
 <!-- 
     ParserSweet v3.5.html
     Version: 3.5
-    Last Updated: September XX, 2025
+    Last Updated: September 10, 2025
     Changes:
     - Add logic for DE047 if it's not include length then display the value
+    - Add logic for DE055 if it's not include length then display the value
 -->
 
 <html lang="en">
@@ -811,6 +812,13 @@
     <p>This tool only supports JSON MTI data from datadog.</p>
     <textarea id="mti-data-input" placeholder='Paste your JSON data here...'></textarea>
     <div id="isoTables" class="tables-container">
+
+      <!-- New Buttons -->
+      <div style="margin-top: 10px;">
+        <button id="paste-json-btn" class="btn">Paste JSON</button>
+        <button id="append-json-btn" class="btn">Append JSON</button>
+      </div>
+
       <div id="tabWrapper" style="display: none;">
         <ul class="tabs">
           <li class="tab active" data-tab="request">Request</li>

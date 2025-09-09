@@ -1839,7 +1839,6 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
         const combinedValue = `<div><strong>Raw:</strong> ${value}</div><div style="margin-top:8px; overflow:auto;">${tlvTable}</div>`;
         table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
       }
-      ;
     }
     else if (key === "035" && typeof value === "string" && value.length > 2) {
       const length = value.slice(0, 2);

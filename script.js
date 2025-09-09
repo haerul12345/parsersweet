@@ -61,40 +61,6 @@ document.addEventListener("DOMContentLoaded", function () {
     console.log("Data entered, input:", mtiInput); // Add this line
   }
 
-  // Paste JSON from Clipboard
-  document.getElementById("paste-json-btn").addEventListener("click", async () => {
-    try {
-      const clipboardText = await navigator.clipboard.readText();
-      document.getElementById("mti-data-input").value = clipboardText;
-      // Optionally call your parsing function here
-      // parseJSON(clipboardText);
-    } catch (err) {
-      console.error("Failed to read clipboard contents: ", err);
-    }
-  });
-
-  // Append JSON from Clipboard
-  document.getElementById("append-json-btn").addEventListener("click", async () => {
-    try {
-      const clipboardText = await navigator.clipboard.readText();
-      const inputField = document.getElementById("mti-data-input");
-      const currentText = inputField.value.trim();
-
-      // Append with a comma if both are valid JSON arrays or objects
-      if (currentText) {
-        inputField.value = currentText + '\n' + clipboardText;
-      } else {
-        inputField.value = clipboardText;
-      }
-
-      // Optionally call your parsing function here
-      // parseJSON(inputField.value);
-    } catch (err) {
-      console.error("Failed to append clipboard contents: ", err);
-    }
-  });
-
-
   // Tab EventListener
   const tabs = document.querySelectorAll(".tabs .tab");
   const contents = document.querySelectorAll(".tab-content");

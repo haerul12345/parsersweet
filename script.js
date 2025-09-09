@@ -1863,8 +1863,16 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
       }
     }
     else if (key === "custom_field" || key === "breakdown") {
-      const subTable = createTableFromObject(value, true);
-      table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
+
+      if (key === "custom_field") {
+        const subTable = createTableFromObject(value, true, false);
+        table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
+      }
+      else {
+        const subTable = createTableFromObject(value, true, true);
+        table += `<tr><td>${key}</td><td>${subTable}</td></tr>`;
+      }
+
     } else {
       table += `<tr><td>${key}</td><td>${value}</td></tr>`;
     }
@@ -1919,13 +1927,13 @@ function parseMTI() {
     jsonArray.forEach(parsed => {
       if (parsed.custom_field) {
         parsed.custom_field = rearrangeObject(parsed.custom_field, !!parsed.breakdown);
-        requestHTML += createTableFromObject(parsed,false,false);
+        requestHTML += createTableFromObject(parsed);
         requestHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
 
       if (parsed.breakdown) {
         parsed.breakdown = rearrangeObject(parsed.breakdown, true);
-        responseHTML += createTableFromObject(parsed,false,true);
+        responseHTML += createTableFromObject(parsed);
         responseHTML += '<hr><div style="margin-top: 40px;"></div>';
       }
     });

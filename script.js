@@ -158,6 +158,17 @@ document.getElementById("paste-mti-btn").addEventListener("click", async () => {
   }
 });
 
+const clearBtn = document.getElementById("clear-mti-btn");
+if (clearBtn) {
+  clearBtn.addEventListener("click", () => {
+    const inputField = document.getElementById("mti-data-input");
+    const outputField = document.getElementById("mti-data-input");
+
+    if (inputField) inputField.value = "";
+    if (outputField) outputField.innerHTML = "";
+  });
+}
+
 // Screen handling
 function showScreen(screenId) {
   document.querySelectorAll('.screen').forEach(screen => {

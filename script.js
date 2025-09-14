@@ -148,16 +148,15 @@ document.getElementById("pasteButton").addEventListener("click", async () => {
 });
 
 // Paste from Clipboard EventListener for MTI parser
-document.getElementById("paste-json-btn").addEventListener("click", async () => {
+document.getElementById("paste-mti-btn").addEventListener("click", async () => {
   try {
     const text = await navigator.clipboard.readText();
     document.getElementById("mti-data-input").value = text;
-    cbaMTI(); // Automatically parse the pasted JSON
+    parseMTI(); // Automatically parse the pasted JSON
   } catch (err) {
     console.error("Failed to read clipboard contents: ", err);
   }
 });
-
 
 // Screen handling
 function showScreen(screenId) {

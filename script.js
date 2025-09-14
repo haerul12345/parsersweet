@@ -175,8 +175,37 @@ if (clearBtn) {
     if (tableRequest) {
       tableRequest.innerHTML = '';
     }
-
+    document.getElementById('tabWrapper').style.display = 'none';
     showInfoAlert('MTI data cleared. Please enter new data.');
+  });
+}
+
+// Append from Clipboard EventListener for MTI parser
+const appendBtn = document.getElementById("append-mti-btn");
+if (appendBtn) {
+  appendBtn.addEventListener("click", async () => {
+    try {
+      const clipboardText = await navigator.clipboard.readText();
+
+      // Basic check: must start with {
+      if (!clipboardText.trim().startsWith("{")) {
+        throw new Error("Clipboard does not contain a valid JSON object.");
+      }
+
+      const inputField = document.getElementById("mti-data-input");
+      const currentText = inputField.value.trim();
+
+      // Append raw JSON block directly
+      const newText = currentText + "\n" + clipboardText.trim();
+      inputField.value = newText;
+
+      if (typeof parseMTI === "function") {
+        parseMTI(); // Let cbaMTI handle parsing and rendering
+      }
+    } catch (err) {
+      console.error("Failed to append JSON: ", err.message);
+      alert("Error: " + err.message);
+    }
   });
 }
 

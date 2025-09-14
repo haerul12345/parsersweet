@@ -166,6 +166,17 @@ if (clearBtn) {
 
     if (inputField) inputField.value = "";
     if (outputField) outputField.innerHTML = "";
+
+    const tableResponse = document.getElementById('responseTable');
+    const tableRequest = document.getElementById('requestTable');
+    if (tableResponse) {
+      tableResponse.innerHTML = '';
+    }
+    if (tableRequest) {
+      tableRequest.innerHTML = '';
+    }
+
+    showInfoAlert('MTI data cleared. Please enter new data.');
   });
 }
 

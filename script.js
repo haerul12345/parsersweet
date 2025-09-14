@@ -151,7 +151,7 @@ document.getElementById("pasteButton").addEventListener("click", async () => {
 document.getElementById("paste-json-btn").addEventListener("click", async () => {
   try {
     const text = await navigator.clipboard.readText();
-    document.getElementById("combinedInput").value = text;
+    document.getElementById("mti-data-input").value = text;
     cbaMTI(); // Automatically parse the pasted JSON
   } catch (err) {
     console.error("Failed to read clipboard contents: ", err);

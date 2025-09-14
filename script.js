@@ -251,12 +251,6 @@ function showScreen(screenId) {
   const inputMTI = document.getElementById('mti-data-input');
   if (inputMTI) inputMTI.value = '';
 
-  const clearButtonDisplay = document.getElementById('clear-mti-btn');
-  if (inputMTI) {
-    clearButtonDisplay.style.display = 'none';
-    output.innerHTML = '';
-  }
-
 }
 
 // Variable to track if DE22 input was previously filled
@@ -1953,7 +1947,6 @@ function parseMTI() {
   const input = document.getElementById('mti-data-input');
   const requestOutput = document.getElementById('requestTable');
   const responseOutput = document.getElementById('responseTable');
-  const clearButtonDisplay = document.getElementById('clear-mti-button');
 
   // Check for empty input
   if (!input.value.trim()) {
@@ -1964,7 +1957,6 @@ function parseMTI() {
     responseOutput.innerHTML = '';
     input.value = '';
     document.getElementById('tabWrapper').style.display = 'none';
-    clearButtonDisplay.style.display = 'none';
     showInfoAlert('JSON Data cleared. Please enter new data.');
     return;
   }
@@ -2019,7 +2011,7 @@ function parseMTI() {
     } else {
       showInfoAlert('Request and response data parsed successfully!');
     }
-    clearButtonDisplay.style.display = 'block';
+
   } catch (e) {
     requestOutput.textContent = 'Invalid JSON: ' + e.message;
     responseOutput.textContent = 'Invalid JSON: ' + e.message;

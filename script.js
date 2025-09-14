@@ -136,12 +136,23 @@ document.addEventListener('click', function (event) {
   }
 });
 
-// Paste from Clipboard EventListener
+// Paste from Clipboard EventListener for JSON parser
 document.getElementById("pasteButton").addEventListener("click", async () => {
   try {
     const text = await navigator.clipboard.readText();
     document.getElementById("json-input").value = text;
     parseJSON(); // Automatically parse the pasted JSON
+  } catch (err) {
+    console.error("Failed to read clipboard contents: ", err);
+  }
+});
+
+// Paste from Clipboard EventListener for MTI parser
+document.getElementById("paste-json-btn").addEventListener("click", async () => {
+  try {
+    const text = await navigator.clipboard.readText();
+    document.getElementById("combinedInput").value = text;
+    cbaMTI(); // Automatically parse the pasted JSON
   } catch (err) {
     console.error("Failed to read clipboard contents: ", err);
   }

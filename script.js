@@ -348,8 +348,13 @@ function parseJSON() {
     }
     else {
       //output.textContent = 'No resource key found in the JSON data';
-      showAlert(`No resource key found in the JSON data`, "error");
-      copyButton.style.display = 'none'; // Hide the copy button
+      //showAlert(`No key found in the JSON data`, "error");
+      //copyButton.style.display = 'none'; // Hide the copy button
+      output.innerHTML = generateTable(jsonData);
+      output.style.display = 'block'; // Show the copy button
+      copyButton.style.display = 'block'; // Show the copy button
+      showInfoAlert(`Data parsed successfully!`);
+
     }
 
   } catch (e) {

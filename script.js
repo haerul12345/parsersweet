@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "3.6";
+  const appVersion = "3.7";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 
@@ -2338,7 +2338,7 @@ function parseHostRecord() {
   const sections = {
     'K Record': data.capkDataList || [],
     'A Record': data.hostAllCardConfigs?.contactConfigs || [],
-    'X Record': data.hostAllCardConfigs?.clessConfig || [],
+    'X Record': data.hostAllCardConfigs?.clessConfigs || [],
     'C Record': Array.isArray(data.hostAllCardConfigs?.cardConfigs)
       ? data.hostAllCardConfigs.cardConfigs
       : []

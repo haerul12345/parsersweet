@@ -5,6 +5,62 @@ document.addEventListener("DOMContentLoaded", function () {
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 
+  // TAB
+  const tab = document.getElementById('tab');
+  const modal = document.getElementById('modal');
+  const closeBtn = document.getElementById('closeBtn');
+  const convertBtn = document.getElementById('convertBtn');
+  const hexInput = document.getElementById('hexInput');
+  const asciiResult = document.getElementById('asciiResult');
+
+  // Show modal
+  tab.addEventListener('click', () => {
+    modal.classList.add('show');
+    hexInput.focus();
+  });
+
+
+  // Close modal
+  /*
+    closeBtn.addEventListener('click', () => {
+      modal.classList.remove('show');
+      asciiResult.textContent = '';
+      hexInput.value = '';
+    });
+  */
+  // Close modal when clicking outside
+  modal.addEventListener('click', (e) => {
+    if (e.target === modal) {
+      modal.classList.remove('show');
+      asciiResult.textContent = '';
+      hexInput.value = '';
+    }
+  });
+
+  // Convert hex to ASCII
+  convertBtn.addEventListener('click', () => {
+    const hexLines = hexInput.value.trim().split(/\r?\n/); // Split input by lines
+    const isMultiline = hexLines.length > 1;
+
+    let output = '<strong>Result:</strong><br>';
+    hexLines.forEach((hex, index) => {
+      if (!/^[0-9a-fA-F]+$/.test(hex) || hex.length % 2 !== 0) {
+        output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}Invalid hex string.</blockquote>`;
+        return;
+      }
+
+      let ascii = '';
+      for (let i = 0; i < hex.length; i += 2) {
+        const byte = hex.substr(i, 2);
+        ascii += String.fromCharCode(parseInt(byte, 16));
+      }
+
+      output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}${ascii}</blockquote>`;
+    });
+
+    asciiResult.innerHTML = output;
+  });
+
   // Button EventListener
   const buttons = document.querySelectorAll(".btn");
   buttons.forEach(button => {
@@ -175,7 +231,7 @@ if (clearBtn) {
     if (tableRequest) {
       tableRequest.innerHTML = '';
     }
-    document.getElementById('tabWrapper').style.display = 'none';
+
     showInfoAlert('MTI data cleared. Please enter new data.');
   });
 }

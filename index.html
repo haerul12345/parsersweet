@@ -749,6 +749,124 @@
         transform: translateY(0);
       }
     }
+
+    .side-tab {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      font-family: 'Segoe UI', sans-serif;
+      width: 40px;
+      height: 120px;
+      transform: translateX(80%) translateY(-50%);
+      background-color: #004F6B;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+      border-radius: 8px 0 0 8px;
+      cursor: pointer;
+      transition: transform 0.3s ease;
+      z-index: 1001;
+    }
+
+    .side-tab:hover {
+      transform: translateX(0%) translateY(-50%);
+      background-color: #004F6B;
+    }
+
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background-color: rgba(0, 0, 0, 0.5);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+
+    .modal-overlay.show {
+      display: flex;
+    }
+
+    .modal-content {
+      background-color: #fff;
+      padding: 10px 10px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+      max-width: 500px;
+      width: 90%;
+      text-align: center;
+      position: relative;
+    }
+
+    .close-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: #ccc;
+      border: none;
+      padding: 5px 10px;
+      cursor: pointer;
+      font-size: 14px;
+      border-radius: 5px;
+    }
+
+
+    #hexInput {
+      font-family: monospace;
+      padding: 10px;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      box-sizing: border-box;
+      resize: vertical;
+      /* Allows user to resize vertically */
+      width: 100%;
+      line-height: 1.5;
+      white-space: pre-wrap;
+      /* Ensures wrapping */
+    }
+
+
+    input[type="text"] {
+      width: 100%;
+      padding: 10px;
+      font-size: 16px;
+      margin-top: 15px;
+      box-sizing: border-box;
+    }
+
+    button.convert-btn {
+      margin-top: 10px;
+      padding: 8px 16px;
+      font-size: 16px;
+      cursor: pointer;
+      background-color: #004F6B;
+      color: white;
+      border: none;
+      border-radius: 5px;
+    }
+
+    #asciiResult {
+      margin-top: 15px;
+      text-align: left;
+      color: #333;
+      word-break: break-word;
+      font-family: monospace;
+    }
+
+
+    blockquote {
+      margin: 10px 0;
+      padding-left: 15px;
+      border-left: 3px solid #ccc;
+      color: #555;
+      font-style: italic;
+    }
   </style>
 </head>
 
@@ -820,10 +938,10 @@
     <p>This tool only supports JSON MTI data from datadog.</p>
     <textarea id="mti-data-input" placeholder='Paste your JSON data here...'></textarea>
     <div style="display: flex; align-items: left; margin-top: 10px;">
-          <button id="paste-mti-btn" style="width: 250px;">📋 Paste from clipboard</button>
-          <button id="append-mti-btn" style=" margin-left: 20px;"> Append</button>
-          <button id="clear-mti-btn" style=" margin-left: 20px;"> Clear</button>
-        </div>
+      <button id="paste-mti-btn" style="width: 250px;">📋 Paste from clipboard</button>
+      <button id="append-mti-btn" style=" margin-left: 20px;"> Append</button>
+      <button id="clear-mti-btn" style=" margin-left: 20px;"> Clear</button>
+    </div>
     <div id="isoTables" class="tables-container">
 
       <div id="tabWrapper" style="display: none;">
@@ -883,6 +1001,31 @@
   </div>
 
   <div id="infoAlert" class="info-alert"></div>
+
+  <!-- Tab on the right -->
+  <div class="side-tab" id="tab">
+    HEX to ASCII
+  </div>
+
+  <!-- Modal -->
+  <div class="modal-overlay" id="modal">
+
+    <div class="modal-content">
+
+      <!--  <div><button class="close-btn" id="closeBtn">X</button></div> -->
+      <!-- <div style="height: 30px;"></div> -->
+      <div>
+        <h2>HEX to ASCII Converter</h2>
+      </div>
+
+      <textarea id="hexInput" placeholder="Enter hex string (e.g. 48656c6c6f)" rows="2"
+        style="width: 100%; resize: vertical;"></textarea>
+      <!-- <input type="text" id="hexInput" placeholder="Enter hex string (e.g. 48656c6c6f)">-->
+      <button class="convert-btn" id="convertBtn">Convert</button>
+
+      <div id="asciiResult"></div>
+    </div>
+  </div>
 
   <script type="module" src="script.js"></script>
 

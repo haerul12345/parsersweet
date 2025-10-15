@@ -1640,6 +1640,79 @@ function parseTLV(hex) {
       </span>`;
     }
 
+// Tooltip for 9F53 (Transaction Category Code)
+    if (tag.toUpperCase() === "9F53" && value.length === 6) {
+      const byte1 = value.slice(0, 2);
+      const byte2 = value.slice(2, 4);
+      const byte3 = value.slice(4, 6);
+      const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
+      const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
+      const bin3 = parseInt(byte3, 16).toString(2).padStart(8, '0');
+
+      const labels1 = [
+        "Bit 7: CVM required by reader / N/A",
+        "Bit 6: Signature supported (9F33: B3b5)",
+        "Bit 5: Online PIN supported (9F33: B2b6)",
+        "Bit 4: On-device CVM supported (DF1B: B3b7)",
+        "Bit 3: RFU (must always be set to 0)",
+        "Bit 2: Reader is a Transit Reader (DF1B: B3b6)",
+        "Bit 1: EMV contact chip supported (9F33: B1b5)",
+        "Bit 0: (Contact chip) Offline PIN supported (9F33: B2b7 & B2b4)"
+      ];
+      const labels2 = [
+        "Bit 7: Issuer Update supported (DF1B: B3b5)",
+        "Bit 6: RFU (must always be set to 0)",
+        "Bit 5: RFU (must always be set to 0)",
+        "Bit 4: RFU (must always be set to 0)",
+        "Bit 3: RFU (must always be set to 0)",
+        "Bit 2: RFU (must always be set to 0)",
+        "Bit 1: RFU (must always be set to 0)",
+        "Bit 0: RFU (must always be set to 0)"
+      ];
+      const labels3 = [
+        "Bit 7: RFU (must always be set to 0)",
+        "Bit 6: RFU (must always be set to 0)",
+        "Bit 5: RFU (must always be set to 0)",
+        "Bit 4: RFU (must always be set to 0)",
+        "Bit 3: RFU (must always be set to 0)",
+        "Bit 2: RFU (must always be set to 0)",
+        "Bit 1: RFU (must always be set to 0)",
+        "Bit 0: RFU (must always be set to 0)"
+      ];
+
+      let tooltipHtml = `<div style="font-family:monospace;font-size:12px;">`;
+      tooltipHtml += `<strong>Byte 1 (${byte1}):</strong><br>`;
+      for (let k = 0; k < bin1.length; k++) {
+        tooltipHtml += `<div>
+          <input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}>
+          <label>${labels1[k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
+      for (let k = 0; k < bin2.length; k++) {
+        tooltipHtml += `<div>
+          <input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}>
+          <label>${labels2[k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `<br><strong>Byte 3 (${byte3}):</strong><br>`;
+      for (let k = 0; k < bin3.length; k++) {
+        tooltipHtml += `<div>
+          <input type="checkbox" disabled ${bin3[k] === "1" ? "checked" : ""}>
+          <label>${labels3[k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;" 
+        onmouseover="showCVMTooltip(this, event)" 
+        onmouseout="hideCVMTooltip(this)">
+        ${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
+      </span>`;
+    }
+
+
     // Tooltip for 82 (AIP) with scheme-specific byte 2
     if (tag.toUpperCase() === "82" && value.length === 4) {
       const byte1 = value.slice(0, 2);

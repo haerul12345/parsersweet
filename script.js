@@ -1306,7 +1306,7 @@ function parseTLV(hex) {
   table += '<tr><th class="tag-column-fixed">Tag</th><th class="field-column-fixed">Length (Byte)</th><th>Value</th></tr>';
 
   // --- Scheme detection using 4F or 84 ---
-  let scheme = "default";
+  let scheme = "default"; 
   let aidValue = null;
   let hexCopy = hex;
   let j = 0;
@@ -1640,7 +1640,7 @@ function parseTLV(hex) {
       </span>`;
     }
 
-// Tooltip for 9F53 (Transaction Category Code)
+    // Tooltip for 9F53 (Transaction Category Code)
     if (tag.toUpperCase() === "9F53" && value.length === 6) {
       const byte1 = value.slice(0, 2);
       const byte2 = value.slice(2, 4);
@@ -1685,21 +1685,21 @@ function parseTLV(hex) {
       for (let k = 0; k < bin1.length; k++) {
         tooltipHtml += `<div>
           <input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""}>
-          <label>${labels1[k]}</label>
+          <label style="color: black; font-size:12px;">${labels1[k]}</label>
         </div>`;
       }
       tooltipHtml += `<br><strong>Byte 2 (${byte2}):</strong><br>`;
       for (let k = 0; k < bin2.length; k++) {
         tooltipHtml += `<div>
           <input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""}>
-          <label>${labels2[k]}</label>
+          <label style="color: black; font-size:12px;">${labels2[k]}</label>
         </div>`;
       }
       tooltipHtml += `<br><strong>Byte 3 (${byte3}):</strong><br>`;
       for (let k = 0; k < bin3.length; k++) {
         tooltipHtml += `<div>
           <input type="checkbox" disabled ${bin3[k] === "1" ? "checked" : ""}>
-          <label>${labels3[k]}</label>
+          <label style="color: black; font-size:12px;">${labels3[k]}</label>
         </div>`;
       }
       tooltipHtml += `</div>`;

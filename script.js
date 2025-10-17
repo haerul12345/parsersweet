@@ -1314,8 +1314,10 @@ let aidLookup = {
   "A00000006510": { vendor: "JCB", name: "JCB" },
   "A0000001524010": { vendor: "DINERS", name: "Discover Debit Common Card" },
   "A0000001523010": { vendor: "DINERS", name: "Discover Card" },
+  "A000000152": { vendor: "DISCOVER", name: "Discover Base AID" },
   "A000000333010101": { vendor: "UnionPay", name: "UnionPay Debit" },
   "A000000333010102": { vendor: "UnionPay", name: "UnionPay Credit" },
+  "A000000333010103": { vendor: "UnionPay", name: "UnionPay Quasi Credit" },
   "A00000038410": { vendor: "EFTPOS", name: "Savings (debit card)" },
   "A00000038420": { vendor: "EFTPOS", name: "Cheque (debit card)" }
 };

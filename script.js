@@ -19,9 +19,6 @@ document.addEventListener("DOMContentLoaded", function () {
     hexInput.focus();
   });
 
-  // attempt to populate aidLookup from eftlab (may be blocked by CORS)
-   loadAidLookupFromEftlab();
-
   // Close modal
   /*
     closeBtn.addEventListener('click', () => {
@@ -1309,68 +1306,6 @@ let aidLookup = {
   "A000000065": { vendor: "JCB", name: "JCB" }
 };
 
-// attempt to fetch and parse the EFTLab AID list (best-effort; may fail due to CORS)
-async function loadAidLookupFromEftlab() {
-  try {
-    const url = "https://www.eftlab.com/knowledge-base/complete-list-of-application-identifiers-aid";
-    const res = await fetch(url, { mode: "cors" });
-    if (!res.ok) throw new Error("Fetch failed");
-    const html = await res.text();
-    const doc = new DOMParser().parseFromString(html, "text/html");
-    // heuristics: find tables or pre elements that list AIDs
-    const tables = doc.querySelectorAll("table");
-    if (tables.length) {
-      tables.forEach(tbl => {
-        Array.from(tbl.querySelectorAll("tr")).forEach(tr => {
-          const cols = tr.querySelectorAll("td, th");
-          if (cols.length >= 2) {
-            const aidText = cols[0].textContent.trim().replace(/\s+/g, "").toUpperCase();
-            const nameText = cols[1].textContent.trim();
-            if (/^[0-9A-F]{6,32}$/.test(aidText)) {
-              aidLookup[aidText] = { vendor: "", name: nameText };
-            }
-          }
-        });
-      });
-    } else {
-      // fallback: scan for lines like "A000000003 - Visa"
-      const re = /([A-F0-9]{6,32})\s*[-–:]\s*([^\n<]{2,120})/gi;
-      let m;
-      while ((m = re.exec(html)) !== null) {
-        const aid = m[1].toUpperCase();
-        const name = m[2].trim();
-        if (/^[0-9A-F]{6,32}$/.test(aid)) aidLookup[aid] = { vendor: "", name };
-      }
-    }
-    // save to sessionStorage for next loads (optional)
-    try { sessionStorage.setItem("aidLookup", JSON.stringify(aidLookup)); } catch (e) { }
-    console.info("AID lookup loaded, entries:", Object.keys(aidLookup).length);
-  } catch (err) {
-    console.warn("Could not load AID list from eftlab (CORS or network). Using built-in map.");
-    // try restore from previous sessionStorage
-    try {
-      const cached = sessionStorage.getItem("aidLookup");
-      if (cached) aidLookup = JSON.parse(cached);
-    } catch (e) { }
-  }
-}
-
-// longest-prefix AID match (AID entries vary length)
-function findAidInfo(aidHex) {
-  if (!aidHex) return null;
-  const hex = aidHex.toUpperCase();
-  // try exact then longest-prefix
-  if (aidLookup[hex]) return aidLookup[hex];
-  // sort keys descending by length
-  const keys = Object.keys(aidLookup).sort((a, b) => b.length - a.length);
-  for (const k of keys) {
-    if (hex.startsWith(k)) return aidLookup[k];
-  }
-  return null;
-}
-
-
-
 // Function to parse TLV data from a hex string
 // This function assumes the input is a valid hex string representing TLV data
 function parseTLV(hex) {
@@ -1527,38 +1462,7 @@ function parseTLV(hex) {
       <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
       </span>`;
     }
-
-    // Tooltip for 9F06 (Application Identifier, Terminal)
-    if (tag.toUpperCase() === "9F06") {
-      const aidHex = value.toUpperCase();
-      // display the raw AID and try to show vendor/name from lookup
-      const info = findAidInfo(aidHex);
-      const vendor = info && info.vendor ? info.vendor : (info && info.name ? "" : "");
-      const name = info && info.name ? info.name : (info && info.vendor ? "" : "");
-      let details = "";
-      if (info) {
-        // show vendor and name if available
-        if (vendor) details += `<div><strong>Vendor:</strong> ${vendor}</div>`;
-        if (name) details += `<div><strong>Name:</strong> ${name}</div>`;
-      } else {
-        details = `<div><em>Vendor/name not found locally</em></div>
-                   <div style="font-size:11px;color:#666;margin-top:6px;">(attempted to load list from EFTLab; CORS may block remote lookup)</div>`;
-      }
-
-      const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black;">
-        <strong>AID</strong><br> ${aidHex}
-        <div style="height:6px;"></div>
-        ${details}
-      </div>`;
-
-      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
-        onmouseover="showCVMTooltip(this, event)"
-        onmouseout="hideCVMTooltip(this)">
-        ${value}
-        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
-      </span>`;
-    }
-
+    
     // Tooltip for 9F35 (Terminal Type) - use fixed TerminalType mapping only
     if (tag.toUpperCase() === "9F35" && value.length === 2) {
       const byte = value.slice(0, 2).toUpperCase();

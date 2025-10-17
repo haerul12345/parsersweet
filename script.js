@@ -1455,6 +1455,42 @@ function parseTLV(hex) {
       </span>`;
     }
 
+    // Tooltip for 9F35 (Terminal Type) - use fixed TerminalType mapping only
+    if (tag.toUpperCase() === "9F35" && value.length === 2) {
+      const byte = value.slice(0, 2).toUpperCase();
+      const terminalTypeMap = {
+        '11': 'Attended - Online only (Operational control: Financial Institution)',
+        '21': 'Attended - Online only (Operational control: Merchant)',
+        '12': 'Attended - Offline with online capability (Operational control: Financial Institution)',
+        '22': 'Attended - Offline with online capability (Operational control: Merchant)',
+        '13': 'Attended - Offline only (Operational control: Financial Institution)',
+        '23': 'Attended - Offline only (Operational control: Merchant)',
+        '14': 'Unattended - Online only (Operational control: Financial Institution)',
+        '24': 'Unattended - Online only (Operational control: Merchant)',
+        '34': 'Unattended - Online only (operational control: Cardholder)',
+        '15': 'Unattended - Offline with online capability (Operational control: Financial Institution)',
+        '25': 'Unattended - Offline with online capability (Operational control: Merchant)',
+        '35': 'Unattended - Offline with online capability (operational control: Cardholder)',
+        '16': 'Unattended - Offline only (Operational control: Financial Institution)',
+        '26': 'Unattended - Offline only (Operational control: Merchant)',
+        '36': 'Unattended - Offline only (operational control: Cardholder)'
+      };
+
+      const description = terminalTypeMap[byte] ? terminalTypeMap[byte] : "Unknown or RFU";
+
+      const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black;">
+        <strong>Terminal Type</strong><br>
+        (${byte}) ${description}
+      </div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">
+        ${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 9B (Transaction Status Information)
     if (tag.toUpperCase() === "9B" && value.length === 4) {
       const byte1 = value.slice(0, 2);

@@ -1534,12 +1534,15 @@ function parseTLV(hex) {
         "Bit 1: RFU"
       ];
 
-      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black;">`;
+      // Build tooltip as two columns: left = byte1 + byte2, right = byte3
+      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:520px;">`;
+      tooltipHtml += `<div style="display:flex; gap:12px; align-items:flex-start;">`;
 
-      // Byte 1
+      // Left column (Byte1 + Byte2)
+      tooltipHtml += `<div style="flex:1; min-width:260px;">`;
       tooltipHtml += `<strong>Byte 1 (${byte1}) — Card data input capability:</strong>
         <div style="height:6px;"></div>
-        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px; margin-bottom:8px;">`;
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px; margin-bottom:10px;">`;
       for (let k = 0; k < 8; k++) {
         tooltipHtml += `<div style="display:contents;">
             <input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
@@ -1548,35 +1551,37 @@ function parseTLV(hex) {
       }
       tooltipHtml += `</div>`;
 
-      // Byte 2
       tooltipHtml += `<strong>Byte 2 (${byte2}) — CVM capability:</strong>
         <div style="height:6px;"></div>
-        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px; margin-bottom:8px;">`;
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px; margin-bottom:6px;">`;
       for (let k = 0; k < 8; k++) {
         tooltipHtml += `<div style="display:contents;">
             <input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
             <label style="color:black;">${tcapByte2[k]}</label>
           </div>`;
       }
-      tooltipHtml += `</div>`;
+      tooltipHtml += `</div></div>`; // end left column
 
-      // Byte 3
+      // Right column (Byte3)
+      tooltipHtml += `<div style="flex:1; min-width:200px;">`;
       tooltipHtml += `<strong>Byte 3 (${byte3}) — Security capability:</strong>
         <div style="height:6px;"></div>
-        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px;">`;
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px;">`;
       for (let k = 0; k < 8; k++) {
         tooltipHtml += `<div style="display:contents;">
             <input type="checkbox" disabled ${bin3[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
             <label style="color:black;">${tcapByte3[k]}</label>
           </div>`;
       }
-      tooltipHtml += `</div></div>`;
+      tooltipHtml += `</div></div>`; // end right column
+
+      tooltipHtml += `</div></div>`; // end columns and tooltip container
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
         onmouseover="showCVMTooltip(this, event)"
         onmouseout="hideCVMTooltip(this)">
           ${value}
-          <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+          <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:normal;max-width:600px;color:black;">${tooltipHtml}</span>
       </span>`;
     }
 

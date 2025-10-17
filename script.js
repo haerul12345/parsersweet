@@ -1552,14 +1552,15 @@ let countryCodeLookup = {
 
 // Tooltip for 5F2A (Transaction Currency Code), 9F1A (Terminal Country Code), 5F28 (Issuer Country Code)
 // Uses the existing countryCodeLookup table (numeric ISO 3166 keys as strings, e.g. "840", "826")
-// Helper: find country by numeric hex value. If ignoreFirstDigit is true and hex is 4 chars, drop first hex nibble.
+// Helper: find country by numeric hex value without numeric conversion.
+// If ignoreFirstDigit is true and hex is 4 chars (e.g. "0036"), drop the first hex digit
+// and use the remaining 3 chars directly as the lookup key (e.g. "036").
 function lookupCountryByNumericHex(hexValue, ignoreFirstDigit = false) {
   if (!hexValue) return null;
   const raw = hexValue.toUpperCase();
-  const hexToParse = (ignoreFirstDigit && raw.length === 4) ? raw.slice(1) : raw;
-  const dec = parseInt(hexToParse, 16);
-  if (Number.isNaN(dec)) return null;
-  const key = String(dec).padStart(3, '0'); // match countryCodeLookup keys
+  const keyRaw = (ignoreFirstDigit && raw.length === 4) ? raw.slice(1) : raw;
+  // ensure 3-character key (preserve leading zeros from source)
+  const key = keyRaw.padStart(3, '0');
   return countryCodeLookup[key] || null;
 }
 
@@ -1917,17 +1918,17 @@ function parseTLV(hex) {
       </span>`;
     }
 
-    // 9F1A - Terminal Country Code (ISO 3166 numeric)
+    // 9F1A - Terminal Country Code (ISO 3166 numeric, value often encoded as 2 or 4 hex chars)
     if (tag.toUpperCase() === "9F1A" && (value.length === 2 || value.length === 4)) {
       const raw = value.toUpperCase();
-      // ignore first hex digit when 4 chars (per request)
+      // per request: if 4-hex chars like "0036" -> use "036" as lookup key
       const country = lookupCountryByNumericHex(raw, true);
       const details = country
         ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
         : `<div style="color:#666"><em>Country code not found in lookup table</em></div>`;
       const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
         <strong>Terminal Country Code (ISO 3166 numeric)</strong><br>
-        Hex: ${raw}<br>
+        Raw hex: ${raw}<br>
         ${details}
       </div>`;
 
@@ -1941,14 +1942,14 @@ function parseTLV(hex) {
     // 5F28 - Issuer Country Code (ISO 3166 numeric)
     if (tag.toUpperCase() === "5F28" && (value.length === 2 || value.length === 4)) {
       const raw = value.toUpperCase();
-      // ignore first hex digit when 4 chars (per request)
+      // per request: if 4-hex chars like "0036" -> use "036" as lookup key
       const country = lookupCountryByNumericHex(raw, true);
       const details = country
         ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
         : `<div style="color:#666"><em>Country code not found in lookup table</em></div>`;
       const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
         <strong>Issuer Country Code (ISO 3166 numeric)</strong><br>
-        Hex: ${raw}<br>
+        Raw hex: ${raw}<br>
         ${details}
       </div>`;
 
@@ -1958,7 +1959,6 @@ function parseTLV(hex) {
         <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
       </span>`;
     }
-
 
     // Tooltip for 9F34 (CVM Results)
     if (tag.toUpperCase() === "9F34" && value.length === 6) {

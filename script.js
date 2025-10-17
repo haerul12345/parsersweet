@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "3.7";
+  const appVersion = "3.8";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 
@@ -1535,7 +1535,7 @@ function parseTLV(hex) {
       ];
 
       // Build tooltip as two columns: left = byte1 + byte2, right = byte3
-      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:520px;">`;
+      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:600px;">`;
       tooltipHtml += `<div style="display:flex; gap:12px; align-items:flex-start;">`;
 
       // Left column (Byte1 + Byte2)
@@ -1582,6 +1582,154 @@ function parseTLV(hex) {
         onmouseout="hideCVMTooltip(this)">
           ${value}
           <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:normal;max-width:600px;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
+    // Tooltip for 9F40 (Additional Terminal Capabilities) - 3 columns:
+    // col1 = Byte1 + Byte2, col2 = Byte3 + Byte4, col3 = Byte5
+    if (tag.toUpperCase() === "9F40" && value.length === 10) {
+      const bytes = [
+        value.slice(0, 2),
+        value.slice(2, 4),
+        value.slice(4, 6),
+        value.slice(6, 8),
+        value.slice(8, 10)
+      ];
+      const bins = bytes.map(b => parseInt(b, 16).toString(2).padStart(8, '0'));
+
+      // EMV A3 Additional Terminal Capabilities - per‑bit labels (Table 28..32)
+      const atcLabels = [
+        // Byte 1: Transaction Type Capability
+        [
+          "Bit 8: Cash",
+          "Bit 7: Goods",
+          "Bit 6: Services",
+          "Bit 5: Cashback",
+          "Bit 4: Inquiry",
+          "Bit 3: Transfer",
+          "Bit 2: Payment",
+          "Bit 1: Administrative"
+        ],
+        // Byte 2: Transaction Type Capability (additional)
+        [
+          "Bit 8: Cash deposit",
+          "Bit 7: RFU",
+          "Bit 6: RFU",
+          "Bit 5: RFU",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        // Byte 3: Terminal Data Input Capability
+        [
+          "Bit 8: Numeric keys",
+          "Bit 7: Alphabetic & special characters keys",
+          "Bit 6: Command keys",
+          "Bit 5: Function keys",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: RFU",
+          "Bit 1: RFU"
+        ],
+        // Byte 4: Terminal Data Output Capability (print/display/code table flags)
+        [
+          "Bit 8: Print, attendant",
+          "Bit 7: Print, cardholder",
+          "Bit 6: Display, attendant",
+          "Bit 5: Display, cardholder",
+          "Bit 4: RFU",
+          "Bit 3: RFU",
+          "Bit 2: Code table (see ISO/IEC 8859)",
+          "Bit 1: Code table (see ISO/IEC 8859)"
+        ],
+        // Byte 5: Terminal Data Output Capability - code table selection
+        [
+          "Bit 8: Code table 8",
+          "Bit 7: Code table 7",
+          "Bit 6: Code table 6",
+          "Bit 5: Code table 5",
+          "Bit 4: Code table 4",
+          "Bit 3: Code table 3",
+          "Bit 2: Code table 2",
+          "Bit 1: Code table 1"
+        ]
+      ];
+
+      // Build tooltipHtml with three columns
+      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:760px;">`;
+      tooltipHtml += `<div style="display:flex; gap:12px; align-items:flex-start;">`;
+
+      // Column 1: Byte1 + Byte2
+      tooltipHtml += `<div style="flex:1; min-width:220px;">`;
+      // Byte1
+      tooltipHtml += `<strong>Byte 1 (${bytes[0]}) — Transaction type:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px; margin-bottom:10px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+          <input type="checkbox" disabled ${bins[0][k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+          <label style="color:black;">${atcLabels[0][k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div>`;
+      // Byte2
+      tooltipHtml += `<strong>Byte 2 (${bytes[1]}) — Transaction type (cont):</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+          <input type="checkbox" disabled ${bins[1][k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+          <label style="color:black;">${atcLabels[1][k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div></div>`; // end column 1
+
+      // Column 2: Byte3 + Byte4
+      tooltipHtml += `<div style="flex:1; min-width:220px;">`;
+      // Byte3
+      tooltipHtml += `<strong>Byte 3 (${bytes[2]}) — Terminal data input capability:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px; margin-bottom:10px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+          <input type="checkbox" disabled ${bins[2][k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+          <label style="color:black;">${atcLabels[2][k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div>`;
+      // Byte4
+      tooltipHtml += `<strong>Byte 4 (${bytes[3]}) — Terminal data output capability:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+          <input type="checkbox" disabled ${bins[3][k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+          <label style="color:black;">${atcLabels[3][k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div></div>`; // end column 2
+
+      // Column 3: Byte5
+      tooltipHtml += `<div style="flex:0 0 200px; min-width:200px;">`;
+      tooltipHtml += `<strong>Byte 5 (${bytes[4]}) — Output code table selection:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns: auto 1fr; gap:6px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+          <input type="checkbox" disabled ${bins[4][k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+          <label style="color:black;">${atcLabels[4][k]}</label>
+        </div>`;
+      }
+      tooltipHtml += `</div></div>`; // end column 3
+
+      tooltipHtml += `</div></div>`; // end flex container and outer
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">
+        ${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:10px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:normal;max-width:760px;color:black;">${tooltipHtml}</span>
       </span>`;
     }
 

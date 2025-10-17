@@ -1552,12 +1552,14 @@ let countryCodeLookup = {
 
 // Tooltip for 5F2A (Transaction Currency Code), 9F1A (Terminal Country Code), 5F28 (Issuer Country Code)
 // Uses the existing countryCodeLookup table (numeric ISO 3166 keys as strings, e.g. "840", "826")
-function lookupCountryByNumericHex(hexValue) {
+// Helper: find country by numeric hex value. If ignoreFirstDigit is true and hex is 4 chars, drop first hex nibble.
+function lookupCountryByNumericHex(hexValue, ignoreFirstDigit = false) {
   if (!hexValue) return null;
-  // Accept 1-2 bytes (2 or 4 hex chars). parseInt handles leading zeros.
-  const dec = parseInt(hexValue, 16);
+  const raw = hexValue.toUpperCase();
+  const hexToParse = (ignoreFirstDigit && raw.length === 4) ? raw.slice(1) : raw;
+  const dec = parseInt(hexToParse, 16);
   if (Number.isNaN(dec)) return null;
-  const key = String(dec).padStart(3, '0'); // countryCodeLookup keys are 3-digit strings
+  const key = String(dec).padStart(3, '0'); // match countryCodeLookup keys
   return countryCodeLookup[key] || null;
 }
 
@@ -1598,6 +1600,189 @@ function findAidInfo(aidHex) {
   }
   return null;
 }
+
+// --- Currency Code lookup (use this fixed mapping) ---
+let currencyCodeLookup = {
+  "978": { currency: "Euro", alpha: "EUR" },
+  "008": { currency: "Lek", alpha: "ALL" },
+  "012": { currency: "Algerian Dinar", alpha: "DZD" },
+  "840": { currency: "US Dollar", alpha: "USD" },
+  "973": { currency: "Kwanza", alpha: "AOA" },
+  "951": { currency: "East Caribbean Dollar", alpha: "XCD" },
+  "396": { currency: "Arab Accounting Dinar", alpha: "XAD" },
+  "032": { currency: "Argentine Peso", alpha: "ARS" },
+  "051": { currency: "Armenian Dram", alpha: "AMD" },
+  "533": { currency: "Aruban Florin", alpha: "AWG" },
+  "036": { currency: "Australian Dollar", alpha: "AUD" },
+  "944": { currency: "Azerbaijan Manat", alpha: "AZN" },
+  "044": { currency: "Bahamian Dollar", alpha: "BSD" },
+  "048": { currency: "Bahraini Dinar", alpha: "BHD" },
+  "050": { currency: "Taka", alpha: "BDT" },
+  "052": { currency: "Barbados Dollar", alpha: "BBD" },
+  "933": { currency: "Belarusian Ruble", alpha: "BYN" },
+  "084": { currency: "Belize Dollar", alpha: "BZD" },
+  "952": { currency: "CFA Franc BCEAO", alpha: "XOF" },
+  "060": { currency: "Bermudian Dollar", alpha: "BMD" },
+  "356": { currency: "Indian Rupee", alpha: "INR" },
+  "064": { currency: "Ngultrum", alpha: "BTN" },
+  "068": { currency: "Boliviano", alpha: "BOB" },
+  "984": { currency: "Mvdol", alpha: "BOV" },
+  "977": { currency: "Convertible Mark", alpha: "BAM" },
+  "072": { currency: "Pula", alpha: "BWP" },
+  "578": { currency: "Norwegian Krone", alpha: "NOK" },
+  "986": { currency: "Brazilian Real", alpha: "BRL" },
+  "096": { currency: "Brunei Dollar", alpha: "BND" },
+  "975": { currency: "Bulgarian Lev", alpha: "BGN" },
+  "108": { currency: "Burundi Franc", alpha: "BIF" },
+  "132": { currency: "Cabo Verde Escudo", alpha: "CVE" },
+  "116": { currency: "Riel", alpha: "KHR" },
+  "950": { currency: "CFA Franc BEAC", alpha: "XAF" },
+  "124": { currency: "Canadian Dollar", alpha: "CAD" },
+  "136": { currency: "Cayman Islands Dollar", alpha: "KYD" },
+  "152": { currency: "Chilean Peso", alpha: "CLP" },
+  "990": { currency: "Unidad de Fomento", alpha: "CLF" },
+  "156": { currency: "Yuan Renminbi", alpha: "CNY" },
+  "170": { currency: "Colombian Peso", alpha: "COP" },
+  "970": { currency: "Unidad de Valor Real", alpha: "COU" },
+  "174": { currency: "Comorian Franc", alpha: "KMF" },
+  "976": { currency: "Congolese Franc", alpha: "CDF" },
+  "554": { currency: "New Zealand Dollar", alpha: "NZD" },
+  "188": { currency: "Costa Rican Colon", alpha: "CRC" },
+  "192": { currency: "Cuban Peso", alpha: "CUP" },
+  "532": { currency: "Caribbean Guilder", alpha: "XCG" },
+  "203": { currency: "Czech Koruna", alpha: "CZK" },
+  "208": { currency: "Danish Krone", alpha: "DKK" },
+  "262": { currency: "Djibouti Franc", alpha: "DJF" },
+  "214": { currency: "Dominican Peso", alpha: "DOP" },
+  "818": { currency: "Egyptian Pound", alpha: "EGP" },
+  "222": { currency: "El Salvador Colon", alpha: "SVC" },
+  "232": { currency: "Nakfa", alpha: "ERN" },
+  "748": { currency: "Lilangeni", alpha: "SZL" },
+  "230": { currency: "Ethiopian Birr", alpha: "ETB" },
+  "238": { currency: "Falkland Islands Pound", alpha: "FKP" },
+  "242": { currency: "Fiji Dollar", alpha: "FJD" },
+  "953": { currency: "CFP Franc", alpha: "XPF" },
+  "270": { currency: "Dalasi", alpha: "GMD" },
+  "981": { currency: "Lari", alpha: "GEL" },
+  "936": { currency: "Ghana Cedi", alpha: "GHS" },
+  "292": { currency: "Gibraltar Pound", alpha: "GIP" },
+  "320": { currency: "Quetzal", alpha: "GTQ" },
+  "826": { currency: "Pound Sterling", alpha: "GBP" },
+  "324": { currency: "Guinean Franc", alpha: "GNF" },
+  "328": { currency: "Guyana Dollar", alpha: "GYD" },
+  "332": { currency: "Gourde", alpha: "HTG" },
+  "340": { currency: "Lempira", alpha: "HNL" },
+  "344": { currency: "Hong Kong Dollar", alpha: "HKD" },
+  "348": { currency: "Forint", alpha: "HUF" },
+  "352": { currency: "Iceland Krona", alpha: "ISK" },
+  "360": { currency: "Rupiah", alpha: "IDR" },
+  "960": { currency: "SDR (Special Drawing Right)", alpha: "XDR" },
+  "364": { currency: "Iranian Rial", alpha: "IRR" },
+  "368": { currency: "Iraqi Dinar", alpha: "IQD" },
+  "376": { currency: "New Israeli Sheqel", alpha: "ILS" },
+  "388": { currency: "Jamaican Dollar", alpha: "JMD" },
+  "392": { currency: "Yen", alpha: "JPY" },
+  "400": { currency: "Jordanian Dinar", alpha: "JOD" },
+  "398": { currency: "Tenge", alpha: "KZT" },
+  "404": { currency: "Kenyan Shilling", alpha: "KES" },
+  "408": { currency: "North Korean Won", alpha: "KPW" },
+  "410": { currency: "Won", alpha: "KRW" },
+  "414": { currency: "Kuwaiti Dinar", alpha: "KWD" },
+  "417": { currency: "Som", alpha: "KGS" },
+  "418": { currency: "Lao Kip", alpha: "LAK" },
+  "422": { currency: "Lebanese Pound", alpha: "LBP" },
+  "426": { currency: "Loti", alpha: "LSL" },
+  "710": { currency: "Rand", alpha: "ZAR" },
+  "430": { currency: "Liberian Dollar", alpha: "LRD" },
+  "434": { currency: "Libyan Dinar", alpha: "LYD" },
+  "756": { currency: "Swiss Franc", alpha: "CHF" },
+  "446": { currency: "Pataca", alpha: "MOP" },
+  "969": { currency: "Malagasy Ariary", alpha: "MGA" },
+  "454": { currency: "Malawi Kwacha", alpha: "MWK" },
+  "458": { currency: "Malaysian Ringgit", alpha: "MYR" },
+  "462": { currency: "Rufiyaa", alpha: "MVR" },
+  "929": { currency: "Ouguiya", alpha: "MRU" },
+  "480": { currency: "Mauritius Rupee", alpha: "MUR" },
+  "965": { currency: "ADB Unit of Account", alpha: "XUA" },
+  "484": { currency: "Mexican Peso", alpha: "MXN" },
+  "979": { currency: "Mexican Unidad de Inversion (UDI)", alpha: "MXV" },
+  "498": { currency: "Moldovan Leu", alpha: "MDL" },
+  "496": { currency: "Tugrik", alpha: "MNT" },
+  "504": { currency: "Moroccan Dirham", alpha: "MAD" },
+  "943": { currency: "Mozambique Metical", alpha: "MZN" },
+  "104": { currency: "Kyat", alpha: "MMK" },
+  "516": { currency: "Namibia Dollar", alpha: "NAD" },
+  "524": { currency: "Nepalese Rupee", alpha: "NPR" },
+  "558": { currency: "Cordoba Oro", alpha: "NIO" },
+  "566": { currency: "Naira", alpha: "NGN" },
+  "807": { currency: "Denar", alpha: "MKD" },
+  "512": { currency: "Rial Omani", alpha: "OMR" },
+  "586": { currency: "Pakistan Rupee", alpha: "PKR" },
+  "590": { currency: "Balboa", alpha: "PAB" },
+  "598": { currency: "Kina", alpha: "PGK" },
+  "600": { currency: "Guarani", alpha: "PYG" },
+  "604": { currency: "Sol", alpha: "PEN" },
+  "608": { currency: "Philippine Peso", alpha: "PHP" },
+  "985": { currency: "Zloty", alpha: "PLN" },
+  "634": { currency: "Qatari Rial", alpha: "QAR" },
+  "946": { currency: "Romanian Leu", alpha: "RON" },
+  "643": { currency: "Russian Ruble", alpha: "RUB" },
+  "646": { currency: "Rwanda Franc", alpha: "RWF" },
+  "654": { currency: "Saint Helena Pound", alpha: "SHP" },
+  "882": { currency: "Tala", alpha: "WST" },
+  "930": { currency: "Dobra", alpha: "STN" },
+  "682": { currency: "Saudi Riyal", alpha: "SAR" },
+  "941": { currency: "Serbian Dinar", alpha: "RSD" },
+  "690": { currency: "Seychelles Rupee", alpha: "SCR" },
+  "925": { currency: "Leone", alpha: "SLE" },
+  "702": { currency: "Singapore Dollar", alpha: "SGD" },
+  "994": { currency: "Sucre", alpha: "XSU" },
+  "090": { currency: "Solomon Islands Dollar", alpha: "SBD" },
+  "706": { currency: "Somali Shilling", alpha: "SOS" },
+  "728": { currency: "South Sudanese Pound", alpha: "SSP" },
+  "144": { currency: "Sri Lanka Rupee", alpha: "LKR" },
+  "938": { currency: "Sudanese Pound", alpha: "SDG" },
+  "968": { currency: "Surinam Dollar", alpha: "SRD" },
+  "752": { currency: "Swedish Krona", alpha: "SEK" },
+  "947": { currency: "WIR Euro", alpha: "CHE" },
+  "948": { currency: "WIR Franc", alpha: "CHW" },
+  "760": { currency: "Syrian Pound", alpha: "SYP" },
+  "901": { currency: "New Taiwan Dollar", alpha: "TWD" },
+  "972": { currency: "Somoni", alpha: "TJS" },
+  "834": { currency: "Tanzanian Shilling", alpha: "TZS" },
+  "764": { currency: "Baht", alpha: "THB" },
+  "776": { currency: "Pa’anga", alpha: "TOP" },
+  "780": { currency: "Trinidad and Tobago Dollar", alpha: "TTD" },
+  "788": { currency: "Tunisian Dinar", alpha: "TND" },
+  "949": { currency: "Turkish Lira", alpha: "TRY" },
+  "934": { currency: "Turkmenistan New Manat", alpha: "TMT" },
+  "800": { currency: "Uganda Shilling", alpha: "UGX" },
+  "980": { currency: "Hryvnia", alpha: "UAH" },
+  "784": { currency: "UAE Dirham", alpha: "AED" },
+  "997": { currency: "US Dollar (Next day)", alpha: "USN" },
+  "858": { currency: "Peso Uruguayo", alpha: "UYU" },
+  "940": { currency: "Uruguay Peso en Unidades Indexadas (UI)", alpha: "UYI" },
+  "927": { currency: "Unidad Previsional", alpha: "UYW" },
+  "860": { currency: "Uzbekistan Sum", alpha: "UZS" },
+  "548": { currency: "Vatu", alpha: "VUV" },
+  "928": { currency: "Bolívar Soberano", alpha: "VES" },
+  "926": { currency: "Bolívar Soberano", alpha: "VED" },
+  "704": { currency: "Dong", alpha: "VND" },
+  "886": { currency: "Yemeni Rial", alpha: "YER" },
+  "967": { currency: "Zambian Kwacha", alpha: "ZMW" },
+  "924": { currency: "Zimbabwe Gold", alpha: "ZWG" },
+  "955": { currency: "Bond Markets Unit European Composite Unit (EURCO)", alpha: "XBA" },
+  "956": { currency: "Bond Markets Unit European Monetary Unit (E.M.U.-6)", alpha: "XBB" },
+  "957": { currency: "Bond Markets Unit European Unit of Account 9 (E.U.A.-9)", alpha: "XBC" },
+  "958": { currency: "Bond Markets Unit European Unit of Account 17 (E.U.A.-17)", alpha: "XBD" },
+  "963": { currency: "Codes specifically reserved for testing purposes", alpha: "XTS" },
+  "999": { currency: "The codes assigned for transactions where no currency is involved", alpha: "XXX" },
+  "959": { currency: "Gold", alpha: "XAU" },
+  "964": { currency: "Palladium", alpha: "XPD" },
+  "962": { currency: "Platinum", alpha: "XPT" },
+  "961": { currency: "Silver", alpha: "XAG" },
+};
+
 
 // Function to parse TLV data from a hex string
 // This function assumes the input is a valid hex string representing TLV data
@@ -1735,21 +1920,20 @@ function parseTLV(hex) {
     // 9F1A - Terminal Country Code (ISO 3166 numeric)
     if (tag.toUpperCase() === "9F1A" && (value.length === 2 || value.length === 4)) {
       const raw = value.toUpperCase();
-      const country = lookupCountryByNumericHex(raw);
-      const dec = parseInt(raw, 16);
-      const codeStr = String(dec).padStart(3, '0');
+      // ignore first hex digit when 4 chars (per request)
+      const country = lookupCountryByNumericHex(raw, true);
       const details = country
         ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
-        : `<div style="color:#666"><em>Country code ${codeStr} not found in lookup</em></div>`;
+        : `<div style="color:#666"><em>Country code not found in lookup table</em></div>`;
       const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
         <strong>Terminal Country Code (ISO 3166 numeric)</strong><br>
-        Hex: ${raw} &nbsp; Decimal: ${dec} &nbsp; (code: ${codeStr})<br>
+        Hex: ${raw}<br>
         ${details}
       </div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
-        onmouseover="showCVMTooltip(this, event)"
-        onmouseout="hideCVMTooltip(this)">${value}
+        onmouseover="showCVMTooltip(this, event)" onmouseout="hideCVMTooltip(this, event)">
+        ${value}
         <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
       </span>`;
     }
@@ -1757,24 +1941,24 @@ function parseTLV(hex) {
     // 5F28 - Issuer Country Code (ISO 3166 numeric)
     if (tag.toUpperCase() === "5F28" && (value.length === 2 || value.length === 4)) {
       const raw = value.toUpperCase();
-      const country = lookupCountryByNumericHex(raw);
-      const dec = parseInt(raw, 16);
-      const codeStr = String(dec).padStart(3, '0');
+      // ignore first hex digit when 4 chars (per request)
+      const country = lookupCountryByNumericHex(raw, true);
       const details = country
         ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
-        : `<div style="color:#666"><em>Country code ${codeStr} not found in lookup</em></div>`;
+        : `<div style="color:#666"><em>Country code not found in lookup table</em></div>`;
       const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
         <strong>Issuer Country Code (ISO 3166 numeric)</strong><br>
-        Hex: ${raw} &nbsp; Decimal: ${dec} &nbsp; (code: ${codeStr})<br>
+        Hex: ${raw}<br>
         ${details}
       </div>`;
 
       valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
-        onmouseover="showCVMTooltip(this, event)"
-        onmouseout="hideCVMTooltip(this)">${value}
+        onmouseover="showCVMTooltip(this, event)" onmouseout="hideCVMTooltip(this, event)">
+        ${value}
         <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
       </span>`;
     }
+
 
     // Tooltip for 9F34 (CVM Results)
     if (tag.toUpperCase() === "9F34" && value.length === 6) {

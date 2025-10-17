@@ -1297,6 +1297,270 @@ var tagsList = {
   _9F7F: "Card Production Life Cycle (CPLC) Data"
 };
 
+// Country Code Lookup Table
+let countryCodeLookup = {
+  "004": { name: "Afghanistan", alpha2: "AF", alpha3: "AFG" },
+  "008": { name: "Albania", alpha2: "AL", alpha3: "ALB" },
+  "012": { name: "Algeria", alpha2: "DZ", alpha3: "DZA" },
+  "016": { name: "American Samoa", alpha2: "AS", alpha3: "ASM" },
+  "020": { name: "Andorra", alpha2: "AD", alpha3: "AND" },
+  "024": { name: "Angola", alpha2: "AO", alpha3: "AGO" },
+  "660": { name: "Anguilla", alpha2: "AI", alpha3: "AIA" },
+  "010": { name: "Antarctica", alpha2: "AQ", alpha3: "ATA" },
+  "028": { name: "Antigua and Barbuda", alpha2: "AG", alpha3: "ATG" },
+  "032": { name: "Argentina", alpha2: "AR", alpha3: "ARG" },
+  "051": { name: "Armenia", alpha2: "AM", alpha3: "ARM" },
+  "533": { name: "Aruba", alpha2: "AW", alpha3: "ABW" },
+  "036": { name: "Australia", alpha2: "AU", alpha3: "AUS" },
+  "040": { name: "Austria", alpha2: "AT", alpha3: "AUT" },
+  "031": { name: "Azerbaijan", alpha2: "AZ", alpha3: "AZE" },
+  "044": { name: "Bahamas (The)", alpha2: "BS", alpha3: "BHS" },
+  "048": { name: "Bahrain", alpha2: "BH", alpha3: "BHR" },
+  "050": { name: "Bangladesh", alpha2: "BD", alpha3: "BGD" },
+  "052": { name: "Barbados", alpha2: "BB", alpha3: "BRB" },
+  "112": { name: "Belarus", alpha2: "BY", alpha3: "BLR" },
+  "056": { name: "Belgium", alpha2: "BE", alpha3: "BEL" },
+  "084": { name: "Belize", alpha2: "BZ", alpha3: "BLZ" },
+  "204": { name: "Benin", alpha2: "BJ", alpha3: "BEN" },
+  "060": { name: "Bermuda", alpha2: "BM", alpha3: "BMU" },
+  "064": { name: "Bhutan", alpha2: "BT", alpha3: "BTN" },
+  "068": { name: "Bolivia (Plurinational State of)", alpha2: "BO", alpha3: "BOL" },
+  "535": { name: "Bonaire, Sint Eustatius and Saba", alpha2: "BQ", alpha3: "BES" },
+  "070": { name: "Bosnia and Herzegovina", alpha2: "BA", alpha3: "BIH" },
+  "072": { name: "Botswana", alpha2: "BW", alpha3: "BWA" },
+  "074": { name: "Bouvet Island", alpha2: "BV", alpha3: "BVT" },
+  "076": { name: "Brazil", alpha2: "BR", alpha3: "BRA" },
+  "086": { name: "British Indian Ocean Territory (the)", alpha2: "IO", alpha3: "IOT" },
+  "096": { name: "Brunei Darussalam", alpha2: "BN", alpha3: "BRN" },
+  "100": { name: "Bulgaria", alpha2: "BG", alpha3: "BGR" },
+  "854": { name: "Burkina Faso", alpha2: "BF", alpha3: "BFA" },
+  "108": { name: "Burundi", alpha2: "BI", alpha3: "BDI" },
+  "132": { name: "Cabo Verde", alpha2: "CV", alpha3: "CPV" },
+  "116": { name: "Cambodia", alpha2: "KH", alpha3: "KHM" },
+  "120": { name: "Cameroon", alpha2: "CM", alpha3: "CMR" },
+  "124": { name: "Canada", alpha2: "CA", alpha3: "CAN" },
+  "136": { name: "Cayman Islands (the)", alpha2: "KY", alpha3: "CYM" },
+  "140": { name: "Central African Republic (the)", alpha2: "CF", alpha3: "CAF" },
+  "148": { name: "Chad", alpha2: "TD", alpha3: "TCD" },
+  "152": { name: "Chile", alpha2: "CL", alpha3: "CHL" },
+  "156": { name: "China", alpha2: "CN", alpha3: "CHN" },
+  "162": { name: "Christmas Island", alpha2: "CX", alpha3: "CXR" },
+  "166": { name: "Cocos (Keeling) Islands (the)", alpha2: "CC", alpha3: "CCK" },
+  "170": { name: "Colombia", alpha2: "CO", alpha3: "COL" },
+  "174": { name: "Comoros (the)", alpha2: "KM", alpha3: "COM" },
+  "180": { name: "Congo (the Democratic Republic of the)", alpha2: "CD", alpha3: "COD" },
+  "178": { name: "Congo (the)", alpha2: "CG", alpha3: "COG" },
+  "184": { name: "Cook Islands (the)", alpha2: "CK", alpha3: "COK" },
+  "188": { name: "Costa Rica", alpha2: "CR", alpha3: "CRI" },
+  "191": { name: "Croatia", alpha2: "HR", alpha3: "HRV" },
+  "192": { name: "Cuba", alpha2: "CU", alpha3: "CUB" },
+  "531": { name: "Curaçao", alpha2: "CW", alpha3: "CUW" },
+  "196": { name: "Cyprus", alpha2: "CY", alpha3: "CYP" },
+  "203": { name: "Czechia", alpha2: "CZ", alpha3: "CZE" },
+  "384": { name: "Côte d'Ivoire", alpha2: "CI", alpha3: "CIV" },
+  "208": { name: "Denmark", alpha2: "DK", alpha3: "DNK" },
+  "262": { name: "Djibouti", alpha2: "DJ", alpha3: "DJI" },
+  "212": { name: "Dominica", alpha2: "DM", alpha3: "DMA" },
+  "214": { name: "Dominican Republic (the)", alpha2: "DO", alpha3: "DOM" },
+  "218": { name: "Ecuador", alpha2: "EC", alpha3: "ECU" },
+  "818": { name: "Egypt", alpha2: "EG", alpha3: "EGY" },
+  "222": { name: "El Salvador", alpha2: "SV", alpha3: "SLV" },
+  "226": { name: "Equatorial Guinea", alpha2: "GQ", alpha3: "GNQ" },
+  "232": { name: "Eritrea", alpha2: "ER", alpha3: "ERI" },
+  "233": { name: "Estonia", alpha2: "EE", alpha3: "EST" },
+  "748": { name: "Eswatini", alpha2: "SZ", alpha3: "SWZ" },
+  "231": { name: "Ethiopia", alpha2: "ET", alpha3: "ETH" },
+  "238": { name: "Falkland Islands (the) [Malvinas]", alpha2: "FK", alpha3: "FLK" },
+  "234": { name: "Faroe Islands (the)", alpha2: "FO", alpha3: "FRO" },
+  "242": { name: "Fiji", alpha2: "FJ", alpha3: "FJI" },
+  "246": { name: "Finland", alpha2: "FI", alpha3: "FIN" },
+  "250": { name: "France", alpha2: "FR", alpha3: "FRA" },
+  "254": { name: "French Guiana", alpha2: "GF", alpha3: "GUF" },
+  "258": { name: "French Polynesia", alpha2: "PF", alpha3: "PYF" },
+  "260": { name: "French Southern Territories (the)", alpha2: "TF", alpha3: "ATF" },
+  "266": { name: "Gabon", alpha2: "GA", alpha3: "GAB" },
+  "270": { name: "Gambia (the)", alpha2: "GM", alpha3: "GMB" },
+  "268": { name: "Georgia", alpha2: "GE", alpha3: "GEO" },
+  "276": { name: "Germany", alpha2: "DE", alpha3: "DEU" },
+  "288": { name: "Ghana", alpha2: "GH", alpha3: "GHA" },
+  "292": { name: "Gibraltar", alpha2: "GI", alpha3: "GIB" },
+  "300": { name: "Greece", alpha2: "GR", alpha3: "GRC" },
+  "304": { name: "Greenland", alpha2: "GL", alpha3: "GRL" },
+  "308": { name: "Grenada", alpha2: "GD", alpha3: "GRD" },
+  "312": { name: "Guadeloupe", alpha2: "GP", alpha3: "GLP" },
+  "316": { name: "Guam", alpha2: "GU", alpha3: "GUM" },
+  "320": { name: "Guatemala", alpha2: "GT", alpha3: "GTM" },
+  "831": { name: "Guernsey", alpha2: "GG", alpha3: "GGY" },
+  "324": { name: "Guinea", alpha2: "GN", alpha3: "GIN" },
+  "624": { name: "Guinea-Bissau", alpha2: "GW", alpha3: "GNB" },
+  "328": { name: "Guyana", alpha2: "GY", alpha3: "GUY" },
+  "332": { name: "Haiti", alpha2: "HT", alpha3: "HTI" },
+  "334": { name: "Heard Island and McDonald Islands", alpha2: "HM", alpha3: "HMD" },
+  "336": { name: "Holy See (the)", alpha2: "VA", alpha3: "VAT" },
+  "340": { name: "Honduras", alpha2: "HN", alpha3: "HND" },
+  "344": { name: "Hong Kong", alpha2: "HK", alpha3: "HKG" },
+  "348": { name: "Hungary", alpha2: "HU", alpha3: "HUN" },
+  "352": { name: "Iceland", alpha2: "IS", alpha3: "ISL" },
+  "356": { name: "India", alpha2: "IN", alpha3: "IND" },
+  "360": { name: "Indonesia", alpha2: "ID", alpha3: "IDN" },
+  "364": { name: "Iran (Islamic Republic of)", alpha2: "IR", alpha3: "IRN" },
+  "368": { name: "Iraq", alpha2: "IQ", alpha3: "IRQ" },
+  "372": { name: "Ireland", alpha2: "IE", alpha3: "IRL" },
+  "833": { name: "Isle of Man", alpha2: "IM", alpha3: "IMN" },
+  "376": { name: "Israel", alpha2: "IL", alpha3: "ISR" },
+  "380": { name: "Italy", alpha2: "IT", alpha3: "ITA" },
+  "388": { name: "Jamaica", alpha2: "JM", alpha3: "JAM" },
+  "392": { name: "Japan", alpha2: "JP", alpha3: "JPN" },
+  "832": { name: "Jersey", alpha2: "JE", alpha3: "JEY" },
+  "400": { name: "Jordan", alpha2: "JO", alpha3: "JOR" },
+  "398": { name: "Kazakhstan", alpha2: "KZ", alpha3: "KAZ" },
+  "404": { name: "Kenya", alpha2: "KE", alpha3: "KEN" },
+  "296": { name: "Kiribati", alpha2: "KI", alpha3: "KIR" },
+  "408": { name: "Korea (the Democratic People's Republic of)", alpha2: "KP", alpha3: "PRK" },
+  "410": { name: "Korea (the Republic of)", alpha2: "KR", alpha3: "KOR" },
+  "414": { name: "Kuwait", alpha2: "KW", alpha3: "KWT" },
+  "417": { name: "Kyrgyzstan", alpha2: "KG", alpha3: "KGZ" },
+  "418": { name: "Lao People's Democratic Republic (the)", alpha2: "LA", alpha3: "LAO" },
+  "428": { name: "Latvia", alpha2: "LV", alpha3: "LVA" },
+  "422": { name: "Lebanon", alpha2: "LB", alpha3: "LBN" },
+  "426": { name: "Lesotho", alpha2: "LS", alpha3: "LSO" },
+  "430": { name: "Liberia", alpha2: "LR", alpha3: "LBR" },
+  "434": { name: "Libya", alpha2: "LY", alpha3: "LBY" },
+  "438": { name: "Liechtenstein", alpha2: "LI", alpha3: "LIE" },
+  "440": { name: "Lithuania", alpha2: "LT", alpha3: "LTU" },
+  "442": { name: "Luxembourg", alpha2: "LU", alpha3: "LUX" },
+  "446": { name: "Macao", alpha2: "MO", alpha3: "MAC" },
+  "450": { name: "Madagascar", alpha2: "MG", alpha3: "MDG" },
+  "454": { name: "Malawi", alpha2: "MW", alpha3: "MWI" },
+  "458": { name: "Malaysia", alpha2: "MY", alpha3: "MYS" },
+  "462": { name: "Maldives", alpha2: "MV", alpha3: "MDV" },
+  "466": { name: "Mali", alpha2: "ML", alpha3: "MLI" },
+  "470": { name: "Malta", alpha2: "MT", alpha3: "MLT" },
+  "584": { name: "Marshall Islands (the)", alpha2: "MH", alpha3: "MHL" },
+  "474": { name: "Martinique", alpha2: "MQ", alpha3: "MTQ" },
+  "478": { name: "Mauritania", alpha2: "MR", alpha3: "MRT" },
+  "480": { name: "Mauritius", alpha2: "MU", alpha3: "MUS" },
+  "175": { name: "Mayotte", alpha2: "YT", alpha3: "MYT" },
+  "484": { name: "Mexico", alpha2: "MX", alpha3: "MEX" },
+  "583": { name: "Micronesia (Federated States of)", alpha2: "FM", alpha3: "FSM" },
+  "498": { name: "Moldova (the Republic of)", alpha2: "MD", alpha3: "MDA" },
+  "492": { name: "Monaco", alpha2: "MC", alpha3: "MCO" },
+  "496": { name: "Mongolia", alpha2: "MN", alpha3: "MNG" },
+  "499": { name: "Montenegro", alpha2: "ME", alpha3: "MNE" },
+  "500": { name: "Montserrat", alpha2: "MS", alpha3: "MSR" },
+  "504": { name: "Morocco", alpha2: "MA", alpha3: "MAR" },
+  "508": { name: "Mozambique", alpha2: "MZ", alpha3: "MOZ" },
+  "104": { name: "Myanmar", alpha2: "MM", alpha3: "MMR" },
+  "516": { name: "Namibia", alpha2: "nan", alpha3: "NAM" },
+  "520": { name: "Nauru", alpha2: "NR", alpha3: "NRU" },
+  "524": { name: "Nepal", alpha2: "NP", alpha3: "NPL" },
+  "528": { name: "Netherlands (Kingdom of the)", alpha2: "NL", alpha3: "NLD" },
+  "540": { name: "New Caledonia", alpha2: "NC", alpha3: "NCL" },
+  "554": { name: "New Zealand", alpha2: "NZ", alpha3: "NZL" },
+  "558": { name: "Nicaragua", alpha2: "NI", alpha3: "NIC" },
+  "562": { name: "Niger (the)", alpha2: "NE", alpha3: "NER" },
+  "566": { name: "Nigeria", alpha2: "NG", alpha3: "NGA" },
+  "570": { name: "Niue", alpha2: "NU", alpha3: "NIU" },
+  "574": { name: "Norfolk Island", alpha2: "NF", alpha3: "NFK" },
+  "807": { name: "North Macedonia", alpha2: "MK", alpha3: "MKD" },
+  "580": { name: "Northern Mariana Islands (the)", alpha2: "MP", alpha3: "MNP" },
+  "578": { name: "Norway", alpha2: "NO", alpha3: "NOR" },
+  "512": { name: "Oman", alpha2: "OM", alpha3: "OMN" },
+  "586": { name: "Pakistan", alpha2: "PK", alpha3: "PAK" },
+  "585": { name: "Palau", alpha2: "PW", alpha3: "PLW" },
+  "275": { name: "Palestine, State of", alpha2: "PS", alpha3: "PSE" },
+  "591": { name: "Panama", alpha2: "PA", alpha3: "PAN" },
+  "598": { name: "Papua New Guinea", alpha2: "PG", alpha3: "PNG" },
+  "600": { name: "Paraguay", alpha2: "PY", alpha3: "PRY" },
+  "604": { name: "Peru", alpha2: "PE", alpha3: "PER" },
+  "608": { name: "Philippines (the)", alpha2: "PH", alpha3: "PHL" },
+  "612": { name: "Pitcairn", alpha2: "PN", alpha3: "PCN" },
+  "616": { name: "Poland", alpha2: "PL", alpha3: "POL" },
+  "620": { name: "Portugal", alpha2: "PT", alpha3: "PRT" },
+  "630": { name: "Puerto Rico", alpha2: "PR", alpha3: "PRI" },
+  "634": { name: "Qatar", alpha2: "QA", alpha3: "QAT" },
+  "642": { name: "Romania", alpha2: "RO", alpha3: "ROU" },
+  "643": { name: "Russian Federation (the)", alpha2: "RU", alpha3: "RUS" },
+  "646": { name: "Rwanda", alpha2: "RW", alpha3: "RWA" },
+  "638": { name: "Réunion", alpha2: "RE", alpha3: "REU" },
+  "652": { name: "Saint Barthélemy", alpha2: "BL", alpha3: "BLM" },
+  "654": { name: "Saint Helena, Ascension and Tristan da Cunha", alpha2: "SH", alpha3: "SHN" },
+  "659": { name: "Saint Kitts and Nevis", alpha2: "KN", alpha3: "KNA" },
+  "662": { name: "Saint Lucia", alpha2: "LC", alpha3: "LCA" },
+  "663": { name: "Saint Martin (French part)", alpha2: "MF", alpha3: "MAF" },
+  "666": { name: "Saint Pierre and Miquelon", alpha2: "PM", alpha3: "SPM" },
+  "670": { name: "Saint Vincent and the Grenadines", alpha2: "VC", alpha3: "VCT" },
+  "882": { name: "Samoa", alpha2: "WS", alpha3: "WSM" },
+  "674": { name: "San Marino", alpha2: "SM", alpha3: "SMR" },
+  "678": { name: "Sao Tome and Principe", alpha2: "ST", alpha3: "STP" },
+  "682": { name: "Saudi Arabia", alpha2: "SA", alpha3: "SAU" },
+  "686": { name: "Senegal", alpha2: "SN", alpha3: "SEN" },
+  "688": { name: "Serbia", alpha2: "RS", alpha3: "SRB" },
+  "690": { name: "Seychelles", alpha2: "SC", alpha3: "SYC" },
+  "694": { name: "Sierra Leone", alpha2: "SL", alpha3: "SLE" },
+  "702": { name: "Singapore", alpha2: "SG", alpha3: "SGP" },
+  "534": { name: "Sint Maarten (Dutch part)", alpha2: "SX", alpha3: "SXM" },
+  "703": { name: "Slovakia", alpha2: "SK", alpha3: "SVK" },
+  "705": { name: "Slovenia", alpha2: "SI", alpha3: "SVN" },
+  "090": { name: "Solomon Islands", alpha2: "SB", alpha3: "SLB" },
+  "706": { name: "Somalia", alpha2: "SO", alpha3: "SOM" },
+  "710": { name: "South Africa", alpha2: "ZA", alpha3: "ZAF" },
+  "239": { name: "South Georgia and the South Sandwich Islands", alpha2: "GS", alpha3: "SGS" },
+  "728": { name: "South Sudan", alpha2: "SS", alpha3: "SSD" },
+  "724": { name: "Spain", alpha2: "ES", alpha3: "ESP" },
+  "144": { name: "Sri Lanka", alpha2: "LK", alpha3: "LKA" },
+  "729": { name: "Sudan (the)", alpha2: "SD", alpha3: "SDN" },
+  "740": { name: "Suriname", alpha2: "SR", alpha3: "SUR" },
+  "744": { name: "Svalbard and Jan Mayen", alpha2: "SJ", alpha3: "SJM" },
+  "752": { name: "Sweden", alpha2: "SE", alpha3: "SWE" },
+  "756": { name: "Switzerland", alpha2: "CH", alpha3: "CHE" },
+  "760": { name: "Syrian Arab Republic (the)", alpha2: "SY", alpha3: "SYR" },
+  "158": { name: "Taiwan (Province of China)", alpha2: "TW", alpha3: "TWN" },
+  "762": { name: "Tajikistan", alpha2: "TJ", alpha3: "TJK" },
+  "834": { name: "Tanzania, the United Republic of", alpha2: "TZ", alpha3: "TZA" },
+  "764": { name: "Thailand", alpha2: "TH", alpha3: "THA" },
+  "626": { name: "Timor-Leste", alpha2: "TL", alpha3: "TLS" },
+  "768": { name: "Togo", alpha2: "TG", alpha3: "TGO" },
+  "772": { name: "Tokelau", alpha2: "TK", alpha3: "TKL" },
+  "776": { name: "Tonga", alpha2: "TO", alpha3: "TON" },
+  "780": { name: "Trinidad and Tobago", alpha2: "TT", alpha3: "TTO" },
+  "788": { name: "Tunisia", alpha2: "TN", alpha3: "TUN" },
+  "795": { name: "Turkmenistan", alpha2: "TM", alpha3: "TKM" },
+  "796": { name: "Turks and Caicos Islands (the)", alpha2: "TC", alpha3: "TCA" },
+  "798": { name: "Tuvalu", alpha2: "TV", alpha3: "TUV" },
+  "792": { name: "Türkiye", alpha2: "TR", alpha3: "TUR" },
+  "800": { name: "Uganda", alpha2: "UG", alpha3: "UGA" },
+  "804": { name: "Ukraine", alpha2: "UA", alpha3: "UKR" },
+  "784": { name: "United Arab Emirates (the)", alpha2: "AE", alpha3: "ARE" },
+  "826": { name: "United Kingdom of Great Britain and Northern Ireland (the)", alpha2: "GB", alpha3: "GBR" },
+  "581": { name: "United States Minor Outlying Islands (the)", alpha2: "UM", alpha3: "UMI" },
+  "840": { name: "United States of America (the)", alpha2: "US", alpha3: "USA" },
+  "858": { name: "Uruguay", alpha2: "UY", alpha3: "URY" },
+  "860": { name: "Uzbekistan", alpha2: "UZ", alpha3: "UZB" },
+  "548": { name: "Vanuatu", alpha2: "VU", alpha3: "VUT" },
+  "862": { name: "Venezuela (Bolivarian Republic of)", alpha2: "VE", alpha3: "VEN" },
+  "704": { name: "Viet Nam", alpha2: "VN", alpha3: "VNM" },
+  "092": { name: "Virgin Islands (British)", alpha2: "VG", alpha3: "VGB" },
+  "850": { name: "Virgin Islands (U.S.)", alpha2: "VI", alpha3: "VIR" },
+  "876": { name: "Wallis and Futuna", alpha2: "WF", alpha3: "WLF" },
+  "732": { name: "Western Sahara*", alpha2: "EH", alpha3: "ESH" },
+  "887": { name: "Yemen", alpha2: "YE", alpha3: "YEM" },
+  "894": { name: "Zambia", alpha2: "ZM", alpha3: "ZMB" },
+  "716": { name: "Zimbabwe", alpha2: "ZW", alpha3: "ZWE" },
+  "248": { name: "Åland Islands", alpha2: "AX", alpha3: "ALA" },
+};
+
+// Tooltip for 5F2A (Transaction Currency Code), 9F1A (Terminal Country Code), 5F28 (Issuer Country Code)
+// Uses the existing countryCodeLookup table (numeric ISO 3166 keys as strings, e.g. "840", "826")
+function lookupCountryByNumericHex(hexValue) {
+  if (!hexValue) return null;
+  // Accept 1-2 bytes (2 or 4 hex chars). parseInt handles leading zeros.
+  const dec = parseInt(hexValue, 16);
+  if (Number.isNaN(dec)) return null;
+  const key = String(dec).padStart(3, '0'); // countryCodeLookup keys are 3-digit strings
+  return countryCodeLookup[key] || null;
+}
+
 // --- AID lookup (use this fixed mapping) ---
 let aidLookup = {
   "A0000000031010": { vendor: "VISA", name: "VISA Debit/Credit (Classic)" },
@@ -1468,6 +1732,50 @@ function parseTLV(hex) {
       </span>`;
     }
 
+    // 9F1A - Terminal Country Code (ISO 3166 numeric)
+    if (tag.toUpperCase() === "9F1A" && (value.length === 2 || value.length === 4)) {
+      const raw = value.toUpperCase();
+      const country = lookupCountryByNumericHex(raw);
+      const dec = parseInt(raw, 16);
+      const codeStr = String(dec).padStart(3, '0');
+      const details = country
+        ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
+        : `<div style="color:#666"><em>Country code ${codeStr} not found in lookup</em></div>`;
+      const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
+        <strong>Terminal Country Code (ISO 3166 numeric)</strong><br>
+        Hex: ${raw} &nbsp; Decimal: ${dec} &nbsp; (code: ${codeStr})<br>
+        ${details}
+      </div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
+    // 5F28 - Issuer Country Code (ISO 3166 numeric)
+    if (tag.toUpperCase() === "5F28" && (value.length === 2 || value.length === 4)) {
+      const raw = value.toUpperCase();
+      const country = lookupCountryByNumericHex(raw);
+      const dec = parseInt(raw, 16);
+      const codeStr = String(dec).padStart(3, '0');
+      const details = country
+        ? `<div><strong>Country:</strong> ${country.name}</div><div><strong>Alpha-2 / Alpha-3:</strong> ${country.alpha2} / ${country.alpha3}</div>`
+        : `<div style="color:#666"><em>Country code ${codeStr} not found in lookup</em></div>`;
+      const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
+        <strong>Issuer Country Code (ISO 3166 numeric)</strong><br>
+        Hex: ${raw} &nbsp; Decimal: ${dec} &nbsp; (code: ${codeStr})<br>
+        ${details}
+      </div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 9F34 (CVM Results)
     if (tag.toUpperCase() === "9F34" && value.length === 6) {
       const byte1 = value.slice(0, 2);
@@ -1491,7 +1799,7 @@ function parseTLV(hex) {
       <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
       </span>`;
     }
-    
+
     // Tooltip for 9F06 (Application Identifier - AID)
     if (tag.toUpperCase() === "9F06") {
       const aidHex = value.toUpperCase();

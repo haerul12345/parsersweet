@@ -1491,6 +1491,95 @@ function parseTLV(hex) {
       </span>`;
     }
 
+    // Tooltip for 9F33 (Terminal Capabilities) - checklist using EMV Table mappings
+    if (tag.toUpperCase() === "9F33" && value.length === 6) {
+      const byte1 = value.slice(0, 2).toUpperCase();
+      const byte2 = value.slice(2, 4).toUpperCase();
+      const byte3 = value.slice(4, 6).toUpperCase();
+      const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
+      const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
+      const bin3 = parseInt(byte3, 16).toString(2).padStart(8, '0');
+
+      // EMV Table mappings (Table 25-27) - per-bit checklist labels
+      const tcapByte1 = [
+        "Bit 8: Manual key entry",
+        "Bit 7: Magnetic stripe",
+        "Bit 6: IC with contacts (contact ICC)",
+        "Bit 5: RFU",
+        "Bit 4: RFU",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      const tcapByte2 = [
+        "Bit 8: Plaintext PIN for ICC verification",
+        "Bit 7: Enciphered PIN for online verification",
+        "Bit 6: Signature (paper)",
+        "Bit 5: Enciphered PIN for offline verification",
+        "Bit 4: No CVM required",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      const tcapByte3 = [
+        "Bit 8: SDA supported",
+        "Bit 7: DDA supported",
+        "Bit 6: Card capture (cardholder capture capability)",
+        "Bit 5: RFU",
+        "Bit 4: CDA supported",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU"
+      ];
+
+      let tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black;">`;
+
+      // Byte 1
+      tooltipHtml += `<strong>Byte 1 (${byte1}) — Card data input capability:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px; margin-bottom:8px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+            <input type="checkbox" disabled ${bin1[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+            <label style="color:black;">${tcapByte1[k]}</label>
+          </div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      // Byte 2
+      tooltipHtml += `<strong>Byte 2 (${byte2}) — CVM capability:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px; margin-bottom:8px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+            <input type="checkbox" disabled ${bin2[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+            <label style="color:black;">${tcapByte2[k]}</label>
+          </div>`;
+      }
+      tooltipHtml += `</div>`;
+
+      // Byte 3
+      tooltipHtml += `<strong>Byte 3 (${byte3}) — Security capability:</strong>
+        <div style="height:6px;"></div>
+        <div style="display:grid; grid-template-columns:auto 1fr; gap:6px;">`;
+      for (let k = 0; k < 8; k++) {
+        tooltipHtml += `<div style="display:contents;">
+            <input type="checkbox" disabled ${bin3[k] === "1" ? "checked" : ""} style="accent-color:black;margin-right:6px;">
+            <label style="color:black;">${tcapByte3[k]}</label>
+          </div>`;
+      }
+      tooltipHtml += `</div></div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">
+          ${value}
+          <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 9B (Transaction Status Information)
     if (tag.toUpperCase() === "9B" && value.length === 4) {
       const byte1 = value.slice(0, 2);

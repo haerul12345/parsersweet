@@ -1297,14 +1297,41 @@ var tagsList = {
   _9F7F: "Card Production Life Cycle (CPLC) Data"
 };
 
-// --- AID lookup: try to populate from EFTLab page, fallback to small local map ---
+// --- AID lookup (use this fixed mapping) ---
 let aidLookup = {
-  // small built-in examples (hex uppercase, variable length)
-  "A000000003": { vendor: "VISA", name: "Visa credit/debit" },
-  "A000000004": { vendor: "MASTERCARD", name: "Mastercard" },
-  "A000000025": { vendor: "AMEX/ExpressPay", name: "ExpressPay / Amex" },
-  "A000000065": { vendor: "JCB", name: "JCB" }
+  "A0000000031010": { vendor: "VISA", name: "VISA Debit/Credit (Classic)" },
+  "A0000000032010": { vendor: "VISA", name: "VISA Electron" },
+  "A0000000032020": { vendor: "VISA", name: "VISA V PAY" },
+  "A0000000033010": { vendor: "VISA", name: "VISA Interlink" },
+  "A0000000036010": { vendor: "VISA", name: "Domestic Visa Cash Stored Value" },
+  "A0000000036020": { vendor: "VISA", name: "International Visa Cash Stored Value" },
+  "A0000000041010": { vendor: "MASTERCARD", name: "MasterCard Credit/Debit (Global)" },
+  "A0000000043060": { vendor: "MASTERCARD", name: "Maestro (Debit)" },
+  "A0000000046010": { vendor: "MASTERCARD", name: "Cirrus" },
+  "A000000025010701": { vendor: "AMEX", name: "ExpressPay" },
+  "A000000025": { vendor: "AMEX", name: "American Express" },
+  "A0000000651010": { vendor: "JCB", name: "JCB J Smart Credit" },
+  "A00000006510": { vendor: "JCB", name: "JCB" },
+  "A0000001524010": { vendor: "DINERS", name: "Discover Debit Common Card" },
+  "A0000001523010": { vendor: "DINERS", name: "Discover Card" },
+  "A000000333010101": { vendor: "UnionPay", name: "UnionPay Debit" },
+  "A000000333010102": { vendor: "UnionPay", name: "UnionPay Credit" },
+  "A00000038410": { vendor: "EFTPOS", name: "Savings (debit card)" },
+  "A00000038420": { vendor: "EFTPOS", name: "Cheque (debit card)" }
 };
+
+// longest-prefix AID lookup helper
+function findAidInfo(aidHex) {
+  if (!aidHex) return null;
+  const hex = aidHex.toUpperCase();
+  if (aidLookup[hex]) return { key: hex, info: aidLookup[hex] };
+  // longest-prefix match
+  const keys = Object.keys(aidLookup).sort((a, b) => b.length - a.length);
+  for (const k of keys) {
+    if (hex.startsWith(k)) return { key: k, info: aidLookup[k] };
+  }
+  return null;
+}
 
 // Function to parse TLV data from a hex string
 // This function assumes the input is a valid hex string representing TLV data
@@ -1463,6 +1490,36 @@ function parseTLV(hex) {
       </span>`;
     }
     
+    // Tooltip for 9F06 (Application Identifier - AID)
+    if (tag.toUpperCase() === "9F06") {
+      const aidHex = value.toUpperCase();
+      const match = findAidInfo(aidHex);
+      let detailsHtml = "";
+      if (match && match.info) {
+        detailsHtml += `<div><strong>Vendor:</strong> ${match.info.vendor}</div>`;
+        detailsHtml += `<div><strong>Name:</strong> ${match.info.name}</div>`;
+        if (match.key !== aidHex) {
+          detailsHtml += `<div style="font-size:11px;color:#666;margin-top:6px;">Matched AID prefix: ${match.key}</div>`;
+        }
+      } else {
+        detailsHtml = `<div style="color:#666;"><em>Vendor / name not found in local lookup</em></div>`;
+      }
+
+      const tooltipHtml = `<div style="font-family:monospace; font-size:12px; color:black; max-width:360px;">
+        <strong>AID</strong><br>
+        ${aidHex}
+        <div style="height:8px;"></div>
+        ${detailsHtml}
+      </div>`;
+
+      valueDisplay = `<span class="cvm-tooltip" style="cursor:pointer;position:relative;"
+        onmouseover="showCVMTooltip(this, event)"
+        onmouseout="hideCVMTooltip(this)">
+        ${value}
+        <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;color:black;">${tooltipHtml}</span>
+      </span>`;
+    }
+
     // Tooltip for 9F35 (Terminal Type) - use fixed TerminalType mapping only
     if (tag.toUpperCase() === "9F35" && value.length === 2) {
       const byte = value.slice(0, 2).toUpperCase();

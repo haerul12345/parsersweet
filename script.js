@@ -37,28 +37,30 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   // Convert hex to ASCII
-  convertBtn.addEventListener('click', () => {
-    const hexLines = hexInput.value.trim().split(/\r?\n/); // Split input by lines
-    const isMultiline = hexLines.length > 1;
+convertBtn.addEventListener('click', () => {
+  const hexLines = hexInput.value.trim().split(/\r?\n/); // Split input by lines
+  const isMultiline = hexLines.length > 1;
 
-    let output = '<strong>Result:</strong><br>';
-    hexLines.forEach((hex, index) => {
-      if (!/^[0-9a-fA-F]+$/.test(hex) || hex.length % 2 !== 0) {
-        output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}Invalid hex string.</blockquote>`;
-        return;
-      }
+  let output = '<strong>Result:</strong><br>';
+  hexLines.forEach((hex, index) => {
+    const cleanedHex = hex.replace(/\s+/g, ''); // Remove all spaces
 
-      let ascii = '';
-      for (let i = 0; i < hex.length; i += 2) {
-        const byte = hex.substr(i, 2);
-        ascii += String.fromCharCode(parseInt(byte, 16));
-      }
+    if (!/^[0-9a-fA-F]+$/.test(cleanedHex) || cleanedHex.length % 2 !== 0) {
+      output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}Invalid hex string.</blockquote>`;
+      return;
+    }
 
-      output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}${ascii}</blockquote>`;
-    });
+    let ascii = '';
+    for (let i = 0; i < cleanedHex.length; i += 2) {
+      const byte = cleanedHex.substr(i, 2);
+      ascii += String.fromCharCode(parseInt(byte, 16));
+    }
 
-    asciiResult.innerHTML = output;
+    output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}${ascii}</blockquote>`;
   });
+
+  asciiResult.innerHTML = output;
+});
 
   // Button EventListener
   const buttons = document.querySelectorAll(".btn");

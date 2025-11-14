@@ -1046,7 +1046,7 @@
   <!-- Side Tab on the right -->
   <div class="side-tabs-container">
     <div class="side-tab" data-modal="modal-hex">HEX to ASCII</div>
-    <div class="side-tab" data-modal="modal-bin">BIN Decoder</div>
+    <div class="side-tab" data-modal="modal-bin">Bitmap Decoder</div>
     <!-- Add more tabs here -->
   </div>
 
@@ -1063,11 +1063,13 @@
   </div>
 
 
-  <div class="modal-overlay" id="modal-bin">
+  <div class="modal-overlay" id="modal-bitmap">
     <div class="modal-content">
       <button class="close-btn" type="button">&times;</button>
-      <h2>BIN Decoder</h2>
-      <!-- ... -->
+      <h2>Bitmap Decoder</h2>
+      <textarea id="bitmapInput" placeholder="Enter bitmap (e.g. 323A468128E21A81)" rows="2"
+        style="width: 100%; resize: vertical;"></textarea>
+      <button class="Decode-btn" id="decodeBtn">Decode</button>
     </div>
   </div>
 

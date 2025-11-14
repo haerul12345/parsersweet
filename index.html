@@ -389,8 +389,7 @@
 
     .de22-input-container label {
       padding-top: 7px;
-      font-size: 16px;
-      /* Match input font-size */
+      font-size: 16px;   /* Match input font-size */
       font-weight: bold;
       /* Adjust value as needed */
     }
@@ -777,16 +776,6 @@
       }
     }
 
-    .side-tab-bar {
-      position: fixed;
-      top: 50%;
-      right: 0;
-      transform: translateY(-50%);
-      display: flex;
-      flex-direction: column;
-      z-index: 1001;
-    }
-
     .side-tab {
       position: fixed;
       top: 50%;
@@ -1040,17 +1029,9 @@
   <div id="infoAlert" class="info-alert"></div>
 
   <!-- Tab on the right -->
-
- <div class="side-tab-bar">
-    <div class="side-tab" id="tab">
-      HEX to ASCII
-    </div>
-    <div class="side-tab" id="tab2">
-      Bitmap Viewer
-    </div>
-  </div>
-
-
+  <div class="side-tab" id="tab">
+    HEX to ASCII
+  </div>  
 
   <!-- Modal -->
   <div class="modal-overlay" id="modal">
@@ -1069,19 +1050,6 @@
       <button class="convert-btn" id="convertBtn">Convert</button>
 
       <div id="asciiResult"></div>
-    </div>
-  </div>
-
-  <!-- New Modal for BIN Decoder -->
-  <div class="modal-overlay" id="modal2">
-    <div class="modal-content">
-      <div>
-        <h2>BIN Decoder</h2>
-      </div>
-      <textarea id="binInput" placeholder="Enter BIN (e.g. 123456)" rows="2"
-        style="width: 100%; resize: vertical;"></textarea>
-      <button class="convert-btn" id="decodeBinBtn">Decode</button>
-      <div id="binResult"></div>
     </div>
   </div>
 

@@ -13,6 +13,15 @@ document.addEventListener("DOMContentLoaded", function () {
   const hexInput = document.getElementById('hexInput');
   const asciiResult = document.getElementById('asciiResult');
 
+  // Show modal and load relevant content
+    sideTabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        const tabType = tab.getAttribute('data-tab');
+        loadModalContent(tabType);
+        modal.classList.add('show');
+      });
+    });
+    
   // Show modal
   tab.addEventListener('click', () => {
     modal.classList.add('show');

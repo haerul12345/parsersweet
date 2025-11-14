@@ -17,7 +17,7 @@ document.addEventListener("DOMContentLoaded", function () {
  // tab.addEventListener('click', () => {
  //   modal.classList.add('show');
  //   hexInput.focus();
-  });
+ // });
 
   // Close modal
   /*

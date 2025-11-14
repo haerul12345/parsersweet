@@ -777,6 +777,16 @@
       }
     }
 
+    .side-tab-bar {
+      position: fixed;
+      top: 50%;
+      right: 0;
+      transform: translateY(-50%);
+      display: flex;
+      flex-direction: column;
+      z-index: 1001;
+    }
+
     .side-tab {
       position: fixed;
       top: 50%;
@@ -1030,12 +1040,17 @@
   <div id="infoAlert" class="info-alert"></div>
 
   <!-- Tab on the right -->
-  <div class="side-tab" id="tab">
-    HEX to ASCII
+
+ <div class="side-tab-bar">
+    <div class="side-tab" id="tab">
+      HEX to ASCII
+    </div>
+    <div class="side-tab" id="tab2">
+      Bitmap Viewer
+    </div>
   </div>
-  <div class="side-tab" id="tab2">
-    Bitmap Viewer
-  </div>
+
+
 
   <!-- Modal -->
   <div class="modal-overlay" id="modal">

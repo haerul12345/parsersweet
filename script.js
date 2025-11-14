@@ -14,9 +14,9 @@ document.addEventListener("DOMContentLoaded", function () {
   const asciiResult = document.getElementById('asciiResult');
 
   // Show modal
-  tab.addEventListener('click', () => {
-    modal.classList.add('show');
-    hexInput.focus();
+ // tab.addEventListener('click', () => {
+ //   modal.classList.add('show');
+ //   hexInput.focus();
   });
 
   // Close modal
@@ -28,6 +28,7 @@ document.addEventListener("DOMContentLoaded", function () {
     });
   */
   // Close modal when clicking outside
+  /*
   modal.addEventListener('click', (e) => {
     if (e.target === modal) {
       modal.classList.remove('show');
@@ -35,6 +36,39 @@ document.addEventListener("DOMContentLoaded", function () {
       hexInput.value = '';
     }
   });
+*/
+
+  // Generic side-tab/modal handler
+document.body.addEventListener('click', function (e) {
+  // Open modal on tab click
+  const tab = e.target.closest('.side-tab[data-modal]');
+  if (tab) {
+    const modalId = tab.getAttribute('data-modal');
+    const modal = document.getElementById(modalId);
+    if (modal) {
+      modal.classList.add('show');
+      const input = modal.querySelector('textarea, input[type="text"]');
+      if (input) input.focus();
+    }
+    return;
+  }
+
+  // Close modal when clicking outside modal-content
+  const modal = e.target.closest('.modal-overlay');
+  if (modal && e.target === modal) {
+    modal.classList.remove('show');
+    const result = modal.querySelector('div[id$="Result"]');
+    if (result) result.textContent = '';
+    const input = modal.querySelector('textarea, input[type="text"]');
+    if (input) input.value = '';
+  }
+
+  // Close modal on close button
+  if (e.target.classList.contains('close-btn')) {
+    const modal = e.target.closest('.modal-overlay');
+    if (modal) modal.classList.remove('show');
+  }
+});
 
   // Convert hex to ASCII
 convertBtn.addEventListener('click', () => {

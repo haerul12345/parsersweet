@@ -872,10 +872,27 @@
       /* Ensures wrapping */
     }
 
+    .bitmap-input-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin: 20px 0;
+    }
+
     #bitmapInput {
-      resize: none;
+      flex: 1 1 auto;
+      min-width: 0;
+      margin: 0;
       height: 40px;
-      /* or adjust as needed */
+      resize: none;
+    }
+
+    .decode-btn {
+      margin: 0;
+      height: 40px;
+      padding: 0 24px;
+      font-size: 16px;
+      border-radius: 20px;
     }
 
     input[type="text"] {
@@ -1072,8 +1089,16 @@
     <div class="modal-content">
       <button class="close-btn" type="button">&times;</button>
       <h2>Bitmap Decoder</h2>
-      <textarea id="bitmapInput" placeholder="Enter bitmap (e.g. 323A468128E21A81)" rows="1"></textarea>
-      <button class="decode-btn" id="decodeBtn">Decode</button>
+      <div class="bitmap-input-row">
+        <textarea id="bitmapInput" placeholder="Enter bitmap (e.g. 323A468128E21A81)" rows="1"></textarea>
+        <button class="decode-btn" id="decodeBtn">Decode</button>
+      </div>
+
+      <h3 id="primaryTitle" style="display:none;">Primary Bitmap</h3>
+      <table id="primaryTable"></table>
+      <h3 id="secondaryTitle" style="display:none;">Secondary Bitmap</h3>
+      <table id="secondaryTable" style="display:none;"></table>
+      <div id="explanation" style="display:none;"></div>
     </div>
   </div>
 

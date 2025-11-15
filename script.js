@@ -96,6 +96,114 @@ convertBtn.addEventListener('click', () => {
   asciiResult.innerHTML = output;
 });
 
+
+  // Decode Bitmap
+// Decode Bitmap
+const decodeBtn = document.getElementById('decodeBtn');
+if (decodeBtn) {
+  decodeBtn.addEventListener('click', renderBitmap);
+}
+
+function renderBitmap() {
+  const input = document.getElementById('bitmapInput').value.trim();
+  if (!/^[0-9A-Fa-f]+$/.test(input)) {
+    alert('Please enter a valid hex string.');
+    return;
+  }
+
+  // Convert hex to binary
+  let binary = '';
+  for (let i = 0; i < input.length; i++) {
+    binary += parseInt(input[i], 16).toString(2).padStart(4, '0');
+  }
+
+  const hasSecondary = binary[0] === '1';
+  const primaryBits = binary.slice(0, 64);
+  const secondaryBits = hasSecondary ? binary.slice(64, 128) : '';
+
+  // Show/hide titles and tables
+  const primaryTitle = document.getElementById('primaryTitle');
+  const secondaryTitle = document.getElementById('secondaryTitle');
+  const secondaryTable = document.getElementById('secondaryTable');
+  if (primaryTitle) primaryTitle.style.display = 'block';
+  if (secondaryTitle) secondaryTitle.style.display = hasSecondary ? 'block' : 'none';
+  if (secondaryTable) secondaryTable.style.display = hasSecondary ? 'table' : 'none';
+
+  renderBitmapTable('primaryTable', primaryBits, 1);
+  if (hasSecondary) {
+    renderBitmapTable('secondaryTable', secondaryBits, 65);
+  }
+
+  // Explanation section
+  const explanationDiv = document.getElementById('explanation');
+  if (explanationDiv) {
+    explanationDiv.style.display = 'block';
+    explanationDiv.innerHTML = `
+      <strong>Hexadecimal:</strong> ${input}<br>
+      <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
+      <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
+      <strong>Total bits:</strong> ${binary.length}
+    `;
+  }
+}
+
+function renderBitmapTable(tableId, bits, startIndex) {
+  const table = document.getElementById(tableId);
+  if (!table) return;
+  table.innerHTML = '';
+
+  // Header row
+  const headerRow = document.createElement('tr');
+  const byteHeader = document.createElement('th');
+  byteHeader.textContent = 'Byte';
+  headerRow.appendChild(byteHeader);
+  for (let col = 0; col < 8; col++) {
+    const th = document.createElement('th');
+    th.textContent = 'DE ' + (startIndex + col);
+    headerRow.appendChild(th);
+  }
+  const binaryHeader = document.createElement('th');
+  binaryHeader.textContent = 'Binary';
+  headerRow.appendChild(binaryHeader);
+  const hexHeader = document.createElement('th');
+  hexHeader.textContent = 'Hex';
+  headerRow.appendChild(hexHeader);
+  table.appendChild(headerRow);
+
+  // Rows
+  for (let row = 0; row < 8; row++) {
+    const tr = document.createElement('tr');
+    const byteCell = document.createElement('td');
+    byteCell.className = 'byte-col';
+    byteCell.textContent = 'Byte ' + (row + 1);
+    tr.appendChild(byteCell);
+
+    let binaryRow = '';
+    for (let col = 0; col < 8; col++) {
+      const bitIndex = row * 8 + col;
+      const td = document.createElement('td');
+      td.textContent = 'DE ' + (startIndex + bitIndex);
+      if (bits[bitIndex] === '1') {
+        td.classList.add('active');
+      }
+      binaryRow += bits[bitIndex];
+      tr.appendChild(td);
+    }
+
+    const binaryCell = document.createElement('td');
+    binaryCell.className = 'binary-col';
+    binaryCell.textContent = binaryRow;
+    tr.appendChild(binaryCell);
+
+    const hexCell = document.createElement('td');
+    hexCell.className = 'hex-col';
+    hexCell.textContent = parseInt(binaryRow, 2).toString(16).toUpperCase().padStart(2, '0');
+    tr.appendChild(hexCell);
+
+    table.appendChild(tr);
+  }
+}
+
   // Button EventListener
   const buttons = document.querySelectorAll(".btn");
   buttons.forEach(button => {

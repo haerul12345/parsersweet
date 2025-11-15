@@ -137,7 +137,7 @@ document.addEventListener("DOMContentLoaded", function () {
     if (explanationDiv) {
       explanationDiv.style.display = 'block';
       explanationDiv.innerHTML = `
-    <blockquote style="text-align:left;">
+    <blockquote style="text-align:left; font-size: 9px;">
     <strong>Hexadecimal:</strong> ${input}<br>
     <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
     <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>

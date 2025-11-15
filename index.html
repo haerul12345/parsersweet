@@ -950,49 +950,51 @@
     }
 
     /* Fixed table layout */
-#primaryTable,
-#secondaryTable {
-  table-layout: fixed;
-}
+    #primaryTable,
+    #secondaryTable {
+      table-layout: fixed;
+    }
 
-/* Base cell styling */
-#primaryTable th,
-#primaryTable td,
-#secondaryTable th,
-#secondaryTable td {
-  text-align: center;
-  min-width: 50px;
+    /* Base cell styling */
+    #primaryTable th,
+    #primaryTable td,
+    #secondaryTable th,
+    #secondaryTable td {
+      text-align: center;
+      min-width: 50px;
       max-width: 50px;
-      width: 80px; 
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
+      width: 50px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
 
- #primaryTable th:first-child,
+    #primaryTable th:first-child,
     #primaryTable td:first-child,
     #secondaryTable th:first-child,
     #secondaryTable td:first-child {
       min-width: 50px;
       max-width: 80px;
-      width: 80px; 
+      width: auto;
     }
 
-/* SECOND-TO-LAST column */
-#primaryTable th:nth-last-child(2),
-#primaryTable td:nth-last-child(2),
-#secondaryTable th:nth-last-child(2),
-#secondaryTable td:nth-last-child(2) {
-  width: 100px;       /* change as you need */
-}
+    /* SECOND-TO-LAST column */
+    #primaryTable th:nth-last-child(2),
+    #primaryTable td:nth-last-child(2),
+    #secondaryTable th:nth-last-child(2),
+    #secondaryTable td:nth-last-child(2) {
+      width: auto;
+      /* change as you need */
+    }
 
-/* LAST column */
-#primaryTable th:last-child,
-#primaryTable td:last-child,
-#secondaryTable th:last-child,
-#secondaryTable td:last-child {
-  width: 50px;       /* change as you need */
-}
+    /* LAST column */
+    #primaryTable th:last-child,
+    #primaryTable td:last-child,
+    #secondaryTable th:last-child,
+    #secondaryTable td:last-child {
+      width: auto;
+      /* change as you need */
+    }
 
     /* Center headings inside the Bitmap Decoder modal */
     #modal-bitmap h2,

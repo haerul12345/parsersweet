@@ -949,7 +949,53 @@
       color: #fff !important;
       font-weight: bold;
     }
-    
+
+    /* Fixed column widths for bitmap tables only */
+    #primaryTable th,
+    #primaryTable td,
+    #secondaryTable th,
+    #secondaryTable td {
+      min-width: 60px;
+      max-width: 80px;
+      width: 70px;
+      /* Adjust as needed */
+      text-align: center;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    #primaryTable th:first-child,
+    #primaryTable td:first-child,
+    #secondaryTable th:first-child,
+    #secondaryTable td:first-child {
+      min-width: 50px;
+      max-width: 60px;
+      width: 55px;
+    }
+
+    #primaryTable th:last-child,
+    #primaryTable td:last-child,
+    #secondaryTable th:last-child,
+    #secondaryTable td:last-child {
+      min-width: 70px;
+      max-width: 90px;
+      width: 80px;
+    }
+
+    /* Only left-align text inside the Bitmap Decoder modal */
+    #modal-bitmap,
+    #modal-bitmap .modal-content,
+    #modal-bitmap .modal-content * {
+      text-align: left;
+    }
+
+    /* Center table text only inside the Bitmap Decoder modal */
+    #modal-bitmap table,
+    #modal-bitmap th,
+    #modal-bitmap td {
+      text-align: center !important;
+    }
   </style>
 </head>
 

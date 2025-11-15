@@ -96,8 +96,6 @@ convertBtn.addEventListener('click', () => {
   asciiResult.innerHTML = output;
 });
 
-
-  // Decode Bitmap
 // Decode Bitmap
 const decodeBtn = document.getElementById('decodeBtn');
 if (decodeBtn) {
@@ -159,7 +157,7 @@ function renderBitmapTable(tableId, bits, startIndex) {
   headerRow.appendChild(byteHeader);
   for (let col = 0; col < 8; col++) {
     const th = document.createElement('th');
-    th.textContent = 'DE ' + (startIndex + col);
+    th.textContent = 'Bit ' + (startIndex + col);
     headerRow.appendChild(th);
   }
   const binaryHeader = document.createElement('th');

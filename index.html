@@ -945,27 +945,32 @@
     /* Highlight enabled bits in the bitmap table */
     #primaryTable td.active,
     #secondaryTable td.active {
-      background-color: #00AFDA !important;
+      background-color: #4edcff !important;
       color: #fff !important;
       font-weight: bold;
     }
 
-    /* Fixed column widths for bitmap tables only */
-    #primaryTable th,
-    #primaryTable td,
-    #secondaryTable th,
-    #secondaryTable td {
-       min-width: 50px;
+    /* Fixed table layout */
+#primaryTable,
+#secondaryTable {
+  table-layout: fixed;
+}
+
+/* Base cell styling */
+#primaryTable th,
+#primaryTable td,
+#secondaryTable th,
+#secondaryTable td {
+  text-align: center;
+  min-width: 50px;
       max-width: 50px;
       width: 80px; 
-      /* Adjust as needed */
-      text-align: center;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
 
-    #primaryTable th:first-child,
+ #primaryTable th:first-child,
     #primaryTable td:first-child,
     #secondaryTable th:first-child,
     #secondaryTable td:first-child {
@@ -974,14 +979,21 @@
       width: 80px; 
     }
 
-    #primaryTable th:last-child,
-    #primaryTable td:last-child,
-    #secondaryTable th:last-child,
-    #secondaryTable td:last-child {
-      min-width: 50px;
-      max-width: 50px;
-      width: 50px;
-    }
+/* SECOND-TO-LAST column */
+#primaryTable th:nth-last-child(2),
+#primaryTable td:nth-last-child(2),
+#secondaryTable th:nth-last-child(2),
+#secondaryTable td:nth-last-child(2) {
+  width: 80px;       /* change as you need */
+}
+
+/* LAST column */
+#primaryTable th:last-child,
+#primaryTable td:last-child,
+#secondaryTable th:last-child,
+#secondaryTable td:last-child {
+  width: 50px;       /* change as you need */
+}
 
     /* Center headings inside the Bitmap Decoder modal */
     #modal-bitmap h2,

@@ -167,7 +167,7 @@ document.addEventListener("DOMContentLoaded", function () {
     headerRow.appendChild(byteHeader);
     for (let col = 0; col < 8; col++) {
       const th = document.createElement('th');
-      th.textContent = 'Bit ' + (startIndex + col);
+      th.textContent = 'Bit ' + (col);
       headerRow.appendChild(th);
     }
     const binaryHeader = document.createElement('th');

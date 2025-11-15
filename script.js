@@ -149,6 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
     const modalContent = document.querySelector('#modal-bitmap .modal-content');
     if (modalContent) {
       modalContent.style.width = 'max-content';
+      modalContent.style.maxWidth = '60vw';  // prevents overflow
       modalContent.style.overflow = 'auto';
     }
 

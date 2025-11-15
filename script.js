@@ -146,13 +146,14 @@ document.addEventListener("DOMContentLoaded", function () {
     `;
     }
 
-    /* const modalContent = document.querySelector('#modal-bitmap .modal-content');
+    const modalContent = document.querySelector('#modal-bitmap .modal-content');
     if (modalContent) {
-      modalContent.style.width = '95vw';
-      modalContent.style.height = '90vh';
-      modalContent.style.maxWidth = '95vw';
-      modalContent.style.maxHeight = '90vh';
-    } */
+      modalContent.style.width = 'auto';
+      modalContent.style.height = 'auto';
+      modalContent.style.maxWidth = 'none';
+      modalContent.style.maxHeight = 'none';
+    }
+
   }
 
   function renderBitmapTable(tableId, bits, startIndex) {

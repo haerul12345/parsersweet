@@ -137,20 +137,19 @@ document.addEventListener("DOMContentLoaded", function () {
     if (explanationDiv) {
       explanationDiv.style.display = 'block';
       explanationDiv.innerHTML = `
-    <blockquote style="text-align:left; font-size: 12px;">
-        <strong>Hexadecimal:</strong> ${input}<br>
-        <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
-        <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
-        <strong>Total bits:</strong> ${binary.length}
-    </blockquote>
-`;
-
+        <blockquote style="text-align:left; font-size: 10px;">
+          <strong>Hexadecimal:</strong> ${input}<br>
+          <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
+          <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
+          <strong>Total bits:</strong> ${binary.length}
+        </blockquote>
+      `;
     }
 
     const modalContent = document.querySelector('#modal-bitmap .modal-content');
     if (modalContent) {
       modalContent.style.width = 'auto%';
-      modalContent.style.maxWidth = '90vw';
+      modalContent.style.maxWidth = '70vw';
       modalContent.style.height = 'auto';
     }
 

@@ -845,6 +845,17 @@
       position: relative;
     }
 
+    /* Add this to your <style> section */
+    #modal-bitmap .modal-content {
+      resize: both;
+      overflow: auto;
+      min-width: 350px;
+      min-height: 250px;
+      max-width: 95vw;
+      max-height: 90vh;
+    }
+
+
     .close-btn {
       position: absolute;
       top: 10px;
@@ -930,6 +941,15 @@
       color: #555;
       font-style: italic;
     }
+
+    /* Highlight enabled bits in the bitmap table */
+    #primaryTable td.active,
+    #secondaryTable td.active {
+      background-color: #00AFDA !important;
+      color: #fff !important;
+      font-weight: bold;
+    }
+    
   </style>
 </head>
 

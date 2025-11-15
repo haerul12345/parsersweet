@@ -137,23 +137,23 @@ document.addEventListener("DOMContentLoaded", function () {
     if (explanationDiv) {
       explanationDiv.style.display = 'block';
       explanationDiv.innerHTML = `
-    <blockquote style="text-align:left; font-size: 9px;">
-    <strong>Hexadecimal:</strong> ${input}<br>
-    <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
-    <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
-    <strong>Total bits:</strong> ${binary.length}
+    <blockquote style="text-align:left; font-size: 18px;">
+        <strong>Hexadecimal:</strong> ${input}<br>
+        <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
+        <strong>Bit 1:</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
+        <strong>Total bits:</strong> ${binary.length}
     </blockquote>
-    `;
+`;
+
     }
 
     const modalContent = document.querySelector('#modal-bitmap .modal-content');
     if (modalContent) {
-      modalContent.style.width = 'auto';
-      modalContent.style.height = 'auto';
-      modalContent.style.maxWidth = 'none';
-      modalContent.style.maxHeight = 'none';
-    }
-
+      modalContent.style.width = '95vw';
+      modalContent.style.height = '90vh';
+      modalContent.style.maxWidth = '95vw';
+      modalContent.style.maxHeight = '90vh';
+    } 
   }
 
   function renderBitmapTable(tableId, bits, startIndex) {

@@ -134,9 +134,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Explanation section
     const explanationDiv = document.getElementById('explanation');
+
+
+
     if (explanationDiv) {
       explanationDiv.style.display = 'block';
-      explanationDiv.innerHTML = `
+
+      if (hasSecondary) {
+        explanationDiv.innerHTML = `
+          <blockquote style="text-align:left; font-size: 11px;">
+            <strong>Hexadecimal:</strong> ${input}<br>
+            <strong>Binary:</strong> 
+            <span class="binary-string">
+            ${hasSecondary
+              ? binary.slice(0, binary.length / 2) + '<br>' + binary.slice(binary.length / 2)
+              : binary}
+            </span><br>
+            <strong>Byte 1 Bit 0 (or DE 1):</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
+            <strong>Total bits:</strong> ${binary.length}
+            </blockquote>
+          `;
+      } else {
+        explanationDiv.innerHTML = `
         <blockquote style="text-align:left; font-size: 11px;">
           <strong>Hexadecimal:</strong> ${input}<br>
           <strong>Binary:</strong> <span class="binary-string">${binary}</span><br>
@@ -144,6 +163,7 @@ document.addEventListener("DOMContentLoaded", function () {
           <strong>Total bits:</strong> ${binary.length}
         </blockquote>
       `;
+      }
     }
 
     const modalContent = document.querySelector('#modal-bitmap .modal-content');

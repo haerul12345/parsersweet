@@ -149,7 +149,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     const modalContent = document.querySelector('#modal-bitmap .modal-content');
     if (modalContent) {
-      modalContent.style.width = 'auto';
+      modalContent.style.width = '50%';
       modalContent.style.height = 'auto';
     }
 

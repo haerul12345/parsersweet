@@ -144,7 +144,7 @@ document.addEventListener("DOMContentLoaded", function () {
         explanationDiv.innerHTML = `
           <blockquote style="text-align:left; font-size: 11px;">
             <strong>Hexadecimal:</strong> ${input}<br>
-            <strong>Binary:</strong> 
+            <strong>Binary:</strong><br>
             <span class="binary-string">
             ${hasSecondary
               ? binary.slice(0, binary.length / 2) + '<br>' + binary.slice(binary.length / 2)

@@ -13,31 +13,6 @@ document.addEventListener("DOMContentLoaded", function () {
   const hexInput = document.getElementById('hexInput');
   const asciiResult = document.getElementById('asciiResult');
 
-  // Show modal
-  // tab.addEventListener('click', () => {
-  //   modal.classList.add('show');
-  //   hexInput.focus();
-  // });
-
-  // Close modal
-  /*
-    closeBtn.addEventListener('click', () => {
-      modal.classList.remove('show');
-      asciiResult.textContent = '';
-      hexInput.value = '';
-    });
-  */
-  // Close modal when clicking outside
-  /*
-  modal.addEventListener('click', (e) => {
-    if (e.target === modal) {
-      modal.classList.remove('show');
-      asciiResult.textContent = '';
-      hexInput.value = '';
-    }
-  });
-*/
-
   // Generic side-tab/modal handler
   document.body.addEventListener('click', function (e) {
     // Open modal on tab click
@@ -105,8 +80,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderBitmap() {
     const input = document.getElementById('bitmapInput').value.trim();
     if (!/^[0-9A-Fa-f]+$/.test(input)) {
-      //alert('Please enter a valid hex string.');
-      showAlert(`Please enter a valid hex string.`, "warning");
+      alert('Please enter a valid hex string.');      
       return;
     }
 
@@ -659,7 +633,6 @@ function showAlert(message, type = 'info', callback = null) {
   alertText.innerHTML = icon + `<div style="text-align: center;">${message}</div>`;
   document.getElementById("overlay").style.display = "block";
   document.getElementById('customAlert').style.display = 'block';
-  document.querySelector('.modal-content').classList.add('blur');
   alertCallback = callback; // Store the callback
 }
 
@@ -679,7 +652,6 @@ function showInfoAlert(message) {
 function closeAlert() {
   document.getElementById('customAlert').style.display = 'none';
   document.getElementById("overlay").style.display = "none";
-  document.querySelector('.modal-content').classList.remove('blur');
   if (typeof alertCallback === 'function') {
     alertCallback();
     alertCallback = null; // Reset after calling

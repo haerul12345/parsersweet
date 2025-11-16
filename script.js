@@ -1,7 +1,7 @@
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "3.8";
+  const appVersion = "3.9";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 
@@ -93,7 +93,7 @@ document.addEventListener("DOMContentLoaded", function () {
       output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}${ascii}</blockquote>`;
     });
 
-    asciiResult.innerHTML = output;
+    asciiResult.innerHTML = output;    
   });
 
   // Decode Bitmap
@@ -105,7 +105,8 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderBitmap() {
     const input = document.getElementById('bitmapInput').value.trim();
     if (!/^[0-9A-Fa-f]+$/.test(input)) {
-      alert('Please enter a valid hex string.');
+      //alert('Please enter a valid hex string.');
+      showAlert(`Please enter a valid hex string.`, "warning");
       return;
     }
 
@@ -134,8 +135,6 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Explanation section
     const explanationDiv = document.getElementById('explanation');
-
-
 
     if (explanationDiv) {
       explanationDiv.style.display = 'block';
@@ -171,8 +170,8 @@ document.addEventListener("DOMContentLoaded", function () {
       modalContent.style.width = 'max-content';
       modalContent.style.maxWidth = '50vw';  // prevents overflow
       modalContent.style.overflow = 'auto';
-    }
-
+      showInfoAlert('Bitmap decoded successfully!');
+    }    
   }
 
   function renderBitmapTable(tableId, bits, startIndex) {

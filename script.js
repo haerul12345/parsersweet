@@ -659,6 +659,7 @@ function showAlert(message, type = 'info', callback = null) {
   alertText.innerHTML = icon + `<div style="text-align: center;">${message}</div>`;
   document.getElementById("overlay").style.display = "block";
   document.getElementById('customAlert').style.display = 'block';
+  document.querySelector('.modal-content').classList.add('blur');
   alertCallback = callback; // Store the callback
 }
 
@@ -678,7 +679,7 @@ function showInfoAlert(message) {
 function closeAlert() {
   document.getElementById('customAlert').style.display = 'none';
   document.getElementById("overlay").style.display = "none";
-
+  document.querySelector('.modal-content').classList.remove('blur');
   if (typeof alertCallback === 'function') {
     alertCallback();
     alertCallback = null; // Reset after calling

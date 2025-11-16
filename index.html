@@ -853,6 +853,10 @@
       position: relative;
     }
 
+    .modal-content.blur {
+      filter: blur(4px);
+    }
+
     /* Add this to your <style> section */
     #modal-bitmap .modal-content {
       overflow: auto;
@@ -1176,7 +1180,7 @@
   </div>
 
 
-  <div class="modal-overlay" id="modal-bitmap">    
+  <div class="modal-overlay" id="modal-bitmap">
     <div class="modal-content">
       <button class="close-btn" type="button">&times;</button>
       <h2>Bitmap Decoder</h2>

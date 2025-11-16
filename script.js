@@ -1340,7 +1340,7 @@ var tagsList = {
   _9F16: "Merchant Identifier",
   _9F17: "Personal Identification Number (PIN) Try Counter",
   _9F18: "Issuer Script Identifier",
-  _9F19: "Deleted (see 9F49)",
+  _9F19: "Token Requestor ID",
   _9F1A: "Terminal Country Code",
   _9F1B: "Terminal Floor Limit",
   _9F1C: "Terminal Identification",
@@ -3718,9 +3718,11 @@ function showCVMTooltip(el, evt) {
     box.style.top = (evt.clientY + 10) + 'px';
   }
 }
+
 function hideCVMTooltip(el) {
   const box = el.querySelector('.cvm-tooltip-box');
   if (box) box.style.display = 'none';
 }
+
 window.showCVMTooltip = showCVMTooltip;
 window.hideCVMTooltip = hideCVMTooltip;

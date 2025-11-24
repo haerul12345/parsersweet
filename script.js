@@ -1,9 +1,117 @@
+// --- TVR labels (shared) ---
+const TVR_BASE_LABELS = [
+  [
+    "Bit 8: Offline data authentication was not performed",
+    "Bit 7: SDA failed",
+    "Bit 6: ICC data missing",
+    "Bit 5: Card appears on terminal exception file",
+    "Bit 4: DDA failed",
+    "Bit 3: CDA failed",
+    "Bit 2: SDA selected",
+    "Bit 1: RFU"
+  ],
+  [
+    "Bit 8: ICC and terminal have different application versions",
+    "Bit 7: Expired application",
+    "Bit 6: Application not yet effective",
+    "Bit 5: Requested service not allowed for card product",
+    "Bit 4: New card",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  [
+    "Bit 8: Cardholder verification was not successful",
+    "Bit 7: Unrecognised CVM",
+    "Bit 6: PIN try limit exceeded",
+    "Bit 5: PIN entry required and PIN pad not present or not working",
+    "Bit 4: PIN entry required, PIN pad present, but PIN was not entered",
+    "Bit 3: Online PIN entered",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  [
+    "Bit 8: Transaction exceeds floor limit",
+    "Bit 7: Lower consecutive offline limit exceeded",
+    "Bit 6: Upper consecutive offline limit exceeded",
+    "Bit 5: Transaction selected randomly for online processing",
+    "Bit 4: Merchant forced transaction online",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  // default byte 5 (non-PayPass)
+  [
+    "Bit 8: Default TDOL was used",
+    "Bit 7: Issuer authentication failed",
+    "Bit 6: Script processing failed before final GENERATE AC",
+    "Bit 5: Script processing failed after final GENERATE AC",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ]
+];
+
+let scheme; // default selection
+function clone(arr) {
+  return JSON.parse(JSON.stringify(arr));
+}
+
+function getTvrLabels(scheme) {
+  const base = clone(TVR_BASE_LABELS.slice(0, 4));
+
+  if ((scheme || "") === "paypass") {
+    return [
+      ...base,
+      [
+        "Bit 8: Default TDOL was used",
+        "Bit 7: Issuer authentication failed",
+        "Bit 6: Script processing failed before final GENERATE AC",
+        "Bit 5: Script processing failed after final GENERATE AC",
+        "Bit 4: Relay resistance threshold exceeded",
+        "Bit 3: Relay resistance time limits exceeded",
+        "Bit 2: Relay Resistance Protocol flags meaning:",
+        "Bit 1: See flags below"
+      ]
+    ];
+  }
+
+  return [
+    ...base,
+    [
+      "Bit 8: Default TDOL was used",
+      "Bit 7: Issuer authentication failed",
+      "Bit 6: Script processing failed before final GENERATE AC",
+      "Bit 5: Script processing failed after final GENERATE AC",
+      "Bit 4: RFU",
+      "Bit 3: RFU",
+      "Bit 2: RFU",
+      "Bit 1: RFU"
+    ]
+  ];
+}
+
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "3.9";
+  const appVersion = "4.0";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
+
+
+  //
+
+  document.querySelectorAll('input[name="scheme"]').forEach(radio => {
+    radio.addEventListener("change", (e) => {
+      scheme = e.target.value;
+      console.log("Scheme set to:", scheme);
+
+      if (!document.getElementById("tvr-input").value) return;
+      tvr(scheme);
+    });
+  });
+
 
   // TAB
   const tab = document.getElementById('tab');
@@ -29,14 +137,14 @@ document.addEventListener("DOMContentLoaded", function () {
     }
 
     // Close modal when clicking outside modal-content
-    const modal = e.target.closest('.modal-overlay');
+    /* const modal = e.target.closest('.modal-overlay');
     if (modal && e.target === modal) {
       modal.classList.remove('show');
       const result = modal.querySelector('div[id$="Result"]');
       if (result) result.textContent = '';
       const input = modal.querySelector('textarea, input[type="text"]');
       if (input) input.value = '';
-    }
+    } */
 
     // Close modal on close button
     if (e.target.classList.contains('close-btn')) {
@@ -68,7 +176,7 @@ document.addEventListener("DOMContentLoaded", function () {
       output += `<blockquote>${isMultiline ? `Line ${index + 1}: ` : ''}${ascii}</blockquote>`;
     });
 
-    asciiResult.innerHTML = output;    
+    asciiResult.innerHTML = output;
   });
 
   // Decode Bitmap
@@ -80,7 +188,7 @@ document.addEventListener("DOMContentLoaded", function () {
   function renderBitmap() {
     const input = document.getElementById('bitmapInput').value.trim();
     if (!/^[0-9A-Fa-f]+$/.test(input)) {
-      alert('Please enter a valid hex string.');      
+      alert('Please enter a valid hex string.');
       return;
     }
 
@@ -120,8 +228,8 @@ document.addEventListener("DOMContentLoaded", function () {
             <strong>Binary:</strong><br>
             <span class="binary-string">
             ${hasSecondary
-              ? binary.slice(0, binary.length / 2) + '<br>' + binary.slice(binary.length / 2)
-              : binary}
+            ? binary.slice(0, binary.length / 2) + '<br>' + binary.slice(binary.length / 2)
+            : binary}
             </span><br>
             <strong>Byte 1 Bit 0 (or DE 1):</strong> ${binary[0]} (Secondary bitmap ${hasSecondary ? 'present' : 'not present'})<br>
             <strong>Total bits:</strong> ${binary.length}
@@ -143,9 +251,10 @@ document.addEventListener("DOMContentLoaded", function () {
     if (modalContent) {
       modalContent.style.width = 'max-content';
       modalContent.style.maxWidth = '50vw';  // prevents overflow
+      modalContent.style.maxHeight = '90vh'; // Example: 90% of the viewport height
       modalContent.style.overflow = 'auto';
       showInfoAlert('Bitmap decoded successfully!');
-    }    
+    }
   }
 
   function renderBitmapTable(tableId, bits, startIndex) {
@@ -204,6 +313,28 @@ document.addEventListener("DOMContentLoaded", function () {
       table.appendChild(tr);
     }
   }
+
+  document.querySelectorAll(".tab-btn").forEach(button => {
+    button.addEventListener("click", () => {
+
+      const tabId = button.getAttribute("data-tab");
+
+      // deactivate all buttons
+      document.querySelectorAll(".tab-btn").forEach(btn =>
+        btn.classList.remove("active")
+      );
+
+      // deactivate all tabs
+      document.querySelectorAll(".tab-content").forEach(tab =>
+        tab.classList.remove("active")
+      );
+
+      // activate the selected tab
+      button.classList.add("active");
+      document.getElementById(tabId).classList.add("active");
+    });
+  });
+
 
   // Button EventListener
   const buttons = document.querySelectorAll(".btn");
@@ -589,6 +720,1749 @@ function copyTable() {
     showAlert(`Oops!  No table to copy`, "error");
   }
 }
+
+//
+// EMV Tools tab function
+// 
+
+// TVR Parser code
+const tvrInput = document.getElementById("tvr-input");
+
+tvrInput.addEventListener("input", () => {
+  // Allow only hex characters and spaces
+  let value = tvrInput.value.replace(/[^0-9a-fA-F ]/g, '');
+
+  // Count hex digits only, max 10
+  const hexOnly = value.replace(/\s/g, '');
+  if (hexOnly.length > 10) {
+    // Trim extra hex characters from the end
+    let excess = hexOnly.length - 10;
+    let i = value.length - 1;
+    while (excess > 0 && i >= 0) {
+      if (/[0-9a-fA-F]/.test(value[i])) {
+        value = value.slice(0, i) + value.slice(i + 1);
+        excess--;
+      }
+      i--;
+    }
+  }
+
+  tvrInput.value = value;
+  tvr(scheme);
+});
+
+// TVR function
+function tvr(scheme) {
+  console.log("Enter TVR with scheme :", scheme); // Add this line
+
+  const inputEl = document.getElementById("tvr-input");
+  let outputElExisting = document.getElementById("tvr-output");
+
+  if (!inputEl) return;
+
+  const raw = (inputEl.value || "").trim().replace(/\s+/g, "").toUpperCase();
+
+  if (!/^[0-9A-F]{10}$/.test(raw)) {
+    const msg = "Please enter a valid TVR (5 bytes hex, e.g. 0011223344).";
+    if (outputElExisting) {
+      outputElExisting.innerHTML = `<div style="color:#b00;font-family:monospace;">${msg}</div>`;
+    } else {
+      showAlert(msg, "warning");
+    }
+    return;
+  }
+
+  const bytes = [
+    raw.slice(0, 2),
+    raw.slice(2, 4),
+    raw.slice(4, 6),
+    raw.slice(6, 8),
+    raw.slice(8, 10)
+  ];
+  const bins = bytes.map(b => parseInt(b, 16).toString(2).padStart(8, "0"));
+
+  //getTvrLabels(scheme);
+
+  const selectedScheme = document.querySelector('input[name="scheme"]:checked')?.value;
+  console.log("Selected scheme :", selectedScheme);
+
+  const tvrLabels = getTvrLabels(selectedScheme);;
+  console.log("TVR :", tvrLabels); // Add this line
+
+  // Build the 3-column HTML (unchanged)
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  html += `<div style="margin-bottom:8px;"><strong>TVR:</strong> ${raw} &nbsp; <small style="color:#666">(${bins.join(' ')})</small></div>`;
+  html += `<div style="display:flex;gap:10px;align-items:flex-start;">`;
+
+  const makeByteCard = (index) => {
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;"><strong>Byte ${index + 1}</strong> &nbsp; <small style="color:#666">(${byteHex})</small></div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+    for (let k = 0; k < 8; k++) {
+      const bitNumber = 8 - k;
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const desc = (tvrLabels[index] && tvrLabels[index][k]) ? tvrLabels[index][k] : "";
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      //card += `<div style="width:56px;color:#333;text-align:left">Bit ${bitNumber}</div>`;
+      card += `<div style="width:28px;flex:0 0 28px;"><input type="checkbox" disabled ${checked} /></div>`;
+      card += `<div style="flex:1;color:#222;font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px;">${makeByteCard(0)}${makeByteCard(1)}</div>`;
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px;">${makeByteCard(2)}${makeByteCard(3)}</div>`;
+
+  let byte5ColumnHtml = `<div style="flex:0.8;display:flex;flex-direction:column;gap:8px;">`;
+  byte5ColumnHtml += makeByteCard(4);
+
+  // Only add RRP flags if PayPass
+  if (selectedScheme === "paypass") {
+    const rrpBits = bins[4].slice(5, 8);
+
+    let rrpMeaning = "";
+    switch (rrpBits) {
+      case "000": rrpMeaning = "RRP not supported"; break;
+      case "001": rrpMeaning = "RRP supported but not performed"; break;
+      case "010": rrpMeaning = "RRP performed successfully"; break;
+      case "011": rrpMeaning = "RRP failed"; break;
+      default: rrpMeaning = "Reserved for future or proprietary use"; break;
+    }
+
+    byte5ColumnHtml += `
+    <div style="margin-top:12px;padding:8px;background:#f8f8f8;border:1px solid #ddd;border-radius:6px;">
+      <strong>Relay Resistance Protocol flags (Byte 5 bits 3–1):</strong> ${rrpBits}<br>
+      <strong>Meaning:</strong> ${rrpMeaning}
+    </div>
+  `;
+  }
+
+  byte5ColumnHtml += `</div>`; // close column div
+
+  // Add to main html
+  html += byte5ColumnHtml;
+
+  html += `</div></div>`;
+
+  // Place the result inside the TVR tab content (so switching tabs hides it)
+  const modal = document.getElementById('modal-emv');
+  let outputEl = outputElExisting;
+
+  if (modal) {
+    // Find the tab button whose tab content contains the tvr input
+    const tabButtons = Array.from(modal.querySelectorAll('.tab-btn[data-tab]'));
+    const tvrTabBtn = tabButtons.find(btn => {
+      const tabId = btn.getAttribute('data-tab');
+      const tabContent = modal.querySelector(`#${tabId}`);
+      return tabContent && tabContent.querySelector('#tvr-input');
+    }) || modal.querySelector('.tab-btn[data-tab="tab1"]');
+
+    // If found, activate/click it and determine target content container
+    let targetTabContent = null;
+    if (tvrTabBtn) {
+      const tabId = tvrTabBtn.getAttribute('data-tab');
+      tvrTabBtn.click();
+      targetTabContent = modal.querySelector(`#${tabId}`);
+    }
+
+    // Fallback: use modal .modal-content
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    if (!targetTabContent) targetTabContent = modalContent;
+
+    // Ensure output container exists inside the specific tab content
+    outputEl = targetTabContent.querySelector('#tvr-output') || outputEl;
+    if (!outputEl) {
+      outputEl = document.createElement('div');
+      outputEl.id = 'tvr-output';
+      outputEl.style.fontFamily = 'monospace';
+      outputEl.style.padding = '8px';
+      targetTabContent.appendChild(outputEl);
+    }
+
+    // Allow modal content to expand but keep it within viewport
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+  }
+
+  if (outputEl) {
+    outputEl.innerHTML = html;
+    showInfoAlert('TVR parsed successfully.');
+  } else {
+    showInfoAlert("TVR parsed. Add an element with id='tvr-output' or ensure modal with id='modal-emv' exists to view details.");
+  }
+}
+
+const cvmlInput = document.getElementById("cvml-input");
+
+cvmlInput.addEventListener("input", () => {
+  // Allow only hex characters and spaces
+  let value = cvmlInput.value.replace(/[^0-9a-fA-F ]/g, '');
+
+  // Preserve whatever user types (continuous or with spaces)
+  cvmlInput.value = value;
+
+  // Optional: call your function to process input
+  cvml();
+});
+// --- START: Data Structures and Helper Functions ---
+
+function getCVMMethodMeaning(code) {
+  if (code === 0x00) return "Fail CVM processing";
+  if (code === 0x01) return "Plaintext PIN verification performed by ICC";
+  if (code === 0x02) return "Enciphered PIN verified online";
+  if (code === 0x03) return "Plaintext PIN verification performed by ICC and Signature";
+  if (code === 0x04) return "Enciphered PIN verification performed by ICC";
+  if (code === 0x05) return "Enciphered PIN verification performed by ICC and Signature";
+  if (code === 0x1E) return "Signature (paper)";
+  if (code === 0x1F) return "No CVM required";
+  if (code === 0x3F) return "RFU (Not available for use)";
+  if (code >= 0x06 && code <= 0x1D) return "RFU (EMV reserved)";
+  if (code >= 0x20 && code <= 0x2F) return "RFU (Payment system reserved)";
+  if (code >= 0x30 && code <= 0x3E) return "RFU (Issuer reserved)";
+  return "Unknown CVM Method";
+}
+
+const CVM_CONDITIONS = {
+  "00": "Always",
+  "01": "If unattended cash",
+  "02": "If not unattended cash and not manual cash and not purchase with cashback",
+  "03": "If terminal supports the CVM",
+  "04": "If manual cash",
+  "05": "If purchase with cashback",
+  "06": "If transaction in application currency AND under Amount X",
+  "07": "If transaction in application currency AND over Amount X",
+  "08": "If transaction in application currency AND under Amount Y",
+  "09": "If transaction in application currency AND over Amount Y",
+};
+
+for (let i = 0x0A; i <= 0x7F; i++) {
+  const key = i.toString(16).toUpperCase().padStart(2, "0");
+  if (!CVM_CONDITIONS[key]) CVM_CONDITIONS[key] = "RFU (EMV reserved)";
+}
+
+for (let i = 0x80; i <= 0xFF; i++) {
+  const key = i.toString(16).toUpperCase().padStart(2, "0");
+  CVM_CONDITIONS[key] = "Reserved for use by individual payment systems";
+}
+
+function hexToInt(bytes) {
+  return parseInt(bytes.join(""), 16);
+}
+
+// --- END: Data Structures and Helper Functions ---
+
+// Note: This code assumes the existence of the hexToInt, getCVMMethodMeaning, and CVM_CONDITIONS helpers 
+// as defined in the previous steps, which is necessary for the parsing logic to work.
+
+function cvml() {
+  let cvmlValue = (document.getElementById("cvml-input").value || "").trim().replace(/\s+/g, "").toUpperCase();
+
+  let outputCVMLExisting = document.getElementById("cvml-output");
+
+  // --- 1. Validation ---
+  if (!/^[0-9A-F]{16,}$/.test(cvmlValue) || cvmlValue.length % 2 !== 0) {
+    if (outputCVMLExisting) outputCVMLExisting.innerHTML = "<p style='color:red;'>Invalid CVM List format. Must be a hex string of at least 16 digits.</p>";
+    return;
+  }
+
+  const bytes = [];
+  for (let i = 0; i < cvmlValue.length; i += 2) {
+    bytes.push(cvmlValue.slice(i, i + 2));
+  }
+
+  // --- 2. Parse Amounts X and Y ---
+  // Assumes hexToInt helper is available
+  const amountX = hexToInt(bytes.slice(0, 4));
+  const amountY = hexToInt(bytes.slice(4, 8));
+
+  // --- 3. Parse CVM Entries ---
+  const cvmRules = [];
+  for (let i = 8; i < bytes.length; i += 2) {
+    const methodByte = bytes[i];
+    const condByte = bytes[i + 1];
+
+    const methodInt = parseInt(methodByte, 16);
+    const cvmCode = methodInt & 0x3F;
+    const tryNext = (methodInt & 0x40) >> 6;
+
+    // Assumes getCVMMethodMeaning and CVM_CONDITIONS helpers are available
+    const cvmMeaning = getCVMMethodMeaning(cvmCode);
+    const condMeaning = CVM_CONDITIONS[condByte] || "Unknown Condition";
+
+    cvmRules.push({
+      ruleNum: (i - 8) / 2 + 1,
+      methodByte,
+      condByte,
+      cvmCode: cvmCode.toString(16).toUpperCase().padStart(2, '0'),
+      cvmMeaning,
+      condMeaning,
+      tryNext
+    });
+  }
+
+  // --- 4. Build HTML Output with CSS Classes ---
+  let html = `
+    <div class="cvm-card" style="border-left-color:#00AFDA; text-align: left; font-size: 12px;">
+        <div class="card-line" style="display: grid; grid-template-columns: 70px 1fr;"><span class="label">Amount X:</span> $${(amountX / 100).toFixed(2)} (Hex: ${bytes.slice(0, 4).join("")})</div>
+        <div class="card-line" style="display: grid; grid-template-columns: 70px 1fr;"><span class="label">Amount Y:</span> $${(amountY / 100).toFixed(2)} (Hex: ${bytes.slice(4, 8).join("")})</div>
+        <span class="card-quote">Amounts are typically in the minor currency unit (e.g., cents), so the displayed value is divided by 100.</span>
+    </div>
+    <div class="columns" id="cvml-rules-columns">
+`;
+
+  // Column logic and HTML generation
+  const totalRules = cvmRules.length;
+  let col1Content = '';
+  let col2Content = '';
+  const half = Math.ceil(totalRules / 2);
+
+  cvmRules.forEach((rule) => {
+    const { ruleNum, methodByte, condByte, cvmCode, cvmMeaning, condMeaning, tryNext } = rule;
+
+    const failBehaviorLine = tryNext === 1
+      ? `Apply succeeding CV Rule (b7=1)`
+      : `Fail cardholder verification (b7=0)`;
+
+    const finalAction = tryNext === 1
+      ? `continue to the next rule`
+      : `fail cardholder verification`;
+
+    //const quoteText = `*Attempt ${cvmMeaning} if the condition ${condMeaning} is met. If the CVM is unsuccessful, the action will be to ${finalAction}.*`;
+
+    let bg = '';
+
+    // --- UPDATED BACKGROUND LOGIC ---
+    if (ruleNum <= half) {
+      // Column 1: Standard alternating (Rule 2, 4, 6... are gray)
+      bg = (ruleNum % 2 === 0) ? 'bg-grey' : '';
+    } else {
+      // Column 2: Position in the second column (starts at 1)
+      const posInCol2 = ruleNum - half;
+
+      // The goal is for the *first* rule in Col 2 (posInCol2=1) to be gray.
+      // Odd-numbered positions (1, 3, 5...) in Col 2 should be gray.
+      bg = (posInCol2 % 2 !== 0) ? 'bg-grey' : '';
+    }
+    // ----------------------------------
+
+    const ruleHtml = `
+<div class="cvm-card ${bg}" style="border-left-color: #B3F1FF; text-align: left; font-size: 12px;">
+ <strong>CVM Rule ${ruleNum}: (${methodByte}${condByte}) </strong>
+ <hr style="margin: 4px 0; border-top: 1px solid #eee;">
+<div class="card-line"><span class="label">CVM Method:</span> ${cvmMeaning} (${cvmCode})</div>
+<div class="card-line"><span class="label">If unsuccessful:</span> ${failBehaviorLine}</div>
+<div class="card-line"><span class="label">Condition Code:</span> ${condMeaning} (${condByte})</div> 
+</div>
+`;
+    // this one no quote
+    /*
+    const ruleHtml = `
+            <div class="cvm-card ${bg}" style="border-left-color: #B3F1FF; text-align: left; font-size: 12px;">
+                <div class="card-line"><span class="label">CVM Rule ${ruleNum}:</span> (${methodByte} ${condByte})</div>
+                <div class="card-line"><span class="label">CVM Method:</span> ${cvmMeaning} (Code ${cvmCode})</div>
+                <div class="card-line"><span class="label">If unsuccessful:</span> ${failBehaviorLine}</div>
+                <div class="card-line"><span class="label">Condition Code:</span> ${condMeaning} (Code ${condByte})</div>               
+            </div>
+        `;
+    */
+
+    // this one with quote
+    /*
+    const ruleHtml = `
+        <div class="cvm-card ${bg}" style="border-left-color: #B3F1FF; text-align: left; font-size: 12px;">
+            <div class="card-line"><span class="label">CVM Rule ${ruleNum}:</span> (${methodByte} ${condByte})</div>
+            <div class="card-line"><span class="label">CVM Method:</span> ${cvmMeaning} (Code ${cvmCode})</div>
+            <div class="card-line"><span class="label">If unsuccessful:</span> ${failBehaviorLine}</div>
+            <div class="card-line"><span class="label">Condition Code:</span> ${condMeaning} (Code ${condByte})</div>
+            <span class="card-quote">${quoteText}</span>
+        </div>
+    `;
+    */
+    if (ruleNum <= half) {
+      col1Content += ruleHtml;
+    } else {
+      col2Content += ruleHtml;
+    }
+  });
+
+  html += `<div class="column">${col1Content}</div>`;
+  if (totalRules > 0) {
+    html += `<div class="column">${col2Content}</div>`;
+  }
+  html += `</div>`;
+
+  // --- 5. Modal/Tab Handling and Output (YOUR REQUIRED LOGIC) ---
+
+  const modal = document.getElementById('modal-emv');
+  let outputCVML = outputCVMLExisting;
+
+  if (modal) {
+    const tabButtons = Array.from(modal.querySelectorAll('.tab-btn[data-tab]'));
+
+    const cvmlTabBtn = tabButtons.find(btn => {
+      const tabId = btn.getAttribute('data-tab');
+      const tabContent = modal.querySelector(`#${tabId}`);
+      return tabContent && tabContent.querySelector('#cvml-input');
+    }) || modal.querySelector('.tab-btn[data-tab="tab2"]');
+
+    let targetTabContent = null;
+    if (cvmlTabBtn) {
+      const tabId = cvmlTabBtn.getAttribute('data-tab');
+      cvmlTabBtn.click();
+      targetTabContent = modal.querySelector(`#${tabId}`);
+    }
+
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    if (!targetTabContent) targetTabContent = modalContent;
+
+    outputCVML = targetTabContent.querySelector('#cvml-output') || outputCVML;
+
+    if (!outputCVML) {
+      outputCVML = document.createElement('div');
+      outputCVML.id = 'cvml-output';
+      outputCVML.style.fontFamily = 'monospace';
+      outputCVML.style.padding = '8px';
+      targetTabContent.appendChild(outputCVML);
+    }
+
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+  }
+
+  // --- 6. Final Output ---
+  if (outputCVML) {
+    outputCVML.innerHTML = html;
+    showInfoAlert('CVM List parsed successfully.');
+  } else {
+    //showAlert("CVML parsed. Add an element with id='cvml-output' to view details.", "info");
+  }
+}
+
+
+const cvmrInput = document.getElementById("cvmr-input");
+
+cvmrInput.addEventListener("input", () => {
+  // Allow only hex characters and spaces
+  let value = cvmrInput.value.replace(/[^0-9a-fA-F ]/g, '');
+
+  // Preserve whatever user types (continuous or with spaces)
+  cvmrInput.value = value;
+
+  // Optional: call your function to process input
+  cvmr();
+});
+
+// --- START: CVM Results Parser (9F34) ---
+function cvmr() {
+  // Get the input element and its value
+  const inputElement = document.getElementById("cvmr-input");
+  const cvmr = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  // Define the output element ID (Assuming the output div is named 'cvmr-output')
+  let outputElement = document.getElementById("cvmr-output");
+
+  // --- START: Modal/Tab Handling and Output Setup ---
+  const modal = document.getElementById('modal-emv');
+
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+
+    // Try to find the output element within the current tab (tab3)
+    const tab3 = document.getElementById('tab3');
+    if (tab3) {
+      outputElement = tab3.querySelector('#cvmr-output') || outputElement;
+    }
+
+    // If the output element doesn't exist, create it inside the modal/tab
+    if (!outputElement && tab3) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'cvmr-output';
+      outputElement.style.marginTop = '15px';
+      tab3.appendChild(outputElement);
+    }
+
+    // Modal resizing logic
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+  }
+
+  if (!outputElement) return; // Exit if we couldn't find or create the output element
+
+  // --- 2. Validation ---
+  if (cvmr.length !== 6 || !/^[0-9A-F]{6}$/.test(cvmr)) {
+
+    if (cvmr.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid CVM Results  format. Must be a 6-digit hex string (3 bytes).</p>";
+    }
+    // Keep modal visible, just clear/change content
+    return;
+  }
+
+  const Byte1 = cvmr.slice(0, 2);
+  const Byte2 = cvmr.slice(2, 4);
+  const Byte3 = cvmr.slice(4, 6);
+
+  // --- 3. Decode Byte 1 (CVM Method/Action) ---
+  const methodInt = parseInt(Byte1, 16);
+  const cvmCode = methodInt & 0x3F;
+  // NOTE: Requires getCVMMethodMeaning to be defined elsewhere
+  const CVM = getCVMMethodMeaning(cvmCode);
+
+  const tryNext = (methodInt & 0x40) >> 6;
+  const ifUnsuccessful = tryNext === 1
+    ? `Apply succeeding CV Rule`
+    : `Fail cardholder verification`;
+  // --- 4. Decode Byte 2 (CVM Condition) ---
+  // NOTE: Requires CVM_CONDITIONS to be defined elsewhere
+  const Condition = CVM_CONDITIONS[Byte2] || `Unknown Condition (Code ${Byte2})`;
+
+  // --- 5. Decode Byte 3 (Result) ---
+  let ResultText;
+  switch (Byte3) {
+    case '00':
+      ResultText = 'Unknown or Not Performed';
+      break;
+    case '01':
+      ResultText = "Failed";
+      break;
+    case '02':
+      ResultText = 'Success';
+      break;
+    default:
+      ResultText = 'RFU (Reserved for Future Use)';
+      break;
+  }
+  // Before the HTML output:
+  const resultDetail = `${ResultText}`; // No space needed here
+  const resultStyle = (Byte3 === '02') ? 'color:green; font-weight:bold;' : (Byte3 === '01') ? 'color:red;' : '';
+
+
+  // --- 6. Build HTML Output (Revised to use card-line format) ---
+  outputElement.innerHTML = `
+    <div class="cvm-card" style="border-left-color:#00AFDA; text-align: left; font-size: 12px; padding: 10px;">
+        <div class="card-line" style="display: grid; grid-template-columns: 120px 1fr;">
+            <span class="label">CVM Method:</span> 
+            <span>${CVM} (${Byte1}) </span>
+        </div> 
+        <div class="card-line" style="display: grid; grid-template-columns: 120px 1fr;">
+            <span class="label">If unsuccessful:</span> 
+            <span>${ifUnsuccessful}</span>
+        </div>     
+        <div class="card-line" style="display: grid; grid-template-columns: 120px 1fr;">
+            <span class="label">Condition:</span> 
+            <span>${Condition} (${Byte2}) </span>
+        </div>
+        <div class="card-line" style="display: grid; grid-template-columns: 120px 1fr;">
+            <span class="label">Result of CVM:</span> 
+            <span><span style="${resultStyle}">${resultDetail}</span> (${Byte3})</span> 
+        </div>
+    </div>
+`;
+}
+
+// --- END: CVM Results Parser (9F34) ---
+
+const TSI_BITS = {
+  // Byte 1 (Index 0)
+  "Byte 1": [
+    "Offline data authentication was performed",       // b8
+    "Cardholder verification was performed",           // b7
+    "Card risk management was performed",              // b6
+    "Issuer authentication was performed",             // b5
+    "Terminal risk management was performed",          // b4
+    "Script processing was performed",                // b3
+    "RFU",                                            // b2
+    "RFU"                                             // b1
+  ],
+  // Byte 2 (Index 1)
+  "Byte 2": [
+    "RFU",                                            // b8
+    "RFU",                                            // b7
+    "RFU",                                            // b6
+    "RFU",                                            // b5
+    "RFU",                                            // b4
+    "RFU",                                            // b3
+    "RFU",                                            // b2
+    "RFU"                                             // b1
+  ]
+};
+
+const tsiInput = document.getElementById("tsi-input");
+
+if (tsiInput) {
+  tsiInput.addEventListener("input", () => {
+    // Optional cleanup (the function handles final cleaning)
+    tsiInput.value = tsiInput.value.replace(/[^0-9a-fA-F ]/g, '');
+    tsi();
+  });
+}
+
+function tsi() {
+  // 1. Get the input value
+  const inputElement = document.getElementById("tsi-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  // Define the output element ID
+  let outputElement = document.getElementById("tsi-output");
+
+  // --- Modal/Tab Handling and Output Setup ---
+  const modal = document.getElementById('modal-emv');
+
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab4');
+    if (tab) {
+      outputElement = tab.querySelector('#tsi-output') || outputElement;
+    }
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'tsi-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+  }
+
+  if (!outputElement) return;
+
+  // 2. Validation
+  if (raw.length !== 4 || !/^[0-9A-F]{4}$/.test(raw)) {
+    if (raw.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid TSI format. Must be a 4-digit hex string (2 bytes).</p>";
+    }
+    // Keep modal visible, just clear/change content
+    return;
+  }
+
+  // 3. Data Processing
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 4; i += 2) {
+    const byteHex = raw.slice(i, i + 2);
+    const byteBin = parseInt(byteHex, 16).toString(2).padStart(8, '0');
+    bytes.push(byteHex);
+    bins.push(byteBin);
+  }
+
+  // --- 4. Build HTML Output using the requested TVR card format ---
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>TSI:</strong> ${raw} &nbsp; <small style="color:#FFF">(${bins.join(' ')})</small></div>`;
+  // We only have 2 bytes, so we can display them side-by-side without wrapping
+  html += `<div style="display:flex;gap:15px;align-items:flex-start;">`;
+
+  const makeByteCard = (index) => {
+    // We use the key names "Byte 1" and "Byte 2" to retrieve the label array
+    const byteKey = `Byte ${index + 1}`;
+    const byteLabels = TSI_BITS[byteKey];
+
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const isSetCount = (byteBin.match(/1/g) || []).length;
+
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+                    <strong>${byteKey}</strong> 
+                    <small style="color:#666">(${byteHex}) - ${isSetCount} bit(s) set</small>
+                 </div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+
+    for (let k = 0; k < 8; k++) {
+      const bitNumber = 8 - k;
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const color = bitVal === "1" ? 'color:#000; font-weight:bold;' : 'color:#555;'; // Highlight set bits
+      const desc = (byteLabels && byteLabels[k]) ? byteLabels[k] : "RFU / Undefined";
+
+      // Reworked line: Changed align-items: flex-start to align-items: center
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      card += `<div style="width:28px;flex:0 0 28px;">
+                        <input type="checkbox" disabled ${checked} style="cursor:default;" />
+                     </div>`;
+      card += `<div style="flex:1;${color}font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  // Column 1: Byte 1
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(0)}
+             </div>`;
+
+  // Column 2: Byte 2
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(1)}
+             </div>`;
+
+  html += `</div>`; // Close the flex container
+  html += `</div>`; // Close the main monospace div
+
+  // 5. Final Output
+  outputElement.innerHTML = html;
+}
+
+
+// AIP function
+/**
+ * AIP (Tag '82') Byte 1 labels are largely standardized across EMV.
+ * This array holds the standard definitions.
+ * Bit 2 will be dynamically updated for PayPass inside getAipLabels.
+ */
+const AIP_BYTE_1_LABELS = [
+  "Bit 8: Reserved for Future Use (RFU)",
+  "Bit 7: Static Data Authentication (SDA) Supported",
+  "Bit 6: Dynamic Data Authentication (DDA) Supported",
+  "Bit 5: Cardholder Verification Supported",
+  "Bit 4: Terminal Risk Management to be Performed",
+  "Bit 3: Issuer Authentication Supported",
+  "Bit 2: RFU", // Default/Generic EMV Bit 2 definition
+  "Bit 1: Combined DDA/Application Cryptogram Generation (CDA) Supported"
+];
+
+/**
+ * Returns the AIP (Tag '82') bit labels based on the specified scheme.
+ * The AIP has two bytes (16 bits). This function returns an array where:
+ * - Element 0 is the array of labels for Byte 1.
+ * - Element 1 is the array of labels for Byte 2 (scheme-specific).
+ *
+ * @param {string} scheme - The selected scheme ('default', 'paypass', or 'expresspay').
+ * @returns {string[][]} An array containing two arrays of 8 bit labels each.
+ */
+function getAipLabels(scheme) {
+  const currentScheme = (scheme || "").toLowerCase();
+
+  // --- 1. Determine Byte 1 Labels (mostly standard, only Bit 2 changes for PayPass) ---
+  // Create a copy of the standard labels
+  let byte1Labels = [...AIP_BYTE_1_LABELS];
+
+  // Check for PayPass and override the non-standard Bit 2 definition
+  if (currentScheme === "paypass") {
+    // AIP_BYTE_1_LABELS[6] corresponds to Bit 2
+    byte1Labels[6] = "Bit 2: On-Device Cardholder Verification Supported";
+  }
+
+  // --- 2. Determine Byte 2 Labels (fully scheme-specific) ---
+  let byte2Labels;
+
+  if (currentScheme === "paypass") {
+    // Mastercard PayPass Byte 2 definitions
+    byte2Labels = [
+      "Bit 8: Magstripe Mode Supported",
+      "Bit 7: EMV Mode Supported",
+      "Bit 6: RFU",
+      "Bit 5: RFU",
+      "Bit 4: RFU",
+      "Bit 3: RFU",
+      "Bit 2: RFU",
+      "Bit 1: Relay resistance protocol supported"
+    ];
+  } else if (currentScheme === "expresspay") {
+    // American Express ExpressPay Byte 2 definitions
+    byte2Labels = [
+      "Bit 8: EMV Mode Supported",
+      "Bit 7: Expresspay Mobile Supported",
+      "Bit 6: Expresspay HCE (Host Card Emulation) Supported",
+      "Bit 5: RFU",
+      "Bit 4: RFU",
+      "Bit 3: RFU",
+      "Bit 2: RFU",
+      "Bit 1: RFU"
+    ];
+  } else {
+    // Default/Generic EMV Byte 2 definitions
+    byte2Labels = [
+      "Bit 8: RFU",
+      "Bit 7: RFU",
+      "Bit 6: RFU",
+      "Bit 5: RFU",
+      "Bit 4: RFU",
+      "Bit 3: RFU",
+      "Bit 2: RFU",
+      "Bit 1: RFU"
+    ];
+  }
+
+  // Return the two arrays of labels
+  return [byte1Labels, byte2Labels];
+}
+
+const aipInput = document.getElementById('aip-input');
+
+// 1. Listener for the AIP Hexadecimal Input Field
+if (aipInput) {
+  aipInput.addEventListener('input', () => {
+    // Optional cleanup: Ensure only hexadecimal characters are processed/kept
+    aipInput.value = aipInput.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+    // Now run the decoding function
+    aip();
+  });
+}
+
+
+document.querySelectorAll('input[name="aip-scheme"]').forEach(radio => {
+  if (radio) {
+    radio.addEventListener('change', () => {
+      // Call the combined TSI function whenever a scheme is selected
+      aip();
+    });
+  }
+});
+
+// --- COMBINED AIP DECODING AND RENDERING FUNCTION ---
+
+/**
+ * Parses the AIP input, fetches the scheme-specific labels, and generates 
+ * the complete HTML output for Tag '82'.
+ */
+function aip() {
+  // 1. Get the input value and scheme
+  const inputElement = document.getElementById("aip-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  const schemeRadio = document.querySelector('input[name="aip-scheme"]:checked');
+  const scheme = schemeRadio ? schemeRadio.value : 'default';
+  let outputElement = document.getElementById("aip-output");
+
+  // 2. --- Modal/Tab Handling and Output Setup ---
+  const modal = document.getElementById('modal-emv'); // The main modal ID
+
+
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab5'); // The AIP tab ID
+
+    if (tab) {
+      // Try to find the output inside the current tab
+      outputElement = tab.querySelector('#aip-output') || outputElement;
+    }
+
+    // Dynamically create the output element if it doesn't exist inside the tab
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'aip-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+
+    // Apply advanced modal sizing from the TSI function
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+
+    // Ensure the modal is visible when a valid input is detected
+    // We will set display to 'block' later upon successful validation/decoding
+  }
+
+  if (!outputElement) return;
+
+  // 2. Validation
+  if (raw.length !== 4 || !/^[0-9A-F]{4}$/.test(raw)) {
+    if (raw.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid AIP format. Must be a 4-digit hex string (2 bytes).</p>";
+    }
+    // Keep modal visible, just clear/change content
+    return;
+  }
+
+  // 4. Data Processing
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 4; i += 2) {
+    const byteHex = raw.slice(i, i + 2);
+    const byteBin = parseInt(byteHex, 16).toString(2).padStart(8, '0');
+    bytes.push(byteHex);
+    bins.push(byteBin);
+  }
+
+  // Get scheme-specific labels
+  const [labels1, labels2] = getAipLabels(scheme);
+  const allLabels = [labels1, labels2];
+
+
+  // --- 5. Build HTML Output using the requested card format ---
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>AIP (Tag 82):</strong> ${raw} &nbsp; <small style="color:#666">Scheme: ${scheme.toUpperCase()}</small></div>`;
+  html += `<div style="display:flex;gap:15px;align-items:flex-start;">`;
+
+  const makeByteCard = (index) => {
+    const byteKey = `Byte ${index + 1}`;
+    const byteLabels = allLabels[index];
+
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const isSetCount = (byteBin.match(/1/g) || []).length;
+
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+                    <strong>${byteKey}</strong> 
+                    <small style="color:#666">(${byteHex}) - ${isSetCount} bit(s) set</small>
+                   </div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+
+    for (let k = 0; k < 8; k++) {
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const color = bitVal === "1" ? 'color:#000; font-weight:bold;' : 'color:#555;'; // Highlight set bits
+      const desc = (byteLabels && byteLabels[k]) ? byteLabels[k] : "RFU / Undefined";
+
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      card += `<div style="width:28px;flex:0 0 28px;">
+                        <input type="checkbox" disabled ${checked} style="cursor:default;" />
+                       </div>`;
+      card += `<div style="flex:1;${color}font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  // Column 1: Byte 1
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(0)}
+              </div>`;
+
+  // Column 2: Byte 2
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(1)}
+              </div>`;
+
+  html += `</div>`; // Close the flex container
+  html += `</div>`; // Close the main monospace div
+
+  // 6. Final Output and Modal Display
+  outputElement.innerHTML = html;
+  //if (modal) {
+  //  modal.style.display = 'block'; // Show the modal
+  //}
+}
+
+// AUC Decoder function
+/**
+ * AUC (Tag '9F07') Bit Labels.
+ */
+const AUC_LABELS = {
+  "Byte 1": [
+    "Bit 8: Valid for domestic cash transactions",
+    "Bit 7: Valid for international cash transactions",
+    "Bit 6: Valid for domestic goods",
+    "Bit 5: Valid for international goods",
+    "Bit 4: Valid for domestic services",
+    "Bit 3: Valid for international services",
+    "Bit 2: Valid at ATMs",
+    "Bit 1: Valid at terminals other than ATMs"
+  ],
+  "Byte 2": [
+    "Bit 8: Domestic cashback allowed",
+    "Bit 7: International cashback allowed",
+    "Bit 6: RFU",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ]
+};
+
+
+const aucInput = document.getElementById("auc-input");
+
+if (aucInput) {
+  aucInput.addEventListener("input", () => {
+    // Optional cleanup (only keep hex chars)
+    aucInput.value = aucInput.value.replace(/[^0-9a-fA-F]/g, '');
+    // Call the AUC function
+    auc();
+  });
+}
+
+function auc() {
+  // 1. Get the input value
+  const inputElement = document.getElementById("auc-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+
+  let outputElement = document.getElementById("auc-output");
+  // 2. Output and Modal Setup
+  const modal = document.getElementById('modal-emv'); // Assuming the main modal ID
+
+
+  // Apply modal sizing (from your TSI function)
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab6');       // The AUC tab ID
+    // Logic to find or create the output element (similar to TSI)
+    if (tab) {
+      outputElement = tab.querySelector('#auc-output') || outputElement;
+    }
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'auc-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+
+
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+
+  }
+
+  //if (!outputElement) return;
+
+  // 3. Validation and Content Clearing
+  if (raw.length !== 4 || !/^[0-9A-F]{4}$/.test(raw)) {
+    if (raw.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid AUC format. Must be a 4-digit hex string (2 bytes).</p>";
+    }
+    // Keep modal visible, just clear/change content
+    return;
+  }
+
+  // 4. Data Processing
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 4; i += 2) {
+    const byteHex = raw.slice(i, i + 2);
+    const byteBin = parseInt(byteHex, 16).toString(2).padStart(8, '0');
+    bytes.push(byteHex);
+    bins.push(byteBin);
+  }
+
+  // --- 5. Build HTML Output using the requested card format ---
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>AUC (Tag 9F07):</strong> ${raw}</div>`;
+  html += `<div style="display:flex;gap:15px;align-items:flex-start;">`;
+
+  const makeByteCard = (index) => {
+    const byteKey = `Byte ${index + 1}`;
+    const byteLabels = AUC_LABELS[byteKey];
+
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const isSetCount = (byteBin.match(/1/g) || []).length;
+
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+                    <strong>${byteKey}</strong> 
+                    <small style="color:#666">(${byteHex}) - ${isSetCount} bit(s) set</small>
+                   </div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+
+    for (let k = 0; k < 8; k++) {
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const color = bitVal === "1" ? 'color:#000; font-weight:bold;' : 'color:#555;'; // Highlight set bits
+      const desc = (byteLabels && byteLabels[k]) ? byteLabels[k] : "RFU / Undefined";
+
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      card += `<div style="width:28px;flex:0 0 28px;">
+                        <input type="checkbox" disabled ${checked} style="cursor:default;" />
+                       </div>`;
+      card += `<div style="flex:1;${color}font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  // Column 1: Byte 1
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(0)}
+              </div>`;
+
+  // Column 2: Byte 2
+  html += `<div style="flex:1;display:flex;flex-direction:column;gap:15px;">
+                ${makeByteCard(1)}
+              </div>`;
+
+  html += `</div>`; // Close the flex container
+  html += `</div>`; // Close the main monospace div
+
+  // 6. Final Output
+  outputElement.innerHTML = html;
+}
+
+
+// TCC Decoder function
+/**
+ * TCC (Tag '9F33') Bit Labels (3 Bytes).
+ */
+const TCC_LABELS = {
+  "Byte 1": [
+    "Bit 8: Manual key entry",
+    "Bit 7: Magnetic stripe",
+    "Bit 6: IC with contacts (contact ICC)",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  "Byte 2": [
+    "Bit 8: Plaintext PIN for ICC verification",
+    "Bit 7: Enciphered PIN for online verification",
+    "Bit 6: Signature (paper)",
+    "Bit 5: Enciphered PIN for offline verification",
+    "Bit 4: No CVM required",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  "Byte 3": [
+    "Bit 8: SDA supported",
+    "Bit 7: DDA supported",
+    "Bit 6: Card capture (cardholder capture capability)",
+    "Bit 5: RFU",
+    "Bit 4: CDA supported",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ]
+};
+
+const tccInput = document.getElementById("tcc-input");
+
+if (tccInput) {
+  tccInput.addEventListener("input", () => {
+    // Optional cleanup (only keep hex chars)
+    tccInput.value = tccInput.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+    // Call the TCC function
+    tcc();
+  });
+}
+
+function tcc() {
+  // 1. Get the input value
+  const inputElement = document.getElementById("tcc-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  let outputElement = document.getElementById("tcc-output");
+
+  // 2. Output and Modal Setup
+  const modal = document.getElementById('modal-emv'); // Assuming the main modal ID
+
+
+  // Apply modal sizing and show modal (from your TSI function structure)
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab7');       // The TCC tab ID
+
+    // Logic to find or create the output element
+    if (tab) {
+      outputElement = tab.querySelector('#tcc-output') || outputElement;
+    }
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'tcc-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+
+  }
+
+  //if (!outputElement) return;
+
+  // 3. Validation and Content Clearing
+  if (raw.length !== 6 || !/^[0-9A-F]{6}$/.test(raw)) {
+    if (raw.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid TCC format. Must be a 6-digit hex string (3 bytes).</p>";
+    }
+    return;
+  }
+
+  // 4. Data Processing (3 Bytes)
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 6; i += 2) {
+    const byteHex = raw.slice(i, i + 2);
+    const byteBin = parseInt(byteHex, 16).toString(2).padStart(8, '0');
+    bytes.push(byteHex);
+    bins.push(byteBin);
+  }
+
+  // --- 5. Build HTML Output using the requested card format ---
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>Terminal Capabilities (Tag 9F33):</strong> ${raw}</div>`;
+
+  // Main Flex Container: Use gap and wrap
+  html += `<div style="display:flex;gap:15px;align-items:flex-start;flex-wrap: wrap;">`;
+
+  // Define the card width style for three perfectly equal columns with 15px gaps
+  // flex: 0 0 calc(33.3333% - 10px) ensures 3 equal columns with 15px gap
+  const cardWidthStyle = `flex: 0 0 calc(33.3333% - 10px);`;
+
+  const makeByteCard = (index) => {
+    const byteKey = `Byte ${index + 1}`;
+    const byteLabels = TCC_LABELS[byteKey];
+
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const isSetCount = (byteBin.match(/1/g) || []).length;
+
+    //let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+                    <strong>${byteKey}</strong> 
+                    <small style="color:#666">(${byteHex}) - ${isSetCount} bit(s) set</small>
+                   </div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+
+    for (let k = 0; k < 8; k++) {
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const color = bitVal === "1" ? 'color:#000; font-weight:bold;' : 'color:#555;'; // Highlight set bits
+      const desc = (byteLabels && byteLabels[k]) ? byteLabels[k] : "RFU / Undefined";
+
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      card += `<div style="width:28px;flex:0 0 28px;">
+                        <input type="checkbox" disabled ${checked} style="cursor:default;" />
+                       </div>`;
+      card += `<div style="flex:1;${color}font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  // Output all three bytes using the strict width wrapper
+  html += `<div style="${cardWidthStyle} display:flex; flex-direction:column; gap:15px;">${makeByteCard(0)}</div>`;
+  html += `<div style="${cardWidthStyle} display:flex; flex-direction:column; gap:15px;">${makeByteCard(1)}</div>`;
+  html += `<div style="${cardWidthStyle} display:flex; flex-direction:column; gap:15px;">${makeByteCard(2)}</div>`;
+
+  html += `</div>`; // Close the flex container
+  html += `</div>`; // Close the main monospace div
+
+  // 6. Final Output
+  outputElement.innerHTML = html;
+}
+
+// ATCC Decoder function
+/**
+ * ATCC (Tag '9F40') Bit Labels (5 Bytes).
+ */
+const ATCC_LABELS = {
+  "Byte 1": [
+    "Bit 8: Cash", "Bit 7: Goods", "Bit 6: Services", "Bit 5: Cashback",
+    "Bit 4: Inquiry", "Bit 3: Transfer", "Bit 2: Payment", "Bit 1: Administrative"
+  ],
+  "Byte 2": [
+    "Bit 8: Cash deposit", "Bit 7: RFU", "Bit 6: RFU", "Bit 5: RFU",
+    "Bit 4: RFU", "Bit 3: RFU", "Bit 2: RFU", "Bit 1: RFU"
+  ],
+  "Byte 3": [
+    "Bit 8: Numeric keys", "Bit 7: Alphabetic & special characters keys",
+    "Bit 6: Command keys", "Bit 5: Function keys", "Bit 4: RFU",
+    "Bit 3: RFU", "Bit 2: RFU", "Bit 1: RFU"
+  ],
+  "Byte 4": [
+    "Bit 8: Print, attendant", "Bit 7: Print, cardholder",
+    "Bit 6: Display, attendant", "Bit 5: Display, cardholder",
+    "Bit 4: RFU", "Bit 3: RFU", "Bit 2: Code table 10", "Bit 1: Code table 9"
+  ],
+  "Byte 5": [
+    "Bit 8: Code table 8", "Bit 7: Code table 7", "Bit 6: Code table 6",
+    "Bit 5: Code table 5", "Bit 4: Code table 4", "Bit 3: Code table 3",
+    "Bit 2: Code table 2", "Bit 1: Code table 1"
+  ]
+};
+
+
+const atccInput = document.getElementById("atcc-input");
+
+if (atccInput) {
+  atccInput.addEventListener("input", () => {
+    // Optional cleanup (only keep hex chars)
+    atccInput.value = atccInput.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+    // Call the ATCC function
+    atcc();
+  });
+}
+
+function atcc() {
+  // 1. Get the input value
+  const inputElement = document.getElementById("atcc-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  // 2. Output and Modal Setup
+  let outputElement = document.getElementById("atcc-output");
+  const modal = document.getElementById('modal-emv');
+
+  // Apply modal sizing and ensure modal is visible
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab8');
+    // Logic to find or create the output element
+    if (tab) {
+      outputElement = tab.querySelector('#atcc-output') || outputElement;
+    }
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'atcc-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+
+
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+
+    //modal.style.display = 'block'; 
+  }
+
+  //if (!outputElement) return;
+
+  // 3. Validation and Content Clearing
+  if (raw.length !== 10 || !/^[0-9A-F]{10}$/.test(raw)) {
+    if (raw.length === 0) {
+      outputElement.innerHTML = "";
+    } else {
+      outputElement.innerHTML = "<p style='color:red;'>Invalid ATCC format. Must be a 10-digit hex string (5 bytes).</p>";
+    }
+    return;
+  }
+
+  // 4. Data Processing (5 Bytes)
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 10; i += 2) {
+    const byteHex = raw.slice(i, i + 2);
+    const byteBin = parseInt(byteHex, 16).toString(2).padStart(8, '0');
+    bytes.push(byteHex);
+    bins.push(byteBin);
+  }
+
+  // --- 5. Build HTML Output using the requested card format ---
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>Additional Terminal Capabilities (Tag 9F40):</strong> ${raw}</div>`;
+
+  // Main Flex Container: Use a strong flex-start alignment and gap
+  html += `<div style="display:flex;gap:15px;align-items:flex-start;flex-wrap: wrap; justify-content: flex-start;">`;
+  const cardWidthStyle = `flex: 0 0 calc(33.3333% - 10px);`;
+
+  // Define the card HTML generation function (ensure no min-width here)
+  const makeByteCard = (index) => {
+    const byteKey = `Byte ${index + 1}`;
+    const byteLabels = ATCC_LABELS[byteKey];
+
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const isSetCount = (byteBin.match(/1/g) || []).length;
+
+    // Card start: Ensure the inner card HTML doesn't define width
+    let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;background:#fff;text-align:left;">`;
+    card += `<div style="margin-bottom:6px;border-bottom:1px solid #eee;padding-bottom:4px;">
+                    <strong>${byteKey}</strong> 
+                    <small style="color:#666">(${byteHex}) - ${isSetCount} bit(s) set</small>
+                   </div>`;
+    card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
+
+    for (let k = 0; k < 8; k++) {
+      const bitVal = byteBin[k];
+      const checked = bitVal === "1" ? "checked" : "";
+      const color = bitVal === "1" ? 'color:#000; font-weight:bold;' : 'color:#555;';
+      const desc = (byteLabels && byteLabels[k]) ? byteLabels[k] : "RFU / Undefined";
+
+      card += `<div style="display:flex;gap:8px;align-items:center;">`;
+      card += `<div style="width:28px;flex:0 0 28px;">
+                        <input type="checkbox" disabled ${checked} style="cursor:default;" />
+                       </div>`;
+      card += `<div style="flex:1;${color}font-size:11px;text-align:left">${desc}</div>`;
+      card += `</div>`;
+    }
+    card += `</div></div>`;
+    return card;
+  };
+
+  // Output all five bytes in containers sized for three columns
+  for (let i = 0; i < 5; i++) {
+    // We apply the strict width and flex properties to the wrapper for each card
+    html += `<div style="${cardWidthStyle} display:flex; flex-direction:column; gap:15px;">${makeByteCard(i)}</div>`;
+  }
+
+  html += `</div>`; // Close the main flex container
+  html += `</div>`; // Close the monospace div
+
+  // 6. Final Output
+  outputElement.innerHTML = html;
+}
+
+// DE55 Decoder function
+
+const de55Input = document.getElementById("de55-input");
+
+// Check if the input element exists
+if (de55Input) {
+  de55Input.addEventListener("input", () => {
+    // Optional cleanup: Ensure input is kept as valid hex characters and made uppercase.
+    // This is especially important for textareas where users might paste data.
+    de55Input.value = de55Input.value.replace(/[^0-9a-fA-F]/g, '').toUpperCase();
+
+    // 🚀 Call the decoding function for DE55
+    // You will need to define a function named decodeDe55() to handle the logic.
+    console.log("DE55 Input Changed:", de55Input.value);
+    decodeDe55();
+
+  });
+}
+
+// --- DE55/TLV Decoding Function ---
+
+/**
+ * Parses a raw hexadecimal string (like DE55) into an array of TLV objects.
+ * Handles single-byte and two-byte tags (9Fxx), and simple or complex length fields.
+ * @param {string} hexString - The raw DE55 data (e.g., "5F200A4A4F484E20444F45").
+ * @returns {Array<Object>} An array of parsed TLV structures.
+ */
+function tlv(hexString) {
+  const results = [];
+  let i = 0;
+  while (i < hexString.length) {
+    let tag, tagLen, lenField, value;
+
+    // 1. Parse Tag (1 or 2 bytes)
+    const currentByte = parseInt(hexString.slice(i, i + 2), 16);
+
+    // Check if the current tag is a two-byte tag (Tag starts with '9F', 'BF', 'DF', etc.)
+    // A tag is two bytes if the 5th bit (position 5) of the first byte is set (0x1F & 0x1F = 0x1F)
+    // More simply, check if the first byte ends in 'F' or if the first byte is 9F.
+    if ((currentByte & 0x1F) === 0x1F) {
+      // Two-byte tag (e.g., 9F1A)
+      tag = hexString.slice(i, i + 4);
+      tagLen = 4;
+    } else {
+      // One-byte tag (e.g., 5F)
+      tag = hexString.slice(i, i + 2);
+      tagLen = 2;
+    }
+    i += tagLen;
+
+    // If we hit the end of the string after the tag, something is wrong
+    if (i >= hexString.length) {
+      results.push({ tag: tag, length: 'Error: Missing Length', value: '' });
+      break;
+    }
+
+    // 2. Parse Length Field
+    lenField = hexString.slice(i, i + 2);
+    let firstLenByte = parseInt(lenField, 16);
+    i += 2;
+
+    let totalLength = 0;
+    let lenFieldLen = 2; // Length of the length field in characters (2 per byte)
+
+    if ((firstLenByte & 0x80) === 0x80) {
+      // Complex Length (High bit is set, indicating subsequent bytes define length)
+      const numLenBytes = firstLenByte & 0x7F; // Number of following bytes for length
+      lenFieldLen += (numLenBytes * 2);
+
+      if (i + (numLenBytes * 2) > hexString.length) {
+        results.push({ tag: tag, length: 'Error: Incomplete Length Field', value: '' });
+        break;
+      }
+
+      const lengthHex = hexString.slice(i, i + (numLenBytes * 2));
+      totalLength = parseInt(lengthHex, 16);
+      i += (numLenBytes * 2);
+    } else {
+      // Simple Length (Length is defined by the single byte itself)
+      totalLength = firstLenByte;
+    }
+
+    // 3. Extract Value
+    const valueLenChars = totalLength * 2;
+    if (i + valueLenChars > hexString.length) {
+      results.push({ tag: tag, length: totalLength + ' (Incomplete)', value: hexString.slice(i) });
+      i = hexString.length; // Stop the loop
+      break;
+    }
+
+    value = hexString.slice(i, i + valueLenChars);
+    i += valueLenChars;
+
+    // 4. Store Result
+    results.push({
+      tag: tag,
+      length: totalLength,
+      value: value
+    });
+  }
+
+  return results;
+}
+
+
+// --- Main DE55 Decoding Function with Modal/Output Logic ---
+
+function decodeDe55() {
+  // 1. Get the input value
+  const inputElement = document.getElementById("de55-input");
+  const raw = (inputElement ? inputElement.value : "").trim().replace(/\s+/g, '').toUpperCase();
+
+  // 2. Output and Modal Setup
+  const modal = document.getElementById('modal-emv'); // Main modal ID
+
+  let outputElement = document.getElementById("de55-output");
+
+
+
+  // Apply modal sizing and ensure modal is visible
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    const tab = document.getElementById('tab9');       // The DE55 tab ID
+
+    // Logic to find or create the output element
+    if (tab) {
+      outputElement = tab.querySelector('#de55-output') || outputElement;
+    }
+    if (!outputElement && tab) {
+      outputElement = document.createElement('div');
+      outputElement.id = 'de55-output';
+      outputElement.style.marginTop = '15px';
+      tab.appendChild(outputElement);
+    }
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+
+    // Show/Hide modal based on input presence
+    //modal.style.display = raw.length > 0 ? 'block' : 'none';
+  }
+
+  //if (!outputElement) return;
+
+  // 3. Validation and Content Clearing
+  if (raw.length === 0) {
+    outputElement.innerHTML = "";
+    return;
+  }
+  if (raw.length % 2 !== 0 || !/^[0-9A-F]*$/.test(raw)) {
+    outputElement.innerHTML = "<p style='color:red;'>Invalid DE55 format. Must be an even-length hex string.</p>";
+    return;
+  }
+
+  // 4. Data Processing (TLV Parsing)
+  const parsedTags = tlv(raw);
+
+  // 5. Build HTML Output (Table Format is best for TLV)
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  //html += `<div style="margin-bottom:12px;"><strong>ICC Data (DE55):</strong> ${raw}</div>`;
+
+  html += `<table style="width:50%; border-collapse: collapse; margin-top: 10px;">`;
+  html += `<thead><tr style="background-color: #f2f2f2;">
+               <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 10%;">Tag</th>
+               <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 40%;">Value</th>
+               <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 10%;">Length (Byte)</th>
+               <th style="padding: 8px; border: 1px solid #ddd; text-align: center; width: 40%;">Tag Name</th> 
+               </tr></thead>`;
+  html += `<tbody>`;
+
+  parsedTags.forEach(item => {
+
+    const tagKey = `_${item.tag}`;
+
+    const valueDisplay = item.value.length > 100 ? item.value.substring(0, 100) + '...' : item.value;
+    const color = item.tag.includes('Error') ? 'style="color:red; font-weight:bold;"' : '';
+    const tagName = tagsList[tagKey] || 'Unknown Tag';
+
+    html += `<tr ${color}>
+                   <td style="padding: 8px; border: 1px solid #ddd; font-weight: bold; ">${item.tag}</td>
+                   <td style="padding: 8px; border: 1px solid #ddd; word-break: break-all;">${valueDisplay}</td>
+                   <td style="padding: 8px; text-align: center; border: 1px solid #ddd;">${item.length}</td>
+                   <td style="padding: 8px; border: 1px solid #ddd; ">${tagName}</td> 
+         </tr>`;
+  });
+
+  html += `</tbody></table></div>`;
+
+  // 6. Final Output
+  outputElement.innerHTML = html;
+}
+
+
+
+// CVM List function
+/* function cvml_old() {
+  let cvmlValue = (document.getElementById("cvml-input").value || "").trim().replace(/\s+/g, "").toUpperCase();
+  let outputCVMLExisting = document.getElementById("cvml-output");
+
+  // Validate hex string
+  if (!/^[0-9A-F]{16,}$/.test(cvmlValue) || cvmlValue.length % 2 !== 0) {
+    showAlert("Please enter a valid CVML (even number of hex digits, at least 16 for Amount X/Y).", "warning");
+    return;
+  }
+
+  // Split into bytes
+  const bytes = [];
+  for (let i = 0; i < cvmlValue.length; i += 2) {
+    bytes.push(cvmlValue.slice(i, i + 2));
+  }
+
+  // Parse Amount X (first 4 bytes)
+  const amountX = parseInt(bytes.slice(0, 4).join(""), 16);
+  // Parse Amount Y (next 4 bytes)
+  const amountY = parseInt(bytes.slice(4, 8).join(""), 16);
+
+  // CVM Entries
+  const cvmEntries = [];
+  for (let i = 8; i < bytes.length; i += 2) {
+    const cvmCode = bytes[i];
+    const condCode = bytes[i + 1];
+    cvmEntries.push({ cvmCode, condCode });
+  }
+
+  // EMV CVM Code names (Book 3 Table 30)
+  const CVM_CODES = {
+    "00": "Fail CVM processing",
+    "01": "Plaintext PIN verified by ICC",
+    "02": "Enciphered PIN verified by ICC",
+    "03": "Plaintext PIN and signature",
+    "04": "Enciphered PIN verified online",
+    "05": "Signature (paper)",
+    "06": "No CVM required",
+    "07": "Consumer Device CVM",
+    "1E": "Signature (paper)",
+    "1F": "No CVM required",
+    "41": "Custom CVM 41",
+    "42": "Custom CVM 42"
+  };
+
+  // EMV Condition Codes (Book 3 Table 31)
+  const CONDITION_CODES = {
+    "00": "Always",
+    "01": "If unattended cash",
+    "02": "If not unattended cash & not manual cash & not cashback",
+    "03": "If terminal supports the CVM",
+    "04": "If manual cash",
+    "05": "If purchase with cashback",
+    "06": "If cash",
+    "07": "If purchase"
+  };
+
+  function failBehavior(cvmCode) {
+    return (parseInt(cvmCode, 16) & 0x80)
+      ? "Fail cardholder verification"
+      : "Apply succeeding CV Rule";
+  }
+
+  // Build HTML output
+  let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
+  html += `<div style="margin-bottom:8px;"><strong>Amount X:</strong> ${amountX} &nbsp; <strong>Amount Y:</strong> ${amountY}</div>`;
+  html += `<div style="display:flex;flex-direction:column;gap:6px;">`;
+
+  cvmEntries.forEach((entry, index) => {
+    html += `
+      <div>
+        <strong>Byte ${index * 2 + 1}-${index * 2 + 2}:</strong> ${entry.cvmCode}${entry.condCode} &nbsp;
+        <small style="color:#666">
+          (${CVM_CODES[entry.cvmCode] || "Unknown CVM"} / ${CONDITION_CODES[entry.condCode] || "Unknown Condition"}, ${failBehavior(entry.cvmCode)})
+        </small>
+      </div>
+    `;
+  });
+
+  html += `</div></div>`;
+
+  // Place the result inside the modal/tab structure (your previous logic)
+  const modal = document.getElementById('modal-emv');
+  let outputCVML = outputCVMLExisting;
+
+  if (modal) {
+    const tabButtons = Array.from(modal.querySelectorAll('.tab-btn[data-tab]'));
+    const cvmlTabBtn = tabButtons.find(btn => {
+      const tabId = btn.getAttribute('data-tab');
+      const tabContent = modal.querySelector(`#${tabId}`);
+      return tabContent && tabContent.querySelector('#cvml-input');
+    }) || modal.querySelector('.tab-btn[data-tab="tab2"]');
+
+    let targetTabContent = null;
+    if (cvmlTabBtn) {
+      const tabId = cvmlTabBtn.getAttribute('data-tab');
+      cvmlTabBtn.click();
+      targetTabContent = modal.querySelector(`#${tabId}`);
+    }
+
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    if (!targetTabContent) targetTabContent = modalContent;
+
+    outputCVML = targetTabContent.querySelector('#cvml-output') || outputCVML;
+    if (!outputCVML) {
+      outputCVML = document.createElement('div');
+      outputCVML.id = 'cvml-output';
+      outputCVML.style.fontFamily = 'monospace';
+      outputCVML.style.padding = '8px';
+      targetTabContent.appendChild(outputCVML);
+    }
+
+    modalContent.style.boxSizing = 'border-box';
+    modalContent.style.width = '85vw';
+    modalContent.style.maxWidth = '85vw';
+    modalContent.style.padding = modalContent.style.padding || '12px';
+    modalContent.style.overflow = 'auto';
+    modalContent.style.margin = '0 auto';
+  }
+
+  if (outputCVML) {
+    outputCVML.innerHTML = html;
+    showInfoAlert('CVML parsed successfully.');
+  } else {
+    showAlert("CVML parsed. Add an element with id='cvml-output' to view details.", "info");
+  }
+}
+ */
+
 
 // Alert Icons
 const alertIcons = {
@@ -2509,70 +4383,7 @@ function parseTLV(hex) {
       const bins = bytes.map(b => parseInt(b, 16).toString(2).padStart(8, '0'));
 
       // Bit labels for each byte (EMV Book 3)
-      const tvrLabels = [
-        [
-          "Bit 8: Offline data authentication was not performed",
-          "Bit 7: SDA failed",
-          "Bit 6: ICC data missing",
-          "Bit 5: Card appears on terminal exception file",
-          "Bit 4: DDA failed",
-          "Bit 3: CDA failed",
-          "Bit 2: SDA Selected",
-          "Bit 1: RFU"
-        ],
-        [
-          "Bit 8: ICC and terminal have different application versions",
-          "Bit 7: Expired application",
-          "Bit 6: Application not yet effective",
-          "Bit 5: Requested service not allowed for card product",
-          "Bit 4: New card",
-          "Bit 3: RFU",
-          "Bit 2: RFU",
-          "Bit 1: RFU"
-        ],
-        [
-          "Bit 8: Cardholder verification was not successful",
-          "Bit 7: Unrecognised CVM",
-          "Bit 6: PIN try limit exceeded",
-          "Bit 5: PIN entry required and PIN pad not present or not working",
-          "Bit 4: PIN entry required, PIN pad present, but PIN was not entered",
-          "Bit 3: Online PIN entered",
-          "Bit 2: RFU",
-          "Bit 1: RFU"
-        ],
-        [
-          "Bit 8: Transaction exceeds floor limit",
-          "Bit 7: Lower consecutive offline limit exceeded",
-          "Bit 6: Upper consecutive offline limit exceeded",
-          "Bit 5: Transaction selected randomly for online processing",
-          "Bit 4: Merchant forced transaction online",
-          "Bit 3: RFU",
-          "Bit 2: RFU",
-          "Bit 1: RFU"
-        ],
-        // Byte 5: PayPass-specific if scheme is paypass
-        scheme === "paypass"
-          ? [
-            "Bit 8: Default TDOL was used",
-            "Bit 7: Issuer authentication failed",
-            "Bit 6: Script processing failed before final GENERATE AC",
-            "Bit 5: Script processing failed after final GENERATE AC",
-            "Bit 4: Relay resistance threshold exceeded",
-            "Bit 3: Relay resistance time limits exceeded",
-            "Bit 2: Relay Resistance Protocol flags meaning:",
-            "Bit 1: See flags below"
-          ]
-          : [
-            "Bit 8: Default TDOL used",
-            "Bit 7: Issuer authentication failed",
-            "Bit 6: Script processing failed before final GENERATE AC",
-            "Bit 5: Script processing failed after final GENERATE AC",
-            "Bit 4: RFU",
-            "Bit 3: RFU",
-            "Bit 2: RFU",
-            "Bit 1: RFU"
-          ]
-      ];
+      const tvrLabels = getTvrLabels(scheme);
 
       // --- Always show RRP flags meaning for PayPass Byte 5 ---
       let rrpFlagsHtml = "";

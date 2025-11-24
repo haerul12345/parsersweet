@@ -127,6 +127,23 @@
     - Add bitmap decoder side tab tools
 -->
 
+<!-- 
+    ParserSweet v4.0.html
+    Version: 4.0
+    Last Updated: , 2025
+    Changes:
+    - Add EMV Tools
+      - TVR Decoder
+      - CVM List Decoder
+      - CVM Results Decoder
+      - TSI Decoder
+      - AIP Decoder
+      - AUC Decoder
+      - TCC Decoder
+      - ATCC Decoder
+      - DE55 Parser
+-->
+
 <html lang="en">
 
 <head>
@@ -139,7 +156,10 @@
 
   <link rel="icon" type="image/png"
     href="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAGQAAABkCAMAAABHPGVmAAAAtFBMVEX///8AAAD8/Pxvb2///v6VlZVgYGD4+PigoKB6enr/NDSOjo5paGh4eHj/OTlWVlZZWFgGBgakpKRMTEz/MTEhICAqKiq2tra9vb3+RUVDQ0MQDg4fFhb/8/Po6Oj/UFD/6enFxcX/+fn/19f/XV3w8PD/mJj/bGz/pqaBf3+urq7/d3dAMzP9j4/9zMyHh4f8hYXPzMz/r6/i4uKbm5v/3t7Y2dmmLCz/urr/v7/hLi6IVlZOwAOuAAAEI0lEQVRo3u2ZDXOqOhCGg6LUKNEoKigIAoqCiJ+1vff//68bErRw5tweCOmZTscdZzQZhsd3d7P5AuBpT3sav53DpEms96mFjToIpTWRStj8ItdgdDCeqd3PLRnXo1zwvLv600ONmbTD8wuvxxY73CohdyZdOtK8xalFx7s/6gAygbwoTULh09KS2nIpJS9gpWJOylZqgpIQkiOcWtTyEBmsOCmlIUMCAcqWy2MdApFLQzgpFSDsF6F0FQ4IqAABSoJxonwxJNWCK2qpDgGNZF6RUgqSjnhVn94tnEl4q3yFkl8MTwVCXMtyiYe6o6KZOffVhFhvh8D3g3hvAaVoo7TMiIC4bz7SoKZpEAXvxQHY6AuCWDEiBMM2DAg1FFtfAXFjqEF/4znX/donPyOHH/K/BXKDIIqzFztrA8FDTktjIATiGRrakEA0XFrZ3tKmaEjjoGlxA1inKDi8pxJOCNpXwe7yDOg7wIlgGvQ0HO4BobVgyBoS78gxRNBAmhY41H++IxTiBprhAceGxsY72SQDZOBG0NgLhTi25ltgj7TgerrujZTIxImEXA0YuNRDAXHSQYMnkmAIrgVDEIFYAUQI2c4Gpq9/R1oscsTLJBo2ifLehpDk1BpC4qgT5Fby+7Ji+RCd0kyOo43lkAYJ+YF1CaxdawRZwsrAOiAYWCQXkO2JhVxJ3gYeKSuuFyFkvKe1DEWuKEiDrcI2BtSMKN7+eyPj8QRkz0boTVSpP7bbSzocN4YG/zHJZH7z32R9sLvByBIEOZL94/hIg7GPjFu6ZDCPYJnu5m6eoElrSfeoWY+731HIK+il32NdDIQxJDVrvprp2meyj6miPKXifJKH6GP6stE5aw9pc2ejNDbEJsv6SjJG/86QqZfwDULjMCtSuJVMGaO9eBxUUOeZhr/2wHlUoPBCQsbofeyFL7RjcKWZW6RwQkLqdtz8YKyoi3B419VnlCM/ZMpCq+bW6iGmLz0/jhUoBVMKHyRL3nZOCPNP7yNtO+wgJ+R3V0YZLIpCPnYISod2mEO5RuAzSn+Rj4j0OBNZNRkjrJVd8nKcp1zoO6XkzqBj5s6osYLMD3g2RqTxaxb0AWtO6y9TGQWPFumRC7Umm1yyQfJg1FoLZ1oSsCgKUWsWyOKSiFGarP5KUjfrpgGZ6KJW9SnFXGa5dRcCdDNfgutPv/qoT/6xnFbL3GngtD84itzOKayyHJOtntuMNr5oY/rp6erPgQy+H0T9xpD+j4EMnpBnCn8TJT+nCnPHZPg3YvLtIJ2/AemWugL81ZQR1is8ruPJojrkPDZfyz8tr3aPlXsFb6nSqNItzbDMBXPRVlts6tXcm6RX5a0Kpu6k+UvFa0DlUurSP38LtJtWv9A8h9teu7T1kilHqrAM+L0B+il2Pe1pP9j+AwW3ZdTixUYKAAAAAElFTkSuQmCC">
-  -->
+
+  <!-- Include Font Awesome CDN in <head> -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
+
 
   <title>ParserSweet</title>
   <!-- <title>Parser </title>-->
@@ -854,6 +874,26 @@
     }
 
     /* Add this to your <style> section */
+    #modal-emv .modal-content {
+      box-sizing: border-box;
+      width: 85vw;
+      /* use 90% of the current viewport width */
+      max-width: 85vw;
+      min-width: 360px;
+      /* avoid being too narrow on large monitors */
+      padding: 14px;
+      margin: 0 auto;
+      height: 90vw;
+      /* grow with content */
+      max-height: 90vh;
+      /* keep inside viewport height */
+      overflow: auto;
+      /* allow scrolling when content exceeds max-height */
+      background-color: #fff;
+      border-radius: 10px;
+    }
+
+    /* Add this to your <style> section */
     #modal-bitmap .modal-content {
       overflow: auto;
       /* min-width: 350px;
@@ -1021,6 +1061,156 @@
     #modal-bitmap td {
       text-align: center !important;
     }
+
+
+    .tabs-container {
+      width: auto;
+      margin: 0 auto;
+    }
+
+    /* ---------- TAB BUTTONS ---------- */
+    .tab-buttons {
+      display: flex;
+      border-bottom: 1px solid #ddd;
+    }
+
+    .tab-buttons button {
+      flex: 0.45;
+      padding: 5px;
+      background: #00AFDA;
+      border: none;
+      border-right: 1px solid #ddd;
+      cursor: pointer;
+      font-size: 12px;
+      transition: 0.2s;
+      overflow-x: auto;
+    }
+
+    .tab-buttons button:last-child {
+      border-right: none;
+    }
+
+    .tab-buttons button.active {
+      background: #004F6B;
+      /* makes it appear lifted */
+    }
+
+    .tab-buttons button:hover {
+      background: #004F6B;
+    }
+
+    /* ---------- CONTENT AREA ---------- */
+    .tab-content {
+      display: none;
+      padding: 20px;
+      animation: fade 0.3s ease;
+      height: auto;
+      width: auto;
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    .tab-text h4 {
+      font-size: 12px;
+      letter-spacing: 1px;
+      color: #777;
+      margin-bottom: 6px;
+    }
+
+    .tab-text h2 {
+      margin: 0;
+      font-size: 24px;
+    }
+
+    /* 2. Input/Output Containers */
+    .input-section {
+      background: white;
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+    }
+
+    .input-section label {
+      font-weight: bold;
+      display: block;
+      margin-bottom: 5px;
+    }
+
+    #cvml-input {
+      width: 90%;
+      padding: 8px;
+      border: 1px solid #ccc;
+      border-radius: 4px;
+      box-sizing: border-box;
+    }
+
+    /* 3. CVM Rule Card Styling */
+    .cvm-card {
+      padding: 15px;
+      border-radius: 8px;
+      margin-bottom: 15px;
+      border-left: 6px solid #4677ff;
+      /* Blue border for rules */
+      box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
+      font-family: "Courier New", monospace;
+      background: white;
+    }
+
+    .bg-grey {
+      background: #f0f0f0 !important;
+    }
+
+    /* 4. Layout for Rules and Details */
+    .columns {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+    }
+
+    .column {
+      flex: 1;
+      min-width: 300px;
+      /* Ensures columns don't collapse too much */
+    }
+
+    .card-line {
+      display: grid;
+      /* 1. Adjust the fixed width of the label column */
+      grid-template-columns: 140px 1fr;
+      /* Reduced from 210px to 140px for a shorter gap */
+
+      /* 2. Adjust the gap between the columns */
+      column-gap: 5px;
+      /* Reduced from 10px to 5px for a tighter fit */
+
+      margin-bottom: 4px;
+      word-wrap: break-word;
+      font-size: 0.95em;
+    }
+
+    .card-line span.label {
+      font-weight: bold;
+      color: #555;
+    }
+
+    .card-quote {
+      display: block;
+      margin-top: 10px;
+      margin-left: 0;
+      padding: 8px;
+      background: #f9f9fa;
+      /* Light purple-grey background for quote */
+      border-radius: 4px;
+      font-style: italic;
+      color: #333;
+      font-family: Arial, sans-serif;
+      /* Use standard font for quote */
+      font-size: 0.9em;
+    }
   </style>
 </head>
 
@@ -1067,7 +1257,10 @@
         <div id="json-output" style="width: 80%;margin-bottom: 80px;align-content: center;"></div>
       </div>
     </div>
-    <button class="btn back-btn" data-screen="home">Back</button>
+    <!-- <button class="btn back-btn" data-screen="home">Back</button>-->
+
+    <button class="btn back-btn" data-screen="home">🏠 Home</button>
+
   </div>
 
   <!-- DE22 EFTEXT Parser Section -->
@@ -1083,7 +1276,9 @@
         style="white-space: pre-wrap;"> </textarea>
     </div>
     <div id="DefinitionsOutput"></div>
-    <button class="btn back-btn" data-screen="home">Back</button>
+    <!-- <button class="btn back-btn" data-screen="home">Back</button>-->
+
+    <button class="btn back-btn" data-screen="home">🏠 Home</button>
   </div>
 
   <!-- CBA MTI Parser Section -->
@@ -1111,7 +1306,9 @@
         </div>
       </div>
     </div>
-    <button class="btn back-btn" data-screen="home">Back</button>
+    <!-- <button class="btn back-btn" data-screen="home">Back</button>-->
+
+    <button class="btn back-btn" data-screen="home">🏠 Home</button>
   </div>
 
   <!-- Paymark Host Record Parser -->
@@ -1146,7 +1343,9 @@
         <div id="host-record-output" style="margin-top: 20px;  margin-bottom: 80px;"></div>
       </div>
     </div>
-    <button class="btn back-btn" data-screen="home">Back</button>
+    <!-- <button class="btn back-btn" data-screen="home">Back</button>-->
+
+    <button class="btn back-btn" data-screen="home">🏠 Home</button>
   </div>
   <div id="overlay"></div>
   <div id="customAlert">
@@ -1182,7 +1381,8 @@
       <button class="close-btn" type="button">&times;</button>
       <h2>Bitmap Decoder</h2>
       <div class="bitmap-input-row">
-        <textarea id="bitmapInput" placeholder="Enter bitmap (e.g. 323A468128E21A81)" rows="1"></textarea>
+        <textarea id="bitmapInput" maxlength="32" placeholder="Enter bitmap (e.g. 323A468128E21A81)"
+          rows="1"></textarea>
         <button class="decode-btn" id="decodeBtn">Decode</button>
       </div>
 
@@ -1196,9 +1396,140 @@
 
   <div class="modal-overlay" id="modal-emv">
     <div class="modal-content">
-      
+      <button class="close-btn" type="button">&times;</button>
       <h2>EMV Tools</h2>
-      <p>🚧 This feature is under construction. Please check back soon!</p>
+
+      <div class="tabs-container">
+        <!-- TAB BUTTONS -->
+        <div class="tab-buttons">
+          <button class="tab-btn active" data-tab="tab1">TVR</button>
+          <button class="tab-btn" data-tab="tab2">CVM List</button>
+          <button class="tab-btn" data-tab="tab3">CVM Results</button>
+          <button class="tab-btn" data-tab="tab4">TSI</button>
+          <button class="tab-btn" data-tab="tab5">AIP</button>
+          <button class="tab-btn" data-tab="tab6">AUC</button>
+          <button class="tab-btn" data-tab="tab7">TCC</button>
+          <button class="tab-btn" data-tab="tab8">ATCC</button>
+          <button class="tab-btn" data-tab="tab9">DE55</button>
+        </div>
+
+        <!-- TAB CONTENT -->
+        <div id="tab1" class="tab-content active">
+          <h4>Terminal Verification Result (Tag 95) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="tvr-input" style="color: black; font-size:12px;">Enter TVR:</label>
+            <input id="tvr-input" maxlength="14">
+          </div>
+          <!-- Radio Buttons for Scheme -->
+          <div style="margin-top: 12px; display: flex; gap: 20px; align-items: center;">
+
+            <label style="color:black; font-size:12px;">
+              <input type="radio" name="scheme" value="default" checked>
+              Default
+            </label>
+
+            <label style="color:black; font-size:12px;">
+              <input style="color:black;" type="radio" name="scheme" value="paypass">
+              PayPass
+            </label>
+          </div>
+        </div>
+
+        <div id="tab2" class="tab-content">
+
+          <h4>Cardholder Verification Method List (Tag 8E) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="cvml-input" style="color: black; font-size:12px;">Enter CVM List:</label>
+            <input id="cvml-input" style="min-width: 40%; max-width: 60%; padding: 4px;">
+          </div>
+
+        </div>
+
+        <div id="tab3" class="tab-content">
+
+          <h4>Cardholder Verification Method Results (Tag 9F34) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="cvmr-input" style="color: black; font-size:12px;">Enter CVM Results:</label>
+            <input id="cvmr-input" maxlength="6">
+          </div>
+        </div>
+
+        <div id="tab4" class="tab-content">
+
+          <h4>Transaction Status Information (Tag 9B) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="tsi-input" style="color: black; font-size:12px;">Enter TSI:</label>
+            <input id="tsi-input" maxlength="4">
+          </div>
+        </div>
+
+        <div id="tab5" class="tab-content">
+
+          <h4>Application Interchange Profile (Tag 82) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="aip-input" style="color: black; font-size:12px;">Enter AIP:</label>
+            <input id="aip-input" maxlength="4">
+          </div>
+
+          <div style="margin-top: 12px; display: flex; gap: 20px; align-items: center;">
+
+            <label style="color:black; font-size:12px;">
+              <input type="radio" name="aip-scheme" value="default" checked>
+              Default
+            </label>
+
+            <label style="color:black; font-size:12px;">
+              <input type="radio" name="aip-scheme" value="paypass">
+              PayPass
+            </label>
+
+            <label style="color:black; font-size:12px;">
+              <input type="radio" name="aip-scheme" value="expresspay">
+              ExpressPay
+            </label>
+          </div>
+        </div>
+
+        <div id="tab6" class="tab-content">
+
+          <h4>Application Usage Control (Tag 9F07) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="auc-input" style="color: black; font-size:12px;">Enter AUC:</label>
+            <input id="auc-input" maxlength="4">
+          </div>
+        </div>
+
+        <div id="tab7" class="tab-content">
+
+          <h4>Terminal Capabilities (Tag 9F33) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="tcc-input" style="color: black; font-size:12px;">Enter Terminal Capabilities:</label>
+            <input id="tcc-input" maxlength="6">
+          </div>
+        </div>
+
+        <div id="tab8" class="tab-content">
+
+          <h4>Additional Terminal Capabilities (Tag 9F40) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="atcc-input" style="color: black; font-size:12px;">Enter Additional Terminal
+              Capabilities:</label>
+            <input id="atcc-input" maxlength="10">
+          </div>
+        </div>
+
+        <div id="tab9" class="tab-content">
+
+          <h4>ICC Data (DE55) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <textarea id="de55-input" placeholder="Enter hex string (e.g. 48656c6c6f)" 
+                          style="width: 50%; height: 40%; resize: vertical;"></textarea>
+          </div>
+        </div>
+
+      </div>
+
+
     </div>
   </div>
 

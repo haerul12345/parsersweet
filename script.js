@@ -1057,7 +1057,7 @@ function cvml() {
     const ruleHtml = `
 <div class="cvm-card ${bg}" style="border-left-color: #B3F1FF; text-align: left; font-size: 12px;">
  <strong>CVM Rule ${ruleNum}: (${methodByte}${condByte}) </strong>
- <hr style="margin: 4px 0; border-top: 1px solid #b0b0b0ff;">
+ <hr style="margin: 4px 0; border-top: 1px solid #9b9b9bff;">
 <div class="card-line"><span class="label">CVM Method:</span> ${cvmMeaning} (${cvmCode})</div>
 <div class="card-line"><span class="label">If unsuccessful:</span> ${failBehaviorLine}</div>
 <div class="card-line"><span class="label">Condition Code:</span> ${condMeaning} (${condByte})</div> 

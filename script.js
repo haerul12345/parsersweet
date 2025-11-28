@@ -824,10 +824,11 @@ function tvr(scheme) {
     return card;
   };
 
-  html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px;">${makeByteCard(0)}${makeByteCard(1)}</div>`;
-  html += `<div style="flex:1;display:flex;flex-direction:column;gap:8px;">${makeByteCard(2)}${makeByteCard(3)}</div>`;
 
-  let byte5ColumnHtml = `<div style="flex:0.8;display:flex;flex-direction:column;gap:8px;">`;
+  html += `<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">${makeByteCard(0)}${makeByteCard(1)}</div>`;
+  html += `<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">${makeByteCard(2)}${makeByteCard(3)}</div>`;
+  let byte5ColumnHtml = `<div style="flex:1;min-width:0;display:flex;flex-direction:column;gap:8px;">`;
+
   byte5ColumnHtml += makeByteCard(4);
 
   // Only add RRP flags if PayPass

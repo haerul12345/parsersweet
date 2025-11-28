@@ -729,6 +729,7 @@ function copyTable() {
 const tvrInput = document.getElementById("tvr-input");
 
 tvrInput.addEventListener("input", () => {
+
   // Allow only hex characters and spaces
   let value = tvrInput.value.replace(/[^0-9a-fA-F ]/g, '');
 
@@ -749,6 +750,7 @@ tvrInput.addEventListener("input", () => {
 
   tvrInput.value = value;
   tvr(scheme);
+
 });
 
 // TVR function
@@ -763,11 +765,12 @@ function tvr(scheme) {
   const raw = (inputEl.value || "").trim().replace(/\s+/g, "").toUpperCase();
 
   if (!/^[0-9A-F]{10}$/.test(raw)) {
-    const msg = "Please enter a valid TVR (5 bytes hex, e.g. 0011223344).";
+    //const msg = "Please enter a valid TVR (5 bytes hex, e.g. 0011223344).";
     if (outputElExisting) {
-      outputElExisting.innerHTML = `<div style="color:#b00;font-family:monospace;">${msg}</div>`;
+      //outputElExisting.innerHTML = `<div style="color:#b00;font-family:monospace;">${msg}</div>`;
+      outputElExisting.innerHTML = "";
     } else {
-      showAlert(msg, "warning");
+      //showAlert(msg, "warning");
     }
     return;
   }
@@ -805,10 +808,16 @@ function tvr(scheme) {
       const bitVal = byteBin[k];
       const checked = bitVal === "1" ? "checked" : "";
       const desc = (tvrLabels[index] && tvrLabels[index][k]) ? tvrLabels[index][k] : "";
+
+      const styledDesc = bitVal === "1"
+        ? `<strong style="color:#000">${desc}</strong>`   // Bold and black for enabled
+        : `<span style="color:#999">${desc}</span>`;      // Grey for disabled
+
       card += `<div style="display:flex;gap:8px;align-items:center;">`;
       //card += `<div style="width:56px;color:#333;text-align:left">Bit ${bitNumber}</div>`;
       card += `<div style="width:28px;flex:0 0 28px;"><input type="checkbox" disabled ${checked} /></div>`;
-      card += `<div style="flex:1;color:#222;font-size:11px;text-align:left">${desc}</div>`;
+      //card += `<div style="flex:1;color:#222;font-size:11px;text-align:left">${desc}</div>`;
+      card += `<div style="flex:1;font-size:11px;text-align:left">${styledDesc}</div>`;
       card += `</div>`;
     }
     card += `</div></div>`;
@@ -1060,7 +1069,7 @@ function cvml() {
  <hr style="margin: 4px 0; border-top: 1px solid #9b9b9bff;">
 <div class="card-line"><span class="label">CVM Method:</span> ${cvmMeaning} (${cvmCode})</div>
 <div class="card-line"><span class="label">If unsuccessful:</span> ${failBehaviorLine}</div>
-<div class="card-line"><span class="label">Condition Code:</span> ${condMeaning} (${condByte})</div> 
+<div class="card-line"><span class="label">Condition:</span> ${condMeaning} (${condByte})</div> 
 </div>
 `;
     // this one no quote
@@ -2294,8 +2303,8 @@ function decodeDe55() {
   }
 
   // 4. Data Processing (TLV Parsing)
+  // const parsedTags = tlv(raw);
   const parsedTags = tlv(raw);
-
   // 5. Build HTML Output (Table Format is best for TLV)
   let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
   //html += `<div style="margin-bottom:12px;"><strong>ICC Data (DE55):</strong> ${raw}</div>`;

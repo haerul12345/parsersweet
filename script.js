@@ -2377,7 +2377,6 @@ if (ctqInput) {
   });
 }
 
-
 function ctq() {
   const inputElement = document.getElementById("ctq-input");
   const raw = (inputElement?.value || "")

@@ -800,8 +800,9 @@ function tvr(scheme) {
   const makeByteCard = (index) => {
     const byteHex = bytes[index];
     const byteBin = bins[index];
+    const setBits = (byteBin.match(/1/g) || []).length;
     let card = `<div style="border:1px solid #ddd;padding:8px;border-radius:6px;min-width:180px;background:#fff;text-align:left;">`;
-    card += `<div style="margin-bottom:6px;"><strong>Byte ${index + 1}</strong> &nbsp; <small style="color:#666">(${byteHex})</small></div>`;
+    card += `<div style="margin-bottom:6px; border-bottom:1px solid #eee;padding-bottom:4px;"><strong>Byte ${index + 1}</strong> &nbsp; <small style="color:#666">(${byteHex}) - ${setBits} bit(s) set</small></div>`;
     card += `<div style="display:flex;flex-direction:column;gap:3px;">`;
     for (let k = 0; k < 8; k++) {
       const bitNumber = 8 - k;
@@ -2304,8 +2305,9 @@ function decodeDe55() {
   }
 
   // 4. Data Processing (TLV Parsing)
-  // const parsedTags = tlv(raw);
   const parsedTags = tlv(raw);
+  ///const parsedTags = parseTLV(raw);
+
   // 5. Build HTML Output (Table Format is best for TLV)
   let html = `<div style="font-family:monospace;font-size:11px;text-align:left;">`;
   //html += `<div style="margin-bottom:12px;"><strong>ICC Data (DE55):</strong> ${raw}</div>`;
@@ -2340,6 +2342,304 @@ function decodeDe55() {
   // 6. Final Output
   outputElement.innerHTML = html;
 }
+
+// CTQ decode function
+const CTQ_LABELS = {
+  "Byte 1": [
+    "Bit 8: Online PIN Required",
+    "Bit 7: Signature Required",
+    "Bit 6: Go Online if Offline Data Authentication Fails and Reader is online capable",
+    "Bit 5: Switch Interface if Offline Data Authentication fails and Reader supports contact chip",
+    "Bit 4: Go Online if Application Expired",
+    "Bit 3: Switch Interface for (manual) Cash Transactions",
+    "Bit 2: Switch Interface for Cashback Transactions",
+    "Bit 1: Valid for contactless ATM transactions"
+  ],
+  "Byte 2": [
+    "Bit 8: CDCVM Performed",
+    "Bit 7: Card supports Issuer Update Processing at the POS",
+    "Bit 6: RFU",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ]
+};
+
+const ctqInput = document.getElementById("ctq-input");
+
+if (ctqInput) {
+  ctqInput.addEventListener("input", () => {
+    ctqInput.value = ctqInput.value.replace(/[^0-9a-fA-F]/g, "");
+    ctq();
+    //console.log("CTQ Input Changed:", ctqInput.value);
+  });
+}
+
+
+function ctq() {
+  const inputElement = document.getElementById("ctq-input");
+  const raw = (inputElement?.value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toUpperCase();
+
+  let outputElement = document.getElementById("ctq-output");
+  console.log("CTQ Output Element:", outputElement);
+  // Ensure output element exists inside CTQ tab
+  const tab = document.getElementById("tab10");
+  if (tab && !outputElement) {
+    outputElement = document.createElement("div");
+    outputElement.id = "ctq-output";
+    outputElement.style.marginTop = "15px";
+    tab.appendChild(outputElement);
+  }
+  if (!outputElement) return;
+
+  // Modal auto-resize (same method as your AUC)
+  const modal = document.getElementById("modal-emv");
+  if (modal) {
+    const modalContent = modal.querySelector('.modal-content') || modal;
+    modalContent.style.boxSizing = "border-box";
+    modalContent.style.width = "85vw";
+    modalContent.style.maxWidth = "85vw";
+    modalContent.style.padding = modalContent.style.padding || "12px";
+    modalContent.style.overflow = "auto";
+    modalContent.style.margin = "0 auto";
+  }
+
+  // Validate input: must be 4 hex chars (2 bytes)
+  if (!/^[0-9A-F]{4}$/.test(raw)) {
+    outputElement.innerHTML = raw.length === 0
+      ? ""
+      : "<p style='color:red;'>Invalid CTQ format. Must be a 4-digit hex string (2 bytes).</p>";
+    return;
+  }
+  console.log("CTQ Raw Input:", raw);
+  // Convert hex → byte hex → byte binary
+  const bytes = [];
+  const bins = [];
+
+  for (let i = 0; i < 4; i += 2) {
+    const hex = raw.slice(i, i + 2);
+    const bin = parseInt(hex, 16).toString(2).padStart(8, "0");
+    bytes.push(hex);
+    bins.push(bin);
+  }
+
+  // Card layout builder
+  const makeByteCard = (index) => {
+    const byteName = `Byte ${index + 1}`;
+    const labels = CTQ_LABELS[byteName];
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const setBits = (byteBin.match(/1/g) || []).length;
+    console.log(`CTQ ${byteName}:`, byteHex, byteBin, setBits);
+    let html = `
+      <div style="border:1px solid #ddd; padding:8px; border-radius:6px;
+                  min-width:180px; background:#fff; text-align:left;">
+        <div style="margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:4px;">
+          <strong>${byteName}</strong>
+          <small style="color:#666">(${byteHex}) - ${setBits} bit(s) set</small>
+        </div>
+
+        <div style="display:flex; flex-direction:column; gap:3px;">
+    `;
+
+    for (let b = 0; b < 8; b++) {
+      const bitSet = byteBin[b] === "1";
+      const desc = labels?.[b] || "RFU";
+
+      html += `
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px; flex:0 0 28px;">
+            <input type="checkbox" disabled ${bitSet ? "checked" : ""} />
+          </div>
+          <div style="flex:1; font-size:11px; ${bitSet ? "font-weight:bold;color:#000;" : "color:#555;"}">
+            ${desc}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `</div></div>`;
+    return html;
+  };
+
+  // Final UI layout
+  outputElement.innerHTML = `
+    <div style="font-family:monospace; font-size:11px; text-align:left;">
+      <div style="display:flex; gap:15px; align-items:flex-start;">
+        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+          ${makeByteCard(0)}
+        </div>
+        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+          ${makeByteCard(1)}
+        </div>
+      </div>
+    </div>
+  `;
+}
+
+// TTQ decode function
+const TTQ_LABELS = {
+  "Byte 1": [
+    "Bit 8: MSD supported",
+    "Bit 7: RFU",
+    "Bit 6: qVSDC supported",
+    "Bit 5: EMV contact chip supported",
+    "Bit 4: Offline-only reader",
+    "Bit 3: Online PIN supported",
+    "Bit 2: Signature supported",
+    "Bit 1: Offline Data Authentication (ODA) for Online Authorizations supported"
+  ],
+  "Byte 2": [
+    "Bit 8: Online cryptogram required",
+    "Bit 7: CVM required",
+    "Bit 6: (Contact Chip) Offline PIN supported",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  "Byte 3": [
+    "Bit 8: Issuer Update Processing supported",
+    "Bit 7: Mobile functionality supported (CDCVM)",
+    "Bit 6: RFU",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ],
+  "Byte 4": [
+    "Bit 8: RFU",
+    "Bit 7: RFU",
+    "Bit 6: RFU",
+    "Bit 5: RFU",
+    "Bit 4: RFU",
+    "Bit 3: RFU",
+    "Bit 2: RFU",
+    "Bit 1: RFU"
+  ]
+};
+
+const ttqInput = document.getElementById("ttq-input");
+
+if (ttqInput) {
+  ttqInput.addEventListener("input", () => {
+    ttqInput.value = ttqInput.value.replace(/[^0-9a-fA-F]/g, "");
+    ttq();
+  });
+}
+
+function ttq() {
+  const inputElement = document.getElementById("ttq-input");
+  const raw = (inputElement?.value || "")
+    .trim()
+    .replace(/\s+/g, "")
+    .toUpperCase();
+
+  let outputElement = document.getElementById("ttq-output");
+
+  const tab = document.getElementById("tab11");
+  if (tab && !outputElement) {
+    outputElement = document.createElement("div");
+    outputElement.id = "ttq-output";
+    outputElement.style.marginTop = "15px";
+    tab.appendChild(outputElement);
+  }
+  if (!outputElement) return;
+
+  const modal = document.getElementById("modal-emv");
+  if (modal) {
+    const modalContent = modal.querySelector(".modal-content") || modal;
+    modalContent.style.boxSizing = "border-box";
+    modalContent.style.width = "85vw";
+    modalContent.style.maxWidth = "85vw";
+    modalContent.style.padding = modalContent.style.padding || "12px";
+    modalContent.style.overflow = "auto";
+    modalContent.style.margin = "0 auto";
+  }
+
+  if (!/^[0-9A-F]{8}$/.test(raw)) {
+    outputElement.innerHTML = raw.length === 0
+      ? ""
+      : "<p style='color:red;'>Invalid TTQ format. Must be an 8-digit hex string (4 bytes).</p>";
+    return;
+  }
+
+  const bytes = [];
+  const bins = [];
+  for (let i = 0; i < 8; i += 2) {
+    const hex = raw.slice(i, i + 2);
+    const bin = parseInt(hex, 16).toString(2).padStart(8, "0");
+    bytes.push(hex);
+    bins.push(bin);
+  }
+
+  const makeByteCard = (index) => {
+    const byteName = `Byte ${index + 1}`;
+    const labels = TTQ_LABELS[byteName];
+    const byteHex = bytes[index];
+    const byteBin = bins[index];
+    const setBits = (byteBin.match(/1/g) || []).length;
+
+    let html = `
+      <div style="border:1px solid #ddd; padding:8px; border-radius:6px;
+                  min-width:240px; background:#fff;">
+        <div style="margin-bottom:6px; border-bottom:1px solid #eee; padding-bottom:4px;">
+          <strong>${byteName}</strong>
+          <small style="color:#666"> (${byteHex}) - ${setBits} bit(s) set </small>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:3px;">
+    `;
+
+    for (let b = 0; b < 8; b++) {
+      const bitSet = byteBin[b] === "1";
+      const desc = labels[b];
+
+      html += `
+        <div style="display:flex; gap:8px; align-items:center;">
+          <div style="width:28px;">
+            <input type="checkbox" disabled ${bitSet ? "checked" : ""} />
+          </div>
+          <div style="flex:1; font-size:11px; ${bitSet ? "font-weight:bold;color:#000;" : "color:#555;"}">
+            ${desc}
+          </div>
+        </div>
+      `;
+    }
+
+    html += `</div></div>`;
+    return html;
+  };
+
+  // NEW TWO-COLUMN LAYOUT
+  outputElement.innerHTML = `
+    <div style="font-family:monospace; font-size:11px; text-align:left;">
+      <div style="display:flex; gap:20px; align-items:flex-start;">
+        
+        <!-- COLUMN 1 -->
+        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+          ${makeByteCard(0)}  <!-- Byte 1 -->
+          ${makeByteCard(1)}  <!-- Byte 2 -->
+        </div>
+
+        <!-- COLUMN 2 -->
+        <div style="flex:1; display:flex; flex-direction:column; gap:15px;">
+          ${makeByteCard(2)}  <!-- Byte 3 -->
+          ${makeByteCard(3)}  <!-- Byte 4 -->
+        </div>
+
+      </div>
+    </div>
+  `;
+}
+
+
 
 // Alert Icons
 const alertIcons = {

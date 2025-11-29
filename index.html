@@ -130,7 +130,7 @@
 <!-- 
     ParserSweet v4.0.html
     Version: 4.0
-    Last Updated: , 2025
+    Last Updated: November 29, 2025
     Changes:
     - Add EMV Tools
       - TVR Decoder
@@ -139,6 +139,8 @@
       - TSI Decoder
       - AIP Decoder
       - AUC Decoder
+      - CTQ Decoder
+      - TTQ Decoder
       - TCC Decoder
       - ATCC Decoder
       - DE55 Parser
@@ -159,7 +161,6 @@
 
   <!-- Include Font Awesome CDN in <head> -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css" />
-
 
   <title>ParserSweet</title>
   <!-- <title>Parser </title>-->
@@ -1408,7 +1409,9 @@
           <button class="tab-btn" data-tab="tab4">TSI</button>
           <button class="tab-btn" data-tab="tab5">AIP</button>
           <button class="tab-btn" data-tab="tab6">AUC</button>
-          <button class="tab-btn" data-tab="tab7">TCC</button>
+          <button class="tab-btn" data-tab="tab10">CTQ</button>
+          <button class="tab-btn" data-tab="tab11">TTQ</button>
+          <button class="tab-btn" data-tab="tab7">TCC</button>          
           <button class="tab-btn" data-tab="tab8">ATCC</button>
           <button class="tab-btn" data-tab="tab9">DE55</button>
         </div>
@@ -1527,7 +1530,27 @@
           </div>
         </div>
 
+        <div id="tab10" class="tab-content">
+
+          <h4>Card Transaction Qualifiers (Tag 9F6C) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="ctq-input" style="color: black; font-size:12px;">Enter CTQ:</label>
+            <input id="ctq-input" maxlength="4">
+          </div>
+        </div>
+
+        <div id="tab11" class="tab-content">
+
+          <h4>Terminal Transaction Qualifiers (Tag 9F66) </h4>
+          <div style="display: flex; align-items: center; gap: 10px; justify-content: flex-start;">
+            <label for="ttq-input" style="color: black; font-size:12px;">Enter TTQ:</label>
+            <input id="ttq-input" maxlength="8">
+          </div>
+        </div>
+
       </div>
+
+
 
 
     </div>

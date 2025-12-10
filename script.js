@@ -5003,6 +5003,12 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
         console.warn(`Error in breakdown`, value);
       }
     }
+    else if (key === "002" && typeof value === "string" && value.length > 2) {
+      const length = value.slice(0, 2);
+      const track2 = value.slice(2);
+      const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>PAN:</strong> ${track2}</div>`;
+      table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+    }
     else if (key === "035" && typeof value === "string" && value.length > 2) {
       const length = value.slice(0, 2);
       const track2 = value.slice(2);

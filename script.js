@@ -5610,5 +5610,8 @@ function openReceiptViewer() {
     window.open("mxa_receipt_viewer.html", "_blank", "noopener,noreferrer");
 }
 
+// Expose functions to the global scope so inline handlers work when using
+// `<script type="module">` in `index.html`.
+window.openReceiptViewer = openReceiptViewer;
 window.showCVMTooltip = showCVMTooltip;
 window.hideCVMTooltip = hideCVMTooltip;

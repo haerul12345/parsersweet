@@ -1,0 +1,475 @@
+
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8" />
+<title>Log printData Extractor + Image Viewer</title>
+
+<style>
+:root {
+    --thumb-width: 280px;
+    --tile-pad: 20px;
+    --tile-width: calc(var(--thumb-width) + (var(--tile-pad) * 2));
+}
+
+/* ===== Global Theme ===== */
+body {
+    font-family: Consolas, monospace;
+    background: #00AFDA;
+    color: #ffffff;
+    padding: 20px;
+}
+
+h2, h3 {
+    color: #fff;
+}
+
+/* Textareas */
+textarea {
+    width: 100%;
+    height: 200px;
+    background: #003644;
+    color: #9ff8ff;
+    border: 1px solid #007a94;
+    padding: 10px;
+    font-family: Consolas, monospace;
+    margin-bottom: 20px;
+    border-radius: 4px;
+}
+
+/* Buttons */
+button {
+    padding: 10px 14px;
+    background: #005f73;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    margin-bottom: 10px;
+}
+button:hover {
+    background: #004654;
+}
+
+/* Image preview single */
+#imgPreview {
+    display: none;
+    margin-top: 40px;
+    border: 1px solid #004654;
+    max-width: 320px;
+    background: #000;
+}
+
+/* ======== Image Grid ======== */
+
+.imgGrid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(var(--tile-width), 1fr));
+    gap: 12px;
+    padding: 16px;
+    margin-top: 12px;
+    justify-content: start;
+}
+
+
+.imgTile {
+    background: #FFFFFF;
+    border: 1px solid #007a94;
+    padding: var(--tile-pad);
+    border-radius: 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.imgTile img.multiImg {
+    width: var(--thumb-width);
+    height: auto;
+    display: block;
+    background: #000;
+}
+
+/* Slider controls */
+.controls {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin: 10px 0 18px 0;
+    flex-wrap: wrap;
+}
+.controls label {
+    color: #ffffff;
+}
+.controls input[type="range"] {
+    width: 280px;
+    accent-color: #005f73;
+}
+.sizeReadout {
+    padding: 2px 8px;
+    background: #003644;
+    border: 1px solid #004654;
+    border-radius: 4px;
+    color: #9ff8ff;
+}
+
+#outputBox {
+    display: none;
+}
+
+
+
+.filterContainer {
+    display: inline-flex;
+    align-items: stretch;     /* same height */
+    margin-bottom: 3px;
+}
+
+/* LEFT FILTER BOX */
+.filterBox {
+    display: flex;
+    align-items: center;
+    padding: 0 12px;          /* remove vertical padding */
+    background: #2E3A47;
+    border: 1px solid #d0d7ff;
+    border-right: none;       /* merge with button */
+    border-radius: 6px 0 0 6px;
+    height: 36px;             /* <-- fixed height */
+    box-sizing: border-box;
+    white-space: nowrap;      /* prevent height expansion */
+}
+
+/* RIGHT BUTTON */
+.copyFilterBtn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    padding: 0 12px;          /* match the left box */
+    background: #ffffff;
+    border: 1px solid #8aa3ff;
+    border-left: none;
+    border-radius: 0 6px 6px 0;
+
+    height: 36px;             /* <-- same height as filterBox */
+    box-sizing: border-box;
+    cursor: pointer;
+
+    appearance: none;
+}
+
+/* Icon size */
+.copyFilterBtn svg {
+    width: 18px;
+    height: 18px;
+}
+
+
+.copyFilterBtn:hover {
+    background: #e7ecff;
+}
+
+</style>
+</head>
+
+<body>
+
+<h2>MXA Receipts Viewer</h2>
+
+
+<p class="info" style="margin-bottom:10px;">
+    Use this filter in Android Studio Logcat to capture printable receipts.
+</p>
+
+<!-- <div class="filterBox">
+    <span id="filterText" class="filterText">
+        package:com.ingenico.nar.unified_api_service tag:PrinterEndpointProcessorV1
+    </span>
+
+
+<button id="copyFilterBtn" class="copyFilterBtn">
+    <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+         stroke="#4a64ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+        <rect x="8" y="2" width="8" height="4" rx="1"></rect>
+    </svg>
+</button>
+
+
+</div> -->
+
+
+
+<div class="filterContainer">
+    <div class="filterBox">
+        <span id="filterText" class="filterText">
+            package:com.ingenico.nar.unified_api_service tag:PrinterEndpointProcessorV1
+        </span>
+    </div>
+
+    <button id="copyFilterBtn" class="copyFilterBtn">
+         <svg viewBox="0 0 24 24" width="16" height="16" fill="none"
+         stroke="#4a64ff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2"></path>
+        <rect x="8" y="2" width="8" height="4" rx="1"></rect>
+    </svg>
+    </button>
+</div>
+
+
+
+<textarea id="logInput" style="margin-top:1px; placeholder="Paste logcat output here..."></textarea>
+
+<button id="pasteBtn">Paste</button>
+<button id="clearBtn">Clear</button>
+<button id="runBtn" onclick="formatLogs()">Generate</button>
+
+<div class="controls">
+    <label for="thumbSize">Thumbnail size:</label>
+    
+<input id="thumbSize" type="range" min="120" max="480" step="10"
+       value="280" oninput="setThumbSize(this.value)">
+<span class="sizeReadout" id="sizeReadout">280 px</span>
+
+</div>
+
+<textarea id="outputBox" readonly></textarea>
+
+<h3>
+  Receipts Preview:
+  <span id="imgCount" class="countBadge" aria-live="polite" style="display:none;"></span>
+</h3>
+
+
+<img id="imgPreview" />
+
+<div id="grid" class="imgGrid"></div>
+
+<script>
+
+const MAX_IMAGES = 20;
+
+/* ================= Helpers (unchanged) ================= */
+function extractMessage(line) {
+    const fullHeader = /^(\d{4}-\d{2}-\d{2}\s+\d{2}:\d{2}:\d{2}\.\d+)\s+\d+-\d+\s+\S+\s+\S+\s+[A-Z]\s{2}(.*)$/;
+    const shortHeader = /^(\d{2}:\d{2}:\d{2}\.\d+)\s+[A-Z]\s{2}(.*)$/;
+    let m = line.match(fullHeader);
+    if (m) return m[2].trim();
+    m = line.match(shortHeader);
+    if (m) return m[2].trim();
+    return line.trim();
+}
+
+function extractAllPrintDataBlocks(logText) {
+    const blocks = [];
+    const lines = logText.split("\n");
+    let current = [];
+    let inside = false;
+
+    for (const raw of lines) {
+        let line = extractMessage(raw);
+        if (line.includes("printData=")) {
+            if (inside && current.length > 0) {
+                blocks.push(current.join("\n"));
+                current = [];
+            }
+            inside = true;
+        }
+
+        if (inside) {
+            if (line.trim().startsWith("textPrintData=")) {
+                inside = false;
+                blocks.push(current.join("\n"));
+                current = [];
+                continue;
+            }
+            current.push(line);
+        }
+    }
+
+    if (current.length > 0) blocks.push(current.join("\n"));
+    return blocks;
+}
+
+function stripAfterTextPrintData(msg) {
+    return msg.split(",textPrintData=")[0];
+}
+
+function setThumbSize(px) {
+    document.documentElement.style.setProperty('--thumb-width', px + 'px');
+    document.getElementById('sizeReadout').textContent = px + ' px';
+}
+
+/* ================= Paste Button ================= */
+document.getElementById("pasteBtn").addEventListener("click", async () => {
+    try {
+        const text = await navigator.clipboard.readText();
+        document.getElementById("logInput").value = text;
+    } catch (err) {
+        alert("Clipboard access denied.\nUse HTTPS or enable permission.");
+    }
+});
+
+/* =================== MAIN =================== */
+function formatLogs() {
+    
+const input = document.getElementById("logInput").value.trim();
+
+    if (input === "") {
+        alert("Log input is empty.\nPlease paste logcat output first.");
+        return;
+    }
+
+	
+// === Exception #4: Clear previous results BEFORE generating ===
+    document.getElementById("outputBox").value = "";
+    document.getElementById("grid").innerHTML = "";
+    document.getElementById("imgPreview").style.display = "none";
+    document.getElementById("imgPreview").src = "";
+
+	
+ // Prepare the counter element: hide it until success
+    const imgCountEl = document.getElementById("imgCount");
+    imgCountEl.style.display = "none";         // hide by default
+    imgCountEl.textContent = "";               // clear text
+
+	
+    const blocks = extractAllPrintDataBlocks(input);
+	
+	if (blocks.length === 0) {
+        alert("No printData found in the logs.\nMake sure log contains printData=...");
+        return;
+    }
+
+	
+    const outputBox = document.getElementById("outputBox");
+    outputBox.value = "";
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+	const LIMIT = 10;
+	
+const total = blocks.length;
+const shown = Math.min(total, LIMIT);
+
+	
+    blocks.forEach((block, index) => {
+		if (index >= LIMIT) {
+			//alert(`Found ${blocks.length} images.\nOnly the first ${LIMIT} will be previewed.`);
+			return;  // ⬅️ stop creating more than 10 preview tiles
+		}
+        let cleaned = block.replace(/^.*printData=/, "").replace(/\s+/g, "");
+        cleaned = stripAfterTextPrintData(cleaned);
+        cleaned = cleaned.replace(/\s+/g, "");
+
+        outputBox.value += `=== IMAGE ${index + 1} ===\n${cleaned}\n\n`;
+
+        const tile = document.createElement("div");
+        tile.className = "imgTile";
+
+        const img = document.createElement("img");
+        img.className = "multiImg";
+        img.src = "data:image/png;base64," + cleaned;
+        img.alt = `Image ${index + 1}`;
+        tile.appendChild(img);
+
+        /* ===== Copy Image Button ===== */
+        const copyBtn = document.createElement("button");
+        copyBtn.textContent = "Copy Image";
+        copyBtn.style.marginTop = "8px";
+        copyBtn.style.background = "#008fb3";
+
+        copyBtn.onclick = async () => {
+            try {
+                // Convert Base64 to binary
+                const byteCharacters = atob(cleaned);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+
+                // Create PNG blob
+                const blob = new Blob([byteArray], { type: "image/png" });
+
+                // Copy to clipboard as image
+                await navigator.clipboard.write([
+                    new ClipboardItem({ "image/png": blob })
+                ]);
+
+                copyBtn.textContent = "Copied ✔";
+                setTimeout(() => (copyBtn.textContent = "Copy Image"), 1500);
+
+            } catch (err) {
+                console.error(err);
+                alert("Clipboard does not allow image copy in this browser.");
+            }
+        };
+
+        tile.appendChild(copyBtn);
+        grid.appendChild(tile);
+    });
+	
+	
+
+	
+// === Show counter only if generation produced at least 1 image ===
+    
+if (shown > 0) {
+    // If total <= LIMIT → show normal count
+    // If total > LIMIT → show "10 of 27 images"
+    imgCountEl.textContent =
+        total <= LIMIT
+            ? `${shown} image${shown === 1 ? "" : "s"}`
+            : `${shown} of ${total} images`;
+
+    imgCountEl.style.display = "inline-block";
+} else {
+    imgCountEl.style.display = "none";
+    imgCountEl.textContent = "";
+}
+
+
+	
+if (blocks.length > LIMIT) {
+    setTimeout(() => {
+        alert(`Found ${blocks.length} receipts data.\n\nShowing only the first ${LIMIT} of ${blocks.length} receipts.`);
+    }, 5);  // small delay so DOM can render first
+}
+
+}
+
+
+// Small copy button for filter
+document.getElementById("copyFilterBtn").addEventListener("click", async () => {
+    const text = document.getElementById("filterText").innerText;
+
+    try {
+        await navigator.clipboard.writeText(text);
+        const btn = document.getElementById("copyFilterBtn");
+        btn.style.background = "#d4e2ff";
+        setTimeout(() => btn.style.background = "#ffffff", 500);
+    } catch (err) {
+        alert("Clipboard access denied.");
+    }
+});
+
+
+document.getElementById("clearBtn").addEventListener("click", () => {
+   
+document.getElementById("logInput").value = "";
+    document.getElementById("outputBox").value = "";
+    document.getElementById("imgPreview").style.display = "none";
+    document.getElementById("imgPreview").src = "";
+    document.getElementById("grid").innerHTML = "";
+
+    const imgCountEl = document.getElementById("imgCount");
+    imgCountEl.style.display = "none"; // hide after clear
+    imgCountEl.textContent = "";       // remove text
+
+});
+
+
+</script>
+
+</body>
+</html>

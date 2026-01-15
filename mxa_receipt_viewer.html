@@ -37,6 +37,16 @@ textarea {
     border-radius: 4px;
 }
 
+footer {
+      color: #FFF;
+      text-align: center;
+      border-top: 1px solid#ddd;
+      padding-top: 1rem;
+      margin-top: 3rem;
+      justify-content: center;
+      align-items: center;
+    }
+
 /* Buttons */
 button {
     padding: 10px 14px;
@@ -244,7 +254,13 @@ button:hover {
 
 <div id="grid" class="imgGrid"></div>
 
+<footer>
+      <ft id="app-version"></ft>
+    </footer>
+
 <script>
+
+document.getElementById("app-version").textContent = `Version 1.0 © 2026 hji`;
 
 const MAX_IMAGES = 20;
 

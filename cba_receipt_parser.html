@@ -359,6 +359,16 @@
             color: var(--muted) !important;
         }
 
+        footer {
+      color: #666;
+      text-align: center;
+      border-top: 1px solid#ddd;
+      padding-top: 1rem;
+      margin-top: 3rem;
+      justify-content: center;
+      align-items: center;
+    }
+
         @media (prefers-reduced-motion: reduce) {
 
             .theme-toggle,
@@ -386,6 +396,7 @@
             </div>
         </div>
     </header>
+
 
     <main class="container-xxl my-3 my-md-4">
         <!-- Notice with Bootstrap input-group + copy button -->
@@ -481,6 +492,11 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
         </div>
     </main>
 
+    
+<footer>
+      <ft id="app-version"></ft>
+    </footer>
+
     <!-- Bootstrap JS (required for button ripple/compat) -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 
@@ -490,6 +506,9 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
     <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
 
     <script>
+
+
+      document.getElementById("app-version").textContent = `Version 1.1 © 2025 Izzuddinr`;         
         /* =========================
    THEME: light/dark toggle
    ========================= */

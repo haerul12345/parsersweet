@@ -5610,8 +5610,13 @@ function openReceiptViewer() {
     window.open("mxa_receipt_viewer.html", "_blank", "noopener,noreferrer");
 }
 
+function openCBAReceiptParser() {
+    window.open("cba_receipt_parser.html", "_blank", "noopener,noreferrer");
+}
+
 // Expose functions to the global scope so inline handlers work when using
 // `<script type="module">` in `index.html`.
 window.openReceiptViewer = openReceiptViewer;
+window.openCBAReceiptParser = openCBAReceiptParser;
 window.showCVMTooltip = showCVMTooltip;
 window.hideCVMTooltip = hideCVMTooltip;

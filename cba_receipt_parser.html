@@ -1,0 +1,1002 @@
+
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="light">
+
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>CBA Receipt Parser — Bootstrap</title>
+
+    <!-- Bootstrap & Icons -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
+
+    <style>
+        :root {
+            --receipt-width-ch: 42ch;
+            /* default width */
+            --radius-md: 0.75rem;
+        }
+
+        /* Light/Dark palettes (soft, eye-friendly) */
+        :root[data-bs-theme="light"] {
+            --bs-body-bg: #f7f8fb;
+            --bs-body-color: #1f2430;
+            --panel-bg: #ffffff;
+            --panel-subtle: #f1f3f9;
+            --panel-border: #dfe3ee;
+            --accent: #0d6efd;
+            /* primary */
+            --accent-2: #6f42c1;
+            /* purple */
+            --success-soft: #198754;
+            --danger-soft: #dc3545;
+            --warning-soft: #ffc107;
+            --cyan-soft: #0dcaf0;
+            --muted: #6b7280;
+            --receipt-paper: #ffffff;
+            --receipt-ink: #111;
+        }
+
+        :root[data-bs-theme="dark"] {
+            --bs-body-bg: #1e2030;
+            --bs-body-color: #e9edf3;
+            --panel-bg: #24273a;
+            --panel-subtle: #2b2f45;
+            --panel-border: #3a3f63;
+            --accent: #8ab4ff;
+            --accent-2: #c2a6ff;
+            --success-soft: #a6e3a1;
+            --danger-soft: #f38ba8;
+            --warning-soft: #f9e2af;
+            --cyan-soft: #94e2d5;
+            --muted: #9aa3b2;
+            --receipt-paper: #ffffff;
+            --receipt-ink: #111;
+        }
+
+        body {
+            font-family: "Courier New", "Consolas", "Monaco", monospace;
+            background: var(--bs-body-bg);
+            color: var(--bs-body-color);
+        }
+
+        .card.panel {
+            background: var(--panel-bg);
+            border-color: var(--panel-border);
+            border-radius: var(--radius-md);
+        }
+
+        .card.panel .card-header {
+            background: var(--panel-subtle);
+            border-bottom-color: var(--panel-border);
+        }
+
+        /* Theme toggle (animated) */
+        .theme-toggle {
+            width: 44px;
+            height: 44px;
+            border-radius: 999px;
+            display: grid;
+            place-items: center;
+            border: 2px solid currentColor;
+            color: var(--bs-body-bg);
+            /* contrast on header */
+            background: transparent;
+            transition: transform 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
+        }
+
+        .theme-toggle:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 0 0 0.35rem rgba(255, 255, 255, 0.12);
+        }
+
+        .theme-toggle .swap {
+            position: relative;
+            width: 22px;
+            height: 22px;
+        }
+
+        .theme-toggle .swap>i {
+            position: absolute;
+            inset: 0;
+            display: grid;
+            place-items: center;
+            transition: opacity 0.35s ease, transform 0.35s ease;
+        }
+
+        html[data-bs-theme="dark"] .icon-sun {
+            opacity: 0;
+            transform: scale(0.6) rotate(-45deg);
+        }
+
+        html[data-bs-theme="dark"] .icon-moon {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        html[data-bs-theme="light"] .icon-sun {
+            opacity: 1;
+            transform: scale(1) rotate(0deg);
+        }
+
+        html[data-bs-theme="light"] .icon-moon {
+            opacity: 0;
+            transform: scale(0.6) rotate(45deg);
+        }
+
+        .theme-toggle.flash .swap {
+            animation: spin 0.5s ease;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        /* Receipt preview (paper look) */
+        .receipt {
+            background: var(--panel-bg);
+            border-color: var(--panel-border);
+            border-radius: var(--radius-md);
+        }
+
+        .receipt .receipt-paper {
+            background: var(--receipt-paper);
+            color: var(--receipt-ink);
+            border: 1px solid #e6e6e6;
+            border-radius: 0.5rem;
+            padding: 0.75rem 0.85rem;
+            max-width: var(--receipt-width-ch);
+            white-space: pre-wrap;
+            word-break: break-word;
+            margin: 0 auto;
+            font-size: 16px;
+            line-height: 1;
+        }
+
+        .receipt-header {
+            background: var(--panel-subtle);
+            border: 1px dashed var(--success-soft);
+            color: var(--success-soft);
+            border-radius: 0.5rem;
+            font-weight: 700;
+        }
+
+        .receipt-line {
+            min-height: 16px;
+            margin-bottom: 2px;
+        }
+
+        .line-centered {
+            text-align: center;
+            font-weight: 700;
+        }
+
+        .line-left {
+            text-align: left;
+        }
+
+        .line-split {
+            display: grid;
+            grid-template-columns: 1fr auto;
+            column-gap: 2ch;
+            align-items: start;
+            width: 100%;
+        }
+
+        /* 3-column layout: left (flex), mid (fixed), right (fixed) */
+        .line-split-3 {
+            display: grid;
+            /* left grows, mid fixed (counts), right fixed (amounts) */
+            grid-template-columns: 1fr 4ch 12ch;
+            column-gap: 1ch;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* Use same grid for 2-col variants so columns always line up */
+        .line-split-2,
+        .line-split-2-midright {
+            display: grid;
+            grid-template-columns: 1fr 4ch 20ch;
+            column-gap: 1ch;
+            align-items: center;
+            width: 100%;
+        }
+
+        /* column classes for consistent alignment */
+        .col-left  { text-align: left;    display: block; max-width: 18ch; min-width: 2ch; padding-right: 0ch; overflow: hidden; }
+        /*
+        .col-left {
+            display: block;
+            width: 16ch;
+          
+            min-width: 12ch;
+            max-width: 11ch;
+            text-align: left;
+            overflow: hidden;
+            white-space: nowrap;
+            font-variant-numeric: tabular-nums;
+        }
+        */
+
+        .col-mid {
+            text-align: center;
+            display: block;
+            justify-self: center;
+            width: 10ch;
+            /* matches grid */
+            min-width: 10ch;
+        }
+
+        /* when mid is a simple integer/count, force fixed width and true centering */
+        .col-mid-number {
+            display: block;
+            text-align: center;
+            width: 10ch;
+            /* matches grid */
+            min-width: 10ch;
+            box-sizing: border-box;
+            justify-self: center;
+        }
+
+        .col-right {
+            text-align: right;
+            display: block;
+            justify-self: end;
+            /* stick to right edge of its grid cell */
+            white-space: nowrap;
+            /* prevent amount wrapping */
+            overflow: visible;
+            font-variant-numeric: tabular-nums;
+            /* consistent digit width */
+            width: 30ch;
+            /* match grid column */
+            min-width: 8ch;
+            box-sizing: border-box;
+            /* allow wrapping inside the fixed column while keeping lines right-justified */
+            white-space: normal;
+            overflow-wrap: anywhere;
+            font-variant-numeric: tabular-nums;
+            /* consistent digit width */
+            width: 30ch;
+            /* fixed column width (adjust if needed) */
+            min-width: 8ch;
+            box-sizing: border-box;
+        }
+
+        /* multi-line right column container: stack lines and right-justify each one */
+        .col-right-multi {
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            /* right align each wrapped row */
+            justify-self: end;
+            width: 16ch;
+        }
+
+        .col-right-multi>.col-right-line {
+            text-align: right;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            font-variant-numeric: tabular-nums;
+            width: 100%;
+        }
+
+        /* Right-column span for long values that should use the mid+right space.
+               Allow wrapping but keep text right-justified within the spanned area. */
+        .col-right-span {
+            grid-column: 2 / 4;
+            /* span mid + right */
+            text-align: right;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            justify-self: end;
+            width: calc(4ch + 1ch + 16ch);
+            /* approximate spanned width (mid + gap + right) */
+            box-sizing: border-box;
+        }
+
+        .line-disclaimer {
+            color: var(--danger-soft);
+            text-align: center;
+            font-weight: 800;
+        }
+
+        .notice code {
+            user-select: all;
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        /* Outline-only buttons for actions */
+        .btn-outline-accent {
+            color: var(--accent-2);
+            border-color: var(--accent-2);
+        }
+
+        .btn-outline-accent:hover {
+            color: var(--accent-2);
+            background: color-mix(in srgb, var(--accent-2) 12%, transparent);
+        }
+
+        .btn-outline-primary-soft {
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .btn-outline-primary-soft:hover {
+            color: var(--accent);
+            background: color-mix(in srgb, var(--accent) 12%, transparent);
+        }
+
+        .btn-outline-cyan {
+            color: var(--cyan-soft);
+            border-color: var(--cyan-soft);
+        }
+
+        .btn-outline-cyan:hover {
+            color: var(--cyan-soft);
+            background: color-mix(in srgb, var(--cyan-soft) 12%, transparent);
+        }
+
+        .btn-outline-danger-soft {
+            color: var(--danger-soft);
+            border-color: var(--danger-soft);
+        }
+
+        .btn-outline-danger-soft:hover {
+            color: var(--danger-soft);
+            background: color-mix(in srgb, var(--danger-soft) 12%, transparent);
+        }
+
+        /* Small help text */
+        .form-text {
+            color: var(--muted) !important;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+
+            .theme-toggle,
+            .theme-toggle * {
+                transition: none !important;
+                animation: none !important;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="sticky-top bg-primary text-white">
+        <div class="container-xxl py-2 d-flex justify-content-between align-items-center">
+            <h1 class="h4 mb-0">🧾 CBA Receipt Parser</h1>
+            <div class="d-flex align-items-center gap-2">
+                <!-- Theme toggle -->
+                <button id="themeToggle" class="theme-toggle" aria-label="Toggle theme" title="Toggle theme">
+                    <span class="swap">
+                        <i class="bi bi-brightness-high-fill icon-sun"></i>
+                        <i class="bi bi-moon-stars-fill icon-moon"></i>
+                    </span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <main class="container-xxl my-3 my-md-4">
+        <!-- Notice with Bootstrap input-group + copy button -->
+        <div class="card panel mb-3">
+            <div class="card-body">
+                <div class="notice text-center">
+                    <div class="mb-2">
+                        <strong style="color: var(--accent-2);">Use this filter in Android Studio Logcat to capture
+                            printable receipts.</strong>
+                    </div>
+                    <div class="d-flex justify-content-center">
+                        <div class="input-group flex-nowrap" style="width: 600px; max-width: 100%;">
+                            <input id="logcatFilter" class="form-control text-center" type="text" readonly
+                                value="tag:APP_PRINT & printReceiptLog & startPrintReceipt:" />
+                            <button class="btn btn-outline-primary-soft" type="button" id="btnCopyFilter"
+                                title="Copy to clipboard">
+                                <i class="bi bi-clipboard"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Config + Input -->
+        <div class="card panel mb-3">
+            <div class="card-header">
+                <h2 class="h6 mb-0 text-uppercase fw-bold" style="color: var(--accent-2);">⚙️ Configuration</h2>
+            </div>
+            <div class="card-body">
+                <div class="row g-3">
+                    <div class="col-12 col-md-4">
+                        <label for="widthInput" class="form-label">Max characters per line</label>
+                        <input id="widthInput" type="number" class="form-control" min="20" max="64" step="1"
+                            value="42" />
+                        <div class="form-text">Controls soft wrapping like the EDC printer (default 42).</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="filePatternInput" class="form-label">Receipt filename pattern</label>
+                        <input id="filePatternInput" type="text" class="form-control"
+                            value="receipt_{index}_{timestamp}_{copy}.png" />
+                        <div class="form-text">Tokens: {index}, {timestamp}, {date}, {time}, {copy}.</div>
+                    </div>
+                    <div class="col-12 col-md-4">
+                        <label for="zipNameInput" class="form-label">Save-all ZIP filename</label>
+                        <input id="zipNameInput" type="text" class="form-control" value="receipts_{date}_{time}.zip" />
+                        <div class="form-text">Tokens: {date}, {time}. Example: receipts_2025-08-27_13-05-00.zip</div>
+                    </div>
+                </div>
+
+                <div class="d-flex gap-2 mt-3">
+                    <button class="btn btn-outline-accent" onclick="applyWidth()"><i
+                            class="bi bi-aspect-ratio me-1"></i>Apply Width</button>
+                </div>
+
+                <hr class="my-4" />
+
+                <h2 class="h6 text-uppercase fw-bold" style="color: var(--accent-2);">📝 Log Input</h2>
+                <textarea id="logInput" class="form-control" rows="10" placeholder="Paste your EDC receipt log here...
+
+Rules:
+• Centered lines: bookended by wide spaces (TAB / NBSP / EN / EM / thin spaces) OR start/end indentation with such spaces.
+• Split lines: have a TAB in the middle, or a run of 2+ spaces → left/right columns.
+• Otherwise: left aligned.
+
+Soft wrap: long lines split at the last space on/just past the width limit."></textarea>
+
+                <div class="d-flex justify-content-end gap-2 mt-3">
+                    <button class="btn btn-outline-primary-soft" onclick="parseReceipts()"><i
+                            class="bi bi-search me-1"></i>Parse Receipts</button>
+                    <button class="btn btn-outline-danger-soft" onclick="clearAll()"><i
+                            class="bi bi-trash3 me-1"></i>Clear</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Output -->
+        <div class="card panel mb-5">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h2 class="h5 mb-0">📄 Parsed Receipts</h2>
+                <button class="btn btn-outline-cyan" onclick="saveAllReceiptsAsZip()"
+                    title="Save all parsed receipts into a single ZIP"><i class="bi bi-archive me-1"></i>Save All
+                    (ZIP)</button>
+            </div>
+            <div class="card-body">
+                <div id="receiptsContainer" class="row g-3 row-cols-1 row-cols-sm-2 row-cols-lg-3">
+                    <div class="col">
+                        <div class="text-secondary small">No receipts parsed yet. Paste log data and click <em>Parse
+                                Receipts</em>.</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- Bootstrap JS (required for button ripple/compat) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <!-- Export libs -->
+    <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.4.1/dist/html2canvas.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jszip@3.10.1/dist/jszip.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/file-saver@2.0.5/dist/FileSaver.min.js"></script>
+
+    <script>
+        /* =========================
+   THEME: light/dark toggle
+   ========================= */
+        (function initTheme() {
+            const root = document.documentElement;
+            const saved = localStorage.getItem("bs_theme");
+            if (saved === "light" || saved === "dark") root.setAttribute("data-bs-theme", saved);
+
+            const btn = document.getElementById("themeToggle");
+            btn.addEventListener("click", () => {
+                const cur = root.getAttribute("data-bs-theme") || "dark";
+                const next = cur === "dark" ? "light" : "dark";
+                root.setAttribute("data-bs-theme", next);
+                localStorage.setItem("bs_theme", next);
+                // flash spin
+                btn.classList.remove("flash");
+                void btn.offsetWidth;
+                btn.classList.add("flash");
+                setTimeout(() => btn.classList.remove("flash"), 520);
+            });
+        })();
+
+        /* =========================
+   Copy button for Logcat filter
+   ========================= */
+        document.getElementById("btnCopyFilter").addEventListener("click", async () => {
+            const val = document.getElementById("logcatFilter").value;
+            try {
+                await navigator.clipboard.writeText(val.replaceAll("&amp;", "&"));
+            } catch {
+                // fallback
+                const input = document.getElementById("logcatFilter");
+                input.select();
+                document.execCommand("copy");
+                input.blur();
+            }
+            const btn = document.getElementById("btnCopyFilter");
+            const old = btn.innerHTML;
+            btn.innerHTML = '<i class="bi bi-clipboard-check"></i>';
+            setTimeout(() => (btn.innerHTML = old), 1400);
+        });
+
+        /* =========================
+   CONFIG helpers
+   ========================= */
+        function applyWidth() {
+            const val = parseInt(document.getElementById("widthInput").value, 10);
+            if (!isNaN(val) && val >= 20 && val <= 64) {
+                document.documentElement.style.setProperty("--receipt-width-ch", val + "ch");
+            }
+        }
+        function getConfiguredWidth() {
+            const val = parseInt(document.getElementById("widthInput").value, 10);
+            return !isNaN(val) && val >= 1 ? val : 42;
+        }
+        function sanitizeFilename(name) {
+            return name
+                .replace(/[\\\/:*?"<>|]+/g, "")
+                .replace(/\s+/g, " ")
+                .trim();
+        }
+        function nowTokens() {
+            const d = new Date();
+            const pad = (n) => String(n).padStart(2, "0");
+            const date = `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+            const time = `${pad(d.getHours())}-${pad(d.getMinutes())}-${pad(d.getSeconds())}`;
+            return { date, time };
+        }
+        function formatPattern(pattern, vars) {
+            const dict = { ...nowTokens(), ...vars };
+            let out = pattern;
+            for (const [k, v] of Object.entries(dict)) {
+                out = out.replaceAll(`{${k}}`, v ?? "");
+            }
+            return sanitizeFilename(out);
+        }
+
+        /* =========================
+   Parsing helpers
+   ========================= */
+        const WIDE_SPACE_RE = /[\u00A0\u2002-\u200A\t]/; // NBSP, EN/EM/thin, TAB
+        function isWideChar(ch) {
+            return WIDE_SPACE_RE.test(ch);
+        }
+        function firstNonAsciiSpaceIndex(s) {
+            for (let i = 0; i < s.length; i++) {
+                if (s[i] !== " ") return i;
+            }
+            return -1;
+        }
+        function lastNonAsciiSpaceIndex(s) {
+            for (let i = s.length - 1; i >= 0; i--) {
+                if (s[i] !== " ") return i;
+            }
+            return -1;
+        }
+        function startsWithWideAfterIndent(s) {
+            const i = firstNonAsciiSpaceIndex(s);
+            if (i < 0) return false;
+            return isWideChar(s[i]);
+        }
+        function endsWithWideBeforeTrail(s) {
+            const i = lastNonAsciiSpaceIndex(s);
+            if (i < 0) return false;
+            return isWideChar(s[i]);
+        }
+        function stripBookendWides(s) {
+            s = s.replace(/^[ ]+/, ""); // leading ascii spaces
+            s = s.replace(/^[\u00A0\u2002-\u200A\t]+/, "");
+            s = s.replace(/[\u00A0\u2002-\u200A\t]+$/, "");
+            return s.trimEnd();
+        }
+        function wrapSoftByWidth(line, width) {
+            const chunks = [];
+            let remaining = line.replace(/\s+/g, " ").trim();
+            while (remaining.length > width) {
+                const window = remaining.slice(0, width + 1);
+                const breakPos = window.lastIndexOf(" ");
+                if (breakPos <= 0) {
+                    chunks.push(remaining.slice(0, width));
+                    remaining = remaining.slice(width).trimStart();
+                } else {
+                    chunks.push(remaining.slice(0, breakPos));
+                    remaining = remaining.slice(breakPos + 1).trimStart();
+                }
+            }
+            if (remaining.length) chunks.push(remaining);
+            return chunks;
+        }
+
+        function splitIntoSections(raw) {
+            const lines = raw.split(/\r?\n/);
+            const sections = [];
+            let current = null;
+            for (const line of lines) {
+                if (line.includes("startPrintReceipt:")) {
+                    if (current) sections.push(current);
+                    current = { header: line, lines: [] };
+                } else if (current) {
+                    current.lines.push(line);
+                }
+            }
+            if (current) sections.push(current);
+            return sections;
+        }
+        function extractTimestampFromHeader(headerLine) {
+            const m = headerLine.match(/(?:(\d{4}-\d{2}-\d{2})\s+)?(\d{2}:\d{2}:\d{2}\.\d{3})/);
+            if (!m) return "Unknown time";
+            return m[1] ? `${m[1]} ${m[2]}` : m[2];
+        }
+
+        /*
+        function splitColumns(line) {
+            // tabs → split
+            const leftTrimmed = line.replace(/^[ ]+/, "");
+            if (!leftTrimmed.startsWith("\t") && leftTrimmed.includes("\t")) {
+                const parts = leftTrimmed.split(/\t+/);
+                const left = parts[0].trim();
+                const right = parts.slice(1).join(" ").trim();
+                if (left && right) return { left, right };					
+            }
+            // 2+ spaces → split
+            const m = leftTrimmed.match(/^(.*?\S)\s{2,}(\S.*)$/);
+            if (m) return { left: m[1].trim(), right: m[2].trim() };
+            return null;
+        }*/
+        /*			
+        function splitColumns(line) {
+            const leftTrimmed = line.replace(/^[ ]+/, "");
+        
+            // Debug log
+            console.log("Evaluating line:", JSON.stringify(leftTrimmed));
+        
+            // Tabs → split
+            if (!leftTrimmed.startsWith("\t") && leftTrimmed.includes("\t")) {
+                const parts = leftTrimmed.split(/\t+/);
+                const left = parts[0].trim();
+                const right = parts.slice(1).join(" ").trim();
+                if (left || right) {
+                    console.log("Tab split →", { left, right: right || "" });
+                    return { left, right: right || "" };
+                }
+            }
+        
+            // 2+ spaces → split
+            const m = leftTrimmed.match(/^(.*?\S)\s{2,}(\S.*)?$/);
+            if (m) {
+                const left = m[1].trim();
+                const right = m[2] ? m[2].trim() : "";
+                console.log("Space split →", { left, right });
+                return { left, right };
+            }
+        
+            // NEW: Colon-only fallback (e.g., "AUTH CODE:")
+            const colonMatch = leftTrimmed.match(/^(.+?:)\s*$/);
+            if (colonMatch) {
+                const left = colonMatch[1].trim();
+                console.log("Colon-only match →", { left, right: "" });
+                return { left, right: "" };
+            }
+        
+            console.log("No match found.");
+            return null;
+        }
+        */
+        // ...existing code...
+        function splitColumns(line) {
+            const leftTrimmed = line.replace(/^[ ]+/, "");
+
+            // If there are tabs, be careful: trailing/leading tab should NOT force a split
+            // when one side is empty (we want those routed to centered handling).
+            if (leftTrimmed.includes("\t")) {
+                const startsWithWide = /^[\t\u00A0\u2002-\u200A]/.test(leftTrimmed);
+                const endsWithWide = /[\t\u00A0\u2002-\u200A]$/.test(leftTrimmed);
+                const parts = leftTrimmed.split(/\t+/).map(p => p.trim());
+
+                // Explicit: leading-tab + mid + right (e.g. "\t0\t$0.00DR") -> mid+right
+                if (parts.length >= 3 && parts[0] === "" && parts[1]) {
+                    return { left: "     ", mid: parts[1] || "", right: parts.slice(2).join(" ") || "" };
+                }
+
+                // Handle bookended-tab case like "\tCBA Demo\t" -> centered (return null)
+                if (parts.length >= 3 && !parts[0] && !parts[parts.length - 1]) {
+                    const middle = parts.slice(1, parts.length - 1).join(" ").trim();
+                    if (middle) return null;
+                }
+
+                if (parts.length >= 3) {
+                    // clear 3+ tab columns -> left / mid / right
+                    return { left: parts[0] || "", mid: parts[1] || "", right: parts.slice(2).join(" ") || "" };
+                }
+
+                if (parts.length === 2) {
+                    // If there's a leading OR trailing wide char (tab/nbsp/..)
+                    // and one of the parts is empty, prefer centered handling (return null)
+                    if ((startsWithWide || endsWithWide) && (!parts[0] || !parts[1])) {
+                        return null;
+                    }
+                    return { left: parts[0] || "", right: parts[1] || "" };
+                }
+            }
+
+            // 2+ spaces → split into up to 3 columns
+            const spaceParts = leftTrimmed.split(/\s{2,}/).map(p => p.trim());
+            if (spaceParts.length >= 3) {
+                return { left: spaceParts[0] || "", mid: spaceParts[1] || "", right: spaceParts.slice(2).join(" ") || "" };
+            }
+            if (spaceParts.length === 2) {
+                return { left: spaceParts[0] || "", right: spaceParts[1] || "" };
+            }
+
+            // Colon-only fallback (e.g., "AUTH CODE:")
+            const colonMatch = leftTrimmed.match(/^(.+?:)\s*$/);
+            if (colonMatch) {
+                return { left: colonMatch[1].trim(), right: "" };
+            }
+
+            return null;
+        }
+        // ...existing code...
+
+
+        function parseReceiptSection(section) {
+            const timestamp = extractTimestampFromHeader(section.header);
+            const width = getConfiguredWidth();
+            const parsedLines = [];
+
+            for (const raw of section.lines) {
+                const rawLine = raw;
+                console.log("Processing line:", JSON.stringify(rawLine));
+                if (rawLine.trim().length === 0) {
+                    parsedLines.push({ type: "empty", content: "" });
+                    continue;
+                }
+
+                /*
+                const cols = splitColumns(rawLine);
+                if (cols) {
+                    parsedLines.push({ type: "split", left: cols.left, right: cols.right });
+                    continue;
+                }
+                */
+                const leftTrimmed = rawLine.replace(/^[ ]+/, "");
+                if (/^[\t\u00A0\u2002-\u200A].*[\t\u00A0\u2002-\u200A]$/.test(leftTrimmed)) {
+                    const content = stripBookendWides(rawLine);
+                    if (content.length > 0) {
+                        wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
+                        continue;
+                    }
+                }
+
+                const cols = splitColumns(rawLine);
+                if (cols) {
+                    // normalize into a single object; mid may be undefined
+                    parsedLines.push({ type: "split", left: cols.left || "", mid: cols.mid !== undefined ? cols.mid : undefined, right: cols.right || "" });
+                    continue;
+                }
+
+
+                const startsWide = startsWithWideAfterIndent(rawLine);
+                const endsWide = endsWithWideBeforeTrail(rawLine);
+
+                if ((startsWide || endsWide) && stripBookendWides(rawLine).length > 0) {
+                    const content = stripBookendWides(rawLine);
+                    wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
+                    continue;
+                }
+
+
+
+                const leftContent = rawLine.replace(/^[ ]+/, "").trimEnd();
+                wrapSoftByWidth(leftContent, width).forEach((p) => parsedLines.push({ type: "left", content: p }));
+            }
+
+            // disclaimers with empty line separation
+            const disclaimers = [
+                { type: "disclaimer", content: "PARSED RECEIPT!" },
+                { type: "disclaimer", content: "FOR REFERENCE ONLY!" },
+            ];
+            const withTop = [...disclaimers, { type: "empty", content: "" }, ...parsedLines];
+            const withBottom = [...withTop, { type: "empty", content: "" }, ...disclaimers];
+
+            return { timestamp, lines: withBottom };
+        }
+
+        function parseReceipts() {
+            const input = document.getElementById("logInput").value;
+            const container = document.getElementById("receiptsContainer");
+            if (!input || !input.trim()) {
+                container.innerHTML = `<div class="col"><div class="text-secondary small">No log data provided. Paste log data and click <em>Parse Receipts</em>.</div></div>`;
+                return;
+            }
+            try {
+                const sections = splitIntoSections(input);
+                if (sections.length === 0) throw new Error('No "startPrintReceipt:" entries found.');
+                let html = "";
+                sections.forEach((sec, idx) => {
+                    const rec = parseReceiptSection(sec);
+                    if (rec) html += createReceiptHtml(rec, idx + 1);
+                });
+                container.innerHTML = html || `<div class="col"><div class="alert alert-danger">No receipts parsed.</div></div>`;
+            } catch (err) {
+                container.innerHTML = `<div class="col"><div class="alert alert-danger"><strong>Parsing Error:</strong><br>${err.message}</div></div>`;
+            }
+        }
+
+        function createReceiptHtml(receipt, index) {
+            //const copyType = receipt.lines.some((l) => l.type !== "empty" && typeof l.content === "string" && l.content.includes("CUSTOMER COPY")) ? "CUSTOMER COPY" : "MERCHANT COPY";
+/*
+			const copyType = receipt.lines.some((l) =>
+  l.type !== "empty" &&
+  typeof l.content === "string" &&
+  l.content.includes("MERCHANT COPY")
+)
+  ? "MERCHANT COPY"
+  : receipt.lines.some((l) =>
+      l.type !== "empty" &&
+      typeof l.content === "string" &&
+      l.content.includes("CUSTOMER COPY")
+    )
+  ? "CUSTOMER COPY"
+  : receipt.lines.some((l) =>
+      l.type !== "empty" &&
+      typeof l.content === "string" &&
+      l.content.includes("SETTLEMENT ENQUIRY")
+    )
+  ? "SETTLEMENT ENQUIRY"
+  : receipt.lines.some((l) =>
+      l.type !== "empty" &&
+      typeof l.content === "string" &&
+      l.content.includes("SETTLEMENT CUTOVER")
+    )
+  ? "SETTLEMENT CUTOVER"
+  : "REPORT";
+  */
+  
+const keywords = [
+  { keyword: "MERCHANT COPY", type: "MERCHANT COPY" },
+  { keyword: "CUSTOMER COPY", type: "CUSTOMER COPY" },
+  { keyword: "SETTLEMENT ENQUIRY", type: "SETTLEMENT ENQUIRY" },
+  { keyword: "SETTLEMENT CUTOVER", type: "SETTLEMENT CUTOVER" }
+];
+
+const copyType =
+  keywords.find(({ keyword }) =>
+    receipt.lines.some(
+      (l) =>
+        l.type !== "empty" &&
+        typeof l.content === "string" &&
+        l.content.includes(keyword)
+    )
+  )?.type || "REPORT";
+
+  
+  
+            let contentHtml = "";
+            receipt.lines.forEach((line) => {
+                switch (line.type) {
+                    case "centered":
+                        contentHtml += `<div class="receipt-line line-centered">${escapeHtml(line.content)}</div>`;
+                        break;
+                    case "split":
+                        // Always render using the same 3-column grid so the mid column lines up vertically.
+                        // If mid is missing insert an empty mid cell to keep alignment.
+                        {
+                            const hasMid = line.mid !== undefined;
+                            const midValue = hasMid ? String(line.mid) : "";
+                            const midCls = /^\d+$/.test(midValue.trim()) ? "col-mid-number" : "col-mid";
+                            const leftHtml = line.left ? `<span class="col-left">${escapeHtml(line.left)}</span>` : `<span class="col-left">&nbsp;</span>`;
+                            const midHtml = hasMid ? `<span class="${midCls}">${escapeHtml(midValue)}</span>` : `<span class="col-mid">&nbsp;</span>`;
+                            const rightHtml = `<span class="col-right">${escapeHtml(line.right || "")}</span>`;
+                            contentHtml += `<div class="receipt-line line-split-3">${leftHtml}${midHtml}${rightHtml}</div>`;
+                        }
+                        break;
+                    case "left":
+                        contentHtml += `<div class="receipt-line line-left">${escapeHtml(line.content)}</div>`;
+                        break;
+                    case "empty":
+                        contentHtml += `<div class="receipt-line">&nbsp;</div>`;
+                        break;
+                    case "disclaimer":
+                        contentHtml += `<div class="receipt-line line-disclaimer">${escapeHtml(line.content)}</div>`;
+                        break;
+                }
+            });
+
+            const safeTs = receipt.timestamp.replace(/[^\d]/g, "");
+            const vars = { index: String(index), timestamp: safeTs || "time", date: nowTokens().date, time: nowTokens().time, copy: copyType.replace(/\s+/g, "_") };
+            const pattern = document.getElementById("filePatternInput").value || "receipt_{index}_{timestamp}.png";
+            const filename = formatPattern(pattern, vars);
+            const id = `receipt-${index}`;
+
+            return `
+        <div class="col">
+          <div class="card receipt h-100">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center receipt-header px-3 py-2 mb-3">
+                <div>
+                  <button class="btn btn-sm btn-outline-warning" onclick="saveReceiptContentById('${id}')" title="Save receipt as PNG">
+                    <i class="bi bi-download me-1"></i>Save
+                  </button>
+                </div>
+                <div class="text-center flex-grow-1">
+                  <div class="fw-bold">Receipt #${index}</div>
+                  <div>${copyType}</div>
+                  <div class="small muted">${receipt.timestamp}</div>
+                </div>
+                <div style="opacity:0">
+                  <button class="btn btn-sm btn-outline-warning" disabled>Save</button>
+                </div>
+              </div>
+              <div class="receipt-paper" id="${id}" data-filename="${filename}">
+                ${contentHtml}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+        }
+
+        function escapeHtml(text) {
+            const div = document.createElement("div");
+            div.textContent = text;
+            return div.innerHTML;
+        }
+
+        function clearAll() {
+            document.getElementById("logInput").value = "";
+            document.getElementById("receiptsContainer").innerHTML = `<div class="col"><div class="text-secondary small">No receipts parsed yet. Paste log data and click <em>Parse Receipts</em>.</div></div>`;
+        }
+
+        /* =========================
+   Export: PNG / ZIP
+   ========================= */
+        async function elementToPngBlob(el) {
+            const canvas = await html2canvas(el, {
+                backgroundColor: "#ffffff",
+                scale: window.devicePixelRatio > 1 ? 2 : 1,
+                useCORS: true,
+                logging: false,
+            });
+            return await new Promise((resolve) => canvas.toBlob(resolve, "image/png"));
+        }
+        async function saveReceiptContentById(receiptPaperId) {
+            const paper = document.getElementById(receiptPaperId);
+            if (!paper) return;
+            const blob = await elementToPngBlob(paper);
+            const filename = paper.getAttribute("data-filename") || "receipt.png";
+            saveAs(blob, filename);
+        }
+        async function saveAllReceiptsAsZip() {
+            const papers = Array.from(document.querySelectorAll(".receipt-paper"));
+            if (papers.length === 0) return;
+            const zip = new JSZip();
+            const zipPattern = document.getElementById("zipNameInput").value || "receipts_{date}_{time}.zip";
+            const zipName = formatPattern(zipPattern, {});
+            for (const [i, el] of papers.entries()) {
+                let filename = el.getAttribute("data-filename") || `receipt_${i + 1}.png`;
+                const blob = await elementToPngBlob(el);
+                const ab = await blob.arrayBuffer();
+                zip.file(filename, ab);
+                await new Promise((r) => setTimeout(r, 20));
+            }
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            saveAs(zipBlob, zipName);
+        }
+    </script>
+</body>
+
+</html>

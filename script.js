@@ -5606,5 +5606,9 @@ function hideCVMTooltip(el) {
   if (box) box.style.display = 'none';
 }
 
+function openReceiptViewer() {
+    window.open("mxa_receipt_viewer.html", "_blank", "noopener,noreferrer");
+}
+
 window.showCVMTooltip = showCVMTooltip;
 window.hideCVMTooltip = hideCVMTooltip;

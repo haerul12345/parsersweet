@@ -95,7 +95,7 @@ function getTvrLabels(scheme) {
 document.addEventListener("DOMContentLoaded", function () {
 
   // Application version
-  const appVersion = "4.0";
+  const appVersion = "4.1";
   //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
   document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
 

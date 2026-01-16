@@ -94,14 +94,21 @@ function getTvrLabels(scheme) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+  
+// Set your first (static) year here:
+  const startYear = 2025;
+
   // Application version
   const appVersion = "4.1";
-  //document.getElementById("app-version").textContent = `ParserSweet Version ${appVersion} © 2025 hji`;
-  document.getElementById("app-version").textContent = `Version ${appVersion} © 2025 hji`;
+  
+// Compute current year and display "start–current" or just "start"
+const currentYear = new Date().getFullYear();
+const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
 
+// Write into the footer/span
+document.getElementById("app-version").textContent = `Version ${appVersion} © ${yearText} hji`;
 
-  //
-
+// TVR Scheme selection EventListener
   document.querySelectorAll('input[name="scheme"]').forEach(radio => {
     radio.addEventListener("change", (e) => {
       scheme = e.target.value;
@@ -337,14 +344,23 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
   // Button EventListener
-  const buttons = document.querySelectorAll(".btn");
+/*   const buttons = document.querySelectorAll(".btn");
   buttons.forEach(button => {
     button.addEventListener("click", function () {
       const screenId = this.getAttribute("data-screen");
       console.log("Button clicked, screenId:", screenId); // Add this line
       showScreen(screenId);
     });
-  });
+  }); */
+
+document.querySelectorAll(".btn[data-screen]").forEach(button => {
+button.addEventListener("click", function () {
+const screenId = this.getAttribute("data-screen");
+if (!screenId) return;
+console.log("Button clicked, screenId:", screenId);
+showScreen(screenId);
+});
+});
 
   // JSON Input EventListener
   const jsonInput = document.getElementById("json-input");

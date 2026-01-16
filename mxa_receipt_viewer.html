@@ -42,18 +42,26 @@ h2, h3 {
     color: #fff;
 }
 
+
+.input-wrap {
+  padding-inline: 1px;     /* equal left & right */
+  /* optional: limit total width and center */
+  /* max-width: 1100px;
+     margin-inline: auto; */
+}
 /* Textareas */
 textarea {
-    width: 100%;
-    height: 200px;
-    background: #003644;
-    color: #9ff8ff;
-    border: 1px solid #007a94;
-    padding: 10px;
-    font-family: Consolas, monospace;
-    margin-bottom: 20px;
-    border-radius: 4px;
+  width: 100%;
+  height: 200px;
+  border: 1px solid #007a94;
+  padding: 10px;
+  font-family: Consolas, monospace;
+  margin-bottom: 20px;
+  border-radius: 4px;
+  resize: none;
+  box-sizing: border-box;   /* keep padding/border within width */
 }
+
 
 footer {
       color: #FFF;
@@ -157,7 +165,7 @@ button:hover {
     display: flex;
     align-items: center;
     padding: 0 12px;          /* remove vertical padding */
-    background: #2E3A47;
+    background: #18333e;
     border: 1px solid #d0d7ff;
     border-right: none;       /* merge with button */
     border-radius: 6px 0 0 6px;
@@ -245,7 +253,9 @@ button:hover {
 
 
 
-<textarea id="logInput" style="margin-top:1px; placeholder="Paste logcat output here..."></textarea>
+<div class="input-wrap">
+  <textarea id="logInput" style="margin-top:1px;" placeholder="Paste logcat output here..."></textarea>
+</div>
 
 <button id="pasteBtn">Paste</button>
 <button id="clearBtn">Clear</button>

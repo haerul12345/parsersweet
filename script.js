@@ -5623,7 +5623,7 @@ function hideCVMTooltip(el) {
 }
 
 function openReceiptViewer() {
-    window.open("mxa_receipt_viewer.html", "_blank", "noopener,noreferrer");
+    window.open("base64_receipt_viewer.html", "_blank", "noopener,noreferrer");
 }
 
 function openCBAReceiptParser() {

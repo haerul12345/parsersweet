@@ -23,6 +23,7 @@
     Changes:
     - embed this page into parsersweet package
     - add paste from clipboard button
+    - add remove button to remove individual receipt cards
 -->
 
 <html lang="en" data-bs-theme="light">
@@ -591,116 +592,116 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             setTimeout(() => (btn.innerHTML = old), 1400);
         });
 
-// =========================
-// Paste button for Log Input
-// =========================
-(function initPasteButton() {
-  const btn = document.getElementById("btnPasteLog");
-  if (!btn) return;
+        // =========================
+        // Paste button for Log Input
+        // =========================
+        (function initPasteButton() {
+            const btn = document.getElementById("btnPasteLog");
+            if (!btn) return;
 
-  async function flashOK() {
-    const old = btn.innerHTML;
-    btn.innerHTML = '<i class="bi bi-clipboard2-check"></i> Pasted';
-    setTimeout(() => (btn.innerHTML = old), 1200);
-  }
+            async function flashOK() {
+                const old = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-clipboard2-check"></i> Pasted';
+                setTimeout(() => (btn.innerHTML = old), 1200);
+            }
 
-  function focusLog() {
-    const ta = document.getElementById("logInput");
-    if (ta) ta.focus();
-  }
+            function focusLog() {
+                const ta = document.getElementById("logInput");
+                if (ta) ta.focus();
+            }
 
-  async function pasteWithClipboardAPI() {
-    // Try permissions API first to avoid noisy errors in some browsers
-    try {
-      if (navigator.permissions && navigator.permissions.query) {
-        try {
-          const p = await navigator.permissions.query({ name: "clipboard-read" });
-          // If denied, skip to other strategies
-          if (p.state === "denied") return null;
-        } catch { /* ignore */ }
-      }
-      const text = await navigator.clipboard.readText();
-      return text || null;
-    } catch {
-      return null;
-    }
-  }
+            async function pasteWithClipboardAPI() {
+                // Try permissions API first to avoid noisy errors in some browsers
+                try {
+                    if (navigator.permissions && navigator.permissions.query) {
+                        try {
+                            const p = await navigator.permissions.query({ name: "clipboard-read" });
+                            // If denied, skip to other strategies
+                            if (p.state === "denied") return null;
+                        } catch { /* ignore */ }
+                    }
+                    const text = await navigator.clipboard.readText();
+                    return text || null;
+                } catch {
+                    return null;
+                }
+            }
 
-  function pasteWithExecCommand() {
-    // This works only in certain contexts; attempt a best-effort fallback.
-    try {
-      const helper = document.createElement("textarea");
-      helper.style.position = "fixed";
-      helper.style.opacity = "0";
-      helper.setAttribute("aria-hidden", "true");
-      document.body.appendChild(helper);
-      helper.focus();
-      const ok = document.execCommand("paste");
-      const text = helper.value || "";
-      document.body.removeChild(helper);
-      return ok && text ? text : null;
-    } catch {
-      return null;
-    }
-  }
+            function pasteWithExecCommand() {
+                // This works only in certain contexts; attempt a best-effort fallback.
+                try {
+                    const helper = document.createElement("textarea");
+                    helper.style.position = "fixed";
+                    helper.style.opacity = "0";
+                    helper.setAttribute("aria-hidden", "true");
+                    document.body.appendChild(helper);
+                    helper.focus();
+                    const ok = document.execCommand("paste");
+                    const text = helper.value || "";
+                    document.body.removeChild(helper);
+                    return ok && text ? text : null;
+                } catch {
+                    return null;
+                }
+            }
 
-  function promptFallback() {
-    const fromUser = window.prompt(
-      "Clipboard access is blocked by the browser.\nPaste your log here and click OK:",
-      ""
-    );
-    return (fromUser && fromUser.length) ? fromUser : null;
-  }
+            function promptFallback() {
+                const fromUser = window.prompt(
+                    "Clipboard access is blocked by the browser.\nPaste your log here and click OK:",
+                    ""
+                );
+                return (fromUser && fromUser.length) ? fromUser : null;
+            }
 
-  function appendOrReplaceIntoLog(text) {
-    const ta = document.getElementById("logInput");
-    if (!ta) return;
-    // If there's already content and the user has a selection, paste at caret;
-    // otherwise append with a newline separation.
-    if (document.activeElement === ta && typeof ta.selectionStart === "number") {
-      const start = ta.selectionStart;
-      const end = ta.selectionEnd;
-      const before = ta.value.slice(0, start);
-      const after  = ta.value.slice(end);
-      ta.value = before + text + after;
-      ta.selectionStart = ta.selectionEnd = start + text.length;
-    } else {
-      ta.value = (ta.value ? (ta.value.replace(/\s+$/, "") + "\n") : "") + text;
-    }
-  }
+            function appendOrReplaceIntoLog(text) {
+                const ta = document.getElementById("logInput");
+                if (!ta) return;
+                // If there's already content and the user has a selection, paste at caret;
+                // otherwise append with a newline separation.
+                if (document.activeElement === ta && typeof ta.selectionStart === "number") {
+                    const start = ta.selectionStart;
+                    const end = ta.selectionEnd;
+                    const before = ta.value.slice(0, start);
+                    const after = ta.value.slice(end);
+                    ta.value = before + text + after;
+                    ta.selectionStart = ta.selectionEnd = start + text.length;
+                } else {
+                    ta.value = (ta.value ? (ta.value.replace(/\s+$/, "") + "\n") : "") + text;
+                }
+            }
 
-  btn.addEventListener("click", async () => {
-    focusLog();
+            btn.addEventListener("click", async () => {
+                focusLog();
 
-    // Strategy 1: Clipboard API
-    let text = await pasteWithClipboardAPI();
+                // Strategy 1: Clipboard API
+                let text = await pasteWithClipboardAPI();
 
-    // Strategy 2: execCommand fallback
-    if (!text) text = pasteWithExecCommand();
+                // Strategy 2: execCommand fallback
+                if (!text) text = pasteWithExecCommand();
 
-    // Strategy 3: prompt fallback
-    if (!text) text = promptFallback();
+                // Strategy 3: prompt fallback
+                if (!text) text = promptFallback();
 
-    if (text) {
-      appendOrReplaceIntoLog(text);
-      await flashOK();
-    } else {
-      // Provide a gentle nudge if all paths failed
-      const alertBox = document.createElement("div");
-      alertBox.className = "alert alert-warning mt-2";
-      alertBox.textContent = "Unable to read from clipboard. Please use Ctrl+V / Cmd+V or paste into the prompt.";
-      // Insert under the textarea block
-      const parent = document.getElementById("logInput")?.parentElement;
-      if (parent) {
-        // Remove any existing warning to avoid stacking
-        const old = parent.querySelector(".alert.alert-warning");
-        if (old) old.remove();
-        parent.appendChild(alertBox);
-        setTimeout(() => alertBox.remove(), 3500);
-      }
-    }
-  });
-})();
+                if (text) {
+                    appendOrReplaceIntoLog(text);
+                    await flashOK();
+                } else {
+                    // Provide a gentle nudge if all paths failed
+                    const alertBox = document.createElement("div");
+                    alertBox.className = "alert alert-warning mt-2";
+                    alertBox.textContent = "Unable to read from clipboard. Please use Ctrl+V / Cmd+V or paste into the prompt.";
+                    // Insert under the textarea block
+                    const parent = document.getElementById("logInput")?.parentElement;
+                    if (parent) {
+                        // Remove any existing warning to avoid stacking
+                        const old = parent.querySelector(".alert.alert-warning");
+                        if (old) old.remove();
+                        parent.appendChild(alertBox);
+                        setTimeout(() => alertBox.remove(), 3500);
+                    }
+                }
+            });
+        })();
 
 
         /* =========================
@@ -1007,79 +1008,43 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             }
         }
 
-        function createReceiptHtml(receipt, index) {
-            //const copyType = receipt.lines.some((l) => l.type !== "empty" && typeof l.content === "string" && l.content.includes("CUSTOMER COPY")) ? "CUSTOMER COPY" : "MERCHANT COPY";
-            /*
-                        const copyType = receipt.lines.some((l) =>
-              l.type !== "empty" &&
-              typeof l.content === "string" &&
-              l.content.includes("MERCHANT COPY")
-            )
-              ? "MERCHANT COPY"
-              : receipt.lines.some((l) =>
-                  l.type !== "empty" &&
-                  typeof l.content === "string" &&
-                  l.content.includes("CUSTOMER COPY")
-                )
-              ? "CUSTOMER COPY"
-              : receipt.lines.some((l) =>
-                  l.type !== "empty" &&
-                  typeof l.content === "string" &&
-                  l.content.includes("SETTLEMENT ENQUIRY")
-                )
-              ? "SETTLEMENT ENQUIRY"
-              : receipt.lines.some((l) =>
-                  l.type !== "empty" &&
-                  typeof l.content === "string" &&
-                  l.content.includes("SETTLEMENT CUTOVER")
-                )
-              ? "SETTLEMENT CUTOVER"
-              : "REPORT";
-              */
 
+        function createReceiptHtml(receipt, index) {
             const keywords = [
                 { keyword: "MERCHANT COPY", type: "MERCHANT COPY" },
                 { keyword: "CUSTOMER COPY", type: "CUSTOMER COPY" },
                 { keyword: "SETTLEMENT ENQUIRY", type: "SETTLEMENT ENQUIRY" },
                 { keyword: "SETTLEMENT CUTOVER", type: "SETTLEMENT CUTOVER" }
             ];
-
             const copyType =
                 keywords.find(({ keyword }) =>
                     receipt.lines.some(
-                        (l) =>
-                            l.type !== "empty" &&
-                            typeof l.content === "string" &&
-                            l.content.includes(keyword)
+                        (l) => l.type !== "empty" && typeof l.content === "string" && l.content.includes(keyword)
                     )
                 )?.type || "REPORT";
 
-
-
+            // Build the receipt's inner lines
             let contentHtml = "";
             receipt.lines.forEach((line) => {
                 switch (line.type) {
                     case "centered":
                         contentHtml += `<div class="receipt-line line-centered">${escapeHtml(line.content)}</div>`;
                         break;
-                    case "split":
-                        // Always render using the same 3-column grid so the mid column lines up vertically.
-                        // If mid is missing insert an empty mid cell to keep alignment.
-                        {
-                            const hasMid = line.mid !== undefined;
-                            const midValue = hasMid ? String(line.mid) : "";
-                            const midCls = /^\d+$/.test(midValue.trim()) ? "col-mid-number" : "col-mid";
-                            const leftHtml = line.left ? `<span class="col-left">${escapeHtml(line.left)}</span>` : `<span class="col-left">&nbsp;</span>`;
-                            const midHtml = hasMid ? `<span class="${midCls}">${escapeHtml(midValue)}</span>` : `<span class="col-mid">&nbsp;</span>`;
-                            const rightHtml = `<span class="col-right">${escapeHtml(line.right || "")}</span>`;
-                            contentHtml += `<div class="receipt-line line-split-3">${leftHtml}${midHtml}${rightHtml}</div>`;
-                        }
+                    case "split": {
+                        const hasMid = line.mid !== undefined;
+                        const midValue = hasMid ? String(line.mid) : "";
+                        const midCls = /^\d+$/.test(midValue.trim()) ? "col-mid-number" : "col-mid";
+                        const leftHtml = line.left ? `<span class="col-left">${escapeHtml(line.left)}</span>` : `<span class="col-left"> </span>`;
+                        const midHtml = hasMid ? `<span class="${midCls}">${escapeHtml(midValue)}</span>` : `<span class="col-mid"> </span>`;
+                        const rightHtml = `<span class="col-right">${escapeHtml(line.right || "")}</span>`;
+                        contentHtml += `<div class="receipt-line line-split-3">${leftHtml}${midHtml}${rightHtml}</div>`;
                         break;
+                    }
                     case "left":
                         contentHtml += `<div class="receipt-line line-left">${escapeHtml(line.content)}</div>`;
                         break;
                     case "empty":
-                        contentHtml += `<div class="receipt-line">&nbsp;</div>`;
+                        contentHtml += `<div class="receipt-line"> </div>`;
                         break;
                     case "disclaimer":
                         contentHtml += `<div class="receipt-line line-disclaimer">${escapeHtml(line.content)}</div>`;
@@ -1088,37 +1053,52 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             });
 
             const safeTs = receipt.timestamp.replace(/[^\d]/g, "");
-            const vars = { index: String(index), timestamp: safeTs || "time", date: nowTokens().date, time: nowTokens().time, copy: copyType.replace(/\s+/g, "_") };
+            const vars = {
+                index: String(index),
+                timestamp: safeTs || "time",
+                date: nowTokens().date,
+                time: nowTokens().time,
+                copy: copyType.replace(/\s+/g, "_")
+            };
             const pattern = document.getElementById("filePatternInput").value || "receipt_{index}_{timestamp}.png";
             const filename = formatPattern(pattern, vars);
             const id = `receipt-${index}`;
 
+            // ✅ All parts stay inside the same .card-body
             return `
-        <div class="col">
-          <div class="card receipt h-100">
-            <div class="card-body">
-              <div class="d-flex justify-content-between align-items-center receipt-header px-3 py-2 mb-3">
-                <div>
-                  <button class="btn btn-sm btn-outline-warning" onclick="saveReceiptContentById('${id}')" title="Save receipt as PNG">
-                    <i class="bi bi-download me-1"></i>Save
-                  </button>
-                </div>
-                <div class="text-center flex-grow-1">
-                  <div class="fw-bold">Receipt #${index}</div>
-                  <div>${copyType}</div>
-                  <div class="small muted">${receipt.timestamp}</div>
-                </div>
-                <div style="opacity:0">
-                  <button class="btn btn-sm btn-outline-warning" disabled>Save</button>
-                </div>
-              </div>
-              <div class="receipt-paper" id="${id}" data-filename="${filename}">
-                ${contentHtml}
-              </div>
+  <div class="col">
+    <div class="card receipt h-100">
+      <div class="card-body">
+        <div class="d-flex justify-content-center align-items-center receipt-header px-3 py-2">
+          <div class="text-center">
+            <div class="fw-bold">Receipt #${index}</div>
+            <div>${copyType}</div>
+            <div class="small muted">${receipt.timestamp}</div>
+
+            <!-- Moved buttons here: centered and right under the date -->
+            <div class="d-flex justify-content-center gap-2 mt-2">
+              <button class="btn btn-sm btn-outline-warning"
+                      onclick="saveReceiptContentById('${id}')"
+                      title="Save receipt as PNG">
+                <i class="bi bi-download me-1"></i>Save
+              </button>
+              <button class="btn btn-sm btn-outline-danger-soft"
+                      title="Remove this receipt"
+                      onclick="removeThisReceipt(this)">
+                <i class="bi bi-x-circle me-1"></i>Remove
+              </button>
             </div>
           </div>
         </div>
-      `;
+
+        <div class="receipt-paper mt-2" id="${id}" data-filename="${filename}">
+          ${contentHtml}
+        </div>
+      </div>
+    </div>
+  </div>
+`;
+
         }
 
         function escapeHtml(text) {
@@ -1131,6 +1111,29 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             document.getElementById("logInput").value = "";
             document.getElementById("receiptsContainer").innerHTML = `<div class="col"><div class="text-secondary small">No receipts parsed yet. Paste log data and click <em>Parse Receipts</em>.</div></div>`;
         }
+
+        // =========================
+        // Remove a single parsed receipt card
+        // =========================
+        function removeThisReceipt(btn) {
+            const container = document.getElementById("receiptsContainer");
+            // Find the closest .col wrapper that holds the entire receipt card
+            const col = btn.closest(".col");
+            if (col) {
+                // Optional confirm:
+                if (!confirm("Remove this receipt?")) return;
+
+                col.remove();
+
+                if (container && container.querySelectorAll(".col").length === 0) {
+                    container.innerHTML =
+                        `<div class="col"><div class="text-secondary small">
+           No receipts parsed yet. Paste log data and click <em>Parse Receipts</em>.
+         </div></div>`;
+                }
+            }
+        }
+
 
         /* =========================
    Export: PNG / ZIP

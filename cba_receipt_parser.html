@@ -684,6 +684,7 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
 
                 if (text) {
                     appendOrReplaceIntoLog(text);
+                    parseReceipts();
                     await flashOK();
                 } else {
                     // Provide a gentle nudge if all paths failed

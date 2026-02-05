@@ -4029,6 +4029,7 @@ function parseTLV(hex) {
       if (aidValue.startsWith("A000000004")) scheme = "paypass";
       else if (aidValue.startsWith("A000000025")) scheme = "expresspay";
       else if (aidValue.startsWith("A000000003")) scheme = "visa";
+      else if (aidValue.startsWith("A00000006510")) scheme = "jcb";
       break;
     }
   }
@@ -4045,7 +4046,12 @@ function parseTLV(hex) {
 
     // Lookup tag name and format display
     const tagKey = "_" + tag.toUpperCase();
-    const tagName = tagsList[tagKey];
+    let tagName = tagsList[tagKey];
+    
+    if (tag === '9F53' && scheme === 'jcb') {
+      console.log("Terminal Interchange Profile (JCB specific)");  
+      tagName = "Terminal Interchange Profile (JCB specific)";
+    }
     const tagDisplay = tagName ? `${tag}<br><small><i>${tagName}</i></small>` : tag;
 
     // Parse Length
@@ -4624,15 +4630,15 @@ function parseTLV(hex) {
       </span>`;
     }
 
-    // Tooltip for 9F53 (Transaction Category Code)
-    if (tag.toUpperCase() === "9F53" && value.length === 6) {
+    // Tooltip for 9F53 (Transaction Category Code)    
+    if (tag.toUpperCase() === "9F53" && value.length === 6 && scheme === "jcb") {
       const byte1 = value.slice(0, 2);
       const byte2 = value.slice(2, 4);
       const byte3 = value.slice(4, 6);
       const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
       const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
       const bin3 = parseInt(byte3, 16).toString(2).padStart(8, '0');
-
+      
       const labels1 = [
         "Bit 7: CVM required by reader / N/A",
         "Bit 6: Signature supported (9F33: B3b5)",
@@ -4645,23 +4651,23 @@ function parseTLV(hex) {
       ];
       const labels2 = [
         "Bit 7: Issuer Update supported (DF1B: B3b5)",
-        "Bit 6: RFU (must always be set to 0)",
-        "Bit 5: RFU (must always be set to 0)",
-        "Bit 4: RFU (must always be set to 0)",
-        "Bit 3: RFU (must always be set to 0)",
-        "Bit 2: RFU (must always be set to 0)",
-        "Bit 1: RFU (must always be set to 0)",
-        "Bit 0: RFU (must always be set to 0)"
+        "Bit 6: RFU",
+        "Bit 5: RFU",
+        "Bit 4: RFU",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU",
+        "Bit 0: RFU"
       ];
       const labels3 = [
-        "Bit 7: RFU (must always be set to 0)",
-        "Bit 6: RFU (must always be set to 0)",
-        "Bit 5: RFU (must always be set to 0)",
-        "Bit 4: RFU (must always be set to 0)",
-        "Bit 3: RFU (must always be set to 0)",
-        "Bit 2: RFU (must always be set to 0)",
-        "Bit 1: RFU (must always be set to 0)",
-        "Bit 0: RFU (must always be set to 0)"
+        "Bit 7: RFU",
+        "Bit 6: RFU",
+        "Bit 5: RFU",
+        "Bit 4: RFU",
+        "Bit 3: RFU",
+        "Bit 2: RFU",
+        "Bit 1: RFU",
+        "Bit 0: RFU"
       ];
 
       let tooltipHtml = `<div style="font-family:monospace;font-size:12px;">`;
@@ -4695,7 +4701,7 @@ function parseTLV(hex) {
         <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
       </span>`;
     }
-
+  
 
     // Tooltip for 82 (AIP) with scheme-specific byte 2
     if (tag.toUpperCase() === "82" && value.length === 4) {

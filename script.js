@@ -710,7 +710,17 @@ function formatTableRows(data, indentLevel = 0) {
             rows += `<tr><td>${indent}${key}</td><td>${combinedValue}</td></tr>`;
           }
 
-        } else {
+        } else if (key === 'value') {
+          const raw = value;
+          const num = Number(value);
+          if (!isNaN(num)) {
+            const currency = (num / 100).toFixed(2);
+            rows += `<tr><td>${indent}${key}</td><td>${raw} (AUD ${currency})</td></tr>`;
+          } else {
+            rows += `<tr><td>${indent}${key}</td><td>${raw}</td></tr>`;
+          }
+        }
+        else {
           rows += `<tr><td>${indent}${key}</td><td>${value}</td></tr>`;
         }
       }

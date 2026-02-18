@@ -5061,6 +5061,51 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
         table += `<tr><td>${key}</td><td>${value}</td></tr>`;
       }
     }
+     else if (key === "090" && value !== null) {
+      const raw = String(value);
+      // MeMo Connex Acquiring Processor Interface - Technical Message Specification v1_10 2.pdf - page 96.
+      // DE 90 fixed layout (best-effort slicing):
+      // 0-3: Original Message Type Identifier (4)
+      // 4-9: Original STAN (6)
+      // 10-15: Original Local Transaction Time (hhmmss) (6)
+      // 16-19: Original Local Transaction Date (MMDD) (4)
+      // 20-31: Original Acquiring Institution ID (12)
+      // 32-43: Original Forwarding Institution ID (12)
+      const origMsgType = raw.slice(0, 4);
+      const origSTAN = raw.slice(4, 10);
+      const origTime = raw.slice(10, 16);
+      const origDate = raw.slice(16, 20);
+      const origAcq = raw.slice(20, 32);
+      const origFwd = raw.slice(32, 44);
+
+      const timeFormatted = origTime && origTime.length >= 6
+        ? `${origTime.slice(0,2)}:${origTime.slice(2,4)}:${origTime.slice(4,6)}`
+        : origTime || '';
+      const dateFormatted = origDate && origDate.length === 4
+        ? `${origDate.slice(0,2)}/${origDate.slice(2,4)}`
+        : origDate || '';
+
+      // Details table with header color matching default and default border color
+      let detailsTable = `<table style="margin-top:8px;border-collapse:collapse;width:100%;border:1px solid #ddd;">`;
+      detailsTable += `<thead><tr>`;
+      detailsTable += `<th style="text-align:left;padding:6px 8px;border:1px solid #ddd;background:#00AFDA;color:#fff;">Usage</th>`;
+      detailsTable += `<th style="text-align:left;padding:6px 8px;border:1px solid #ddd;background:#00AFDA;color:#fff;">Value</th>`;
+      detailsTable += `</tr></thead><tbody>`;
+
+      const row = (label, val) => `<tr><td style="padding:6px 8px;border:1px solid #ddd;font-size:12px;vertical-align:top;">${label}</td><td style="padding:6px 8px;border:1px solid #ddd;font-size:12px;vertical-align:top;">${val || ''}</td></tr>`;
+
+      detailsTable += row('Original message type identifier', origMsgType);
+      detailsTable += row('Original System Trace Audit Number (STAN)', origSTAN);
+      detailsTable += row('Original Local transaction Time (Field 12)', `${origTime || ''} ${timeFormatted ? `(${timeFormatted})` : ''}`);
+      detailsTable += row('Original Local transaction Date (Field 13)', `${origDate || ''} ${dateFormatted ? `(${dateFormatted})` : ''}`);
+      detailsTable += row('Original Acquiring Institution ID (Field 32)', origAcq);
+      detailsTable += row('Original Forwarding Institution ID', origFwd);
+
+      detailsTable += `</tbody></table>`;
+
+      const combinedValue = `<div><strong>Raw:</strong> ${raw}</div><div style="margin-top:8px; overflow:auto;">${detailsTable}</div>`;
+      table += `<tr><td>${key}</td><td>${combinedValue}</td></tr>`;
+    }
     else if (key === "custom_field" || key === "breakdown") {
 
       if (key === "custom_field") {

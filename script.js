@@ -5069,14 +5069,14 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
       // 4-9: Original STAN (6)
       // 10-15: Original Local Transaction Time (hhmmss) (6)
       // 16-19: Original Local Transaction Date (MMDD) (4)
-      // 20-31: Original Acquiring Institution ID (12)
-      // 32-43: Original Forwarding Institution ID (12)
+      // 20-31: Original Acquiring Institution ID (11)
+      // 31-42: Original Forwarding Institution ID (11)
       const origMsgType = raw.slice(0, 4);
       const origSTAN = raw.slice(4, 10);
       const origTime = raw.slice(10, 16);
       const origDate = raw.slice(16, 20);
-      const origAcq = raw.slice(20, 32);
-      const origFwd = raw.slice(32, 44);
+      const origAcq = raw.slice(20, 31);
+      const origFwd = raw.slice(31, 42);
 
       const timeFormatted = origTime && origTime.length >= 6
         ? `${origTime.slice(0,2)}:${origTime.slice(2,4)}:${origTime.slice(4,6)}`

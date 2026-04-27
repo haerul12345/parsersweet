@@ -94,21 +94,21 @@ function getTvrLabels(scheme) {
 
 document.addEventListener("DOMContentLoaded", function () {
 
-  
-// Set your first (static) year here:
+
+  // Set your first (static) year here:
   const startYear = 2025;
 
   // Application version
   const appVersion = "4.1";
-  
-// Compute current year and display "start–current" or just "start"
-const currentYear = new Date().getFullYear();
-const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
 
-// Write into the footer/span
-document.getElementById("app-version").textContent = `Version ${appVersion} © ${yearText} hji`;
+  // Compute current year and display "start–current" or just "start"
+  const currentYear = new Date().getFullYear();
+  const yearText = currentYear > startYear ? `${startYear}–${currentYear}` : `${startYear}`;
 
-// TVR Scheme selection EventListener
+  // Write into the footer/span
+  document.getElementById("app-version").textContent = `Version ${appVersion} © ${yearText} hji`;
+
+  // TVR Scheme selection EventListener
   document.querySelectorAll('input[name="scheme"]').forEach(radio => {
     radio.addEventListener("change", (e) => {
       scheme = e.target.value;
@@ -344,23 +344,23 @@ document.getElementById("app-version").textContent = `Version ${appVersion} © $
 
 
   // Button EventListener
-/*   const buttons = document.querySelectorAll(".btn");
-  buttons.forEach(button => {
+  /*   const buttons = document.querySelectorAll(".btn");
+    buttons.forEach(button => {
+      button.addEventListener("click", function () {
+        const screenId = this.getAttribute("data-screen");
+        console.log("Button clicked, screenId:", screenId); // Add this line
+        showScreen(screenId);
+      });
+    }); */
+
+  document.querySelectorAll(".btn[data-screen]").forEach(button => {
     button.addEventListener("click", function () {
       const screenId = this.getAttribute("data-screen");
-      console.log("Button clicked, screenId:", screenId); // Add this line
+      if (!screenId) return;
+      console.log("Button clicked, screenId:", screenId);
       showScreen(screenId);
     });
-  }); */
-
-document.querySelectorAll(".btn[data-screen]").forEach(button => {
-button.addEventListener("click", function () {
-const screenId = this.getAttribute("data-screen");
-if (!screenId) return;
-console.log("Button clicked, screenId:", screenId);
-showScreen(screenId);
-});
-});
+  });
 
   // JSON Input EventListener
   const jsonInput = document.getElementById("json-input");
@@ -715,7 +715,18 @@ function formatTableRows(data, indentLevel = 0) {
           const num = Number(value);
           if (!isNaN(num)) {
             const currency = (num / 100).toFixed(2);
-            rows += `<tr><td>${indent}${key}</td><td>${raw} (AUD ${currency})</td></tr>`;
+            rows += `<tr><td>${indent}${key}</td><td>${raw} (${currency})</td></tr>`;
+          } else {
+            rows += `<tr><td>${indent}${key}</td><td>${raw}</td></tr>`;
+          }
+        } else if (key === 'currencyCode') {
+          const raw = String(value);
+          // Normalize numeric codes to 3 digits (e.g. "36" -> "036")
+          const numeric = raw.replace(/\D/g, '');
+          const lookupKey = /^\d+$/.test(raw) && numeric ? numeric.padStart(3, '0') : raw;
+          const info = currencyCodeLookup[lookupKey];
+          if (info) {
+            rows += `<tr><td>${indent}${key}</td><td>${raw} (${info.alpha})</td></tr>`;
           } else {
             rows += `<tr><td>${indent}${key}</td><td>${raw}</td></tr>`;
           }
@@ -4057,9 +4068,9 @@ function parseTLV(hex) {
     // Lookup tag name and format display
     const tagKey = "_" + tag.toUpperCase();
     let tagName = tagsList[tagKey];
-    
+
     if (tag === '9F53' && scheme === 'jcb') {
-      console.log("Terminal Interchange Profile (JCB specific)");  
+      console.log("Terminal Interchange Profile (JCB specific)");
       tagName = "Terminal Interchange Profile (JCB specific)";
     }
     const tagDisplay = tagName ? `${tag}<br><small><i>${tagName}</i></small>` : tag;
@@ -4648,7 +4659,7 @@ function parseTLV(hex) {
       const bin1 = parseInt(byte1, 16).toString(2).padStart(8, '0');
       const bin2 = parseInt(byte2, 16).toString(2).padStart(8, '0');
       const bin3 = parseInt(byte3, 16).toString(2).padStart(8, '0');
-      
+
       const labels1 = [
         "Bit 7: CVM required by reader / N/A",
         "Bit 6: Signature supported (9F33: B3b5)",
@@ -4711,7 +4722,7 @@ function parseTLV(hex) {
         <span class="cvm-tooltip-box" style="display:none;position:fixed;z-index:9999;background:#fff;border:1px solid #ccc;padding:8px;border-radius:6px;box-shadow:0 2px 8px rgba(0,0,0,0.15);white-space:nowrap;">${tooltipHtml}</span>
       </span>`;
     }
-  
+
 
     // Tooltip for 82 (AIP) with scheme-specific byte 2
     if (tag.toUpperCase() === "82" && value.length === 4) {
@@ -5061,7 +5072,7 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
         table += `<tr><td>${key}</td><td>${value}</td></tr>`;
       }
     }
-     else if (key === "090" && value !== null) {
+    else if (key === "090" && value !== null) {
       const raw = String(value);
       // MeMo Connex Acquiring Processor Interface - Technical Message Specification v1_10 2.pdf - page 96.
       // DE 90 fixed layout (best-effort slicing):
@@ -5079,10 +5090,10 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
       const origFwd = raw.slice(31, 42);
 
       const timeFormatted = origTime && origTime.length >= 6
-        ? `${origTime.slice(0,2)}:${origTime.slice(2,4)}:${origTime.slice(4,6)}`
+        ? `${origTime.slice(0, 2)}:${origTime.slice(2, 4)}:${origTime.slice(4, 6)}`
         : origTime || '';
       const dateFormatted = origDate && origDate.length === 4
-        ? `${origDate.slice(0,2)}/${origDate.slice(2,4)}`
+        ? `${origDate.slice(0, 2)}/${origDate.slice(2, 4)}`
         : origDate || '';
 
       // Details table with header color matching default and default border color
@@ -5684,11 +5695,11 @@ function hideCVMTooltip(el) {
 }
 
 function openReceiptViewer() {
-    window.open("base64_receipt_viewer.html", "_blank", "noopener,noreferrer");
+  window.open("base64_receipt_viewer.html", "_blank", "noopener,noreferrer");
 }
 
 function openCBAReceiptParser() {
-    window.open("cba_receipt_parser.html", "_blank", "noopener,noreferrer");
+  window.open("cba_receipt_parser.html", "_blank", "noopener,noreferrer");
 }
 
 // Expose functions to the global scope so inline handlers work when using

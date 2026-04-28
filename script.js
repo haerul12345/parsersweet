@@ -730,6 +730,19 @@ function formatTableRows(data, indentLevel = 0) {
           } else {
             rows += `<tr><td>${indent}${key}</td><td>${raw}</td></tr>`;
           }
+        } else if (key === 'settlementDate') {
+          const raw = value;
+          const s = String(raw).padStart(4, '0');
+          let formatted = raw;
+          if (/^\d{4}$/.test(s)) {
+            const mm = parseInt(s.slice(0, 2), 10);
+            const dd = parseInt(s.slice(2), 10);
+            const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            if (mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) {
+              formatted = `${months[mm - 1]} ${dd}`;
+            }
+          }
+          rows += `<tr><td>${indent}${key}</td><td>${raw} (${formatted})</td></tr>`;
         }
         else {
           rows += `<tr><td>${indent}${key}</td><td>${value}</td></tr>`;
@@ -5057,6 +5070,20 @@ function createTableFromObject(obj, isNested = false, isBreakdown = false) {
       const track2 = value.slice(2);
       const formattedValue = `<div><strong>Length:</strong> ${length}</div><div><strong>Track2:</strong> ${track2}</div>`;
       table += `<tr><td>${key}</td><td>${formattedValue}</td></tr>`;
+    }
+    else if ((key === "013" | key === "015") && typeof value === "string" && value.length > 2) {
+      const raw = value;
+      const s = String(raw).padStart(4, '0');
+      let formatted = raw;
+      if (/^\d{4}$/.test(s)) {
+        const mm = parseInt(s.slice(0, 2), 10);
+        const dd = parseInt(s.slice(2), 10);
+        const months = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+        if (mm >= 1 && mm <= 12 && dd >= 1 && dd <= 31) {
+          formatted = `${months[mm - 1]} ${dd}`;
+          table += `<tr><td>${key}</td><td>${raw} (${formatted})</td></tr>`;
+        }
+      }      
     }
     else if (key === "047" && typeof value === "string" && value.length > 3) {
       const length = value.slice(0, 3);

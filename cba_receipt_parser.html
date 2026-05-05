@@ -856,6 +856,8 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             }
             return null;
         }
+
+        /*
         function splitIntoSections(raw) {
             const lines = raw.split(/\r?\n/);
             const sections = [];
@@ -896,6 +898,73 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             // If a section was started but not closed, still include it
             if (current) sections.push(current);
             return sections;
+        }
+        */
+        function splitIntoSectionsCBA(raw) {
+            const lines = raw.split(/\r?\n/);
+            const sections = [];
+            let current = null;
+            for (const line of lines) {
+                if (line.includes("startPrintReceipt:")) {
+                    if (current) sections.push(current);
+                    current = { header: line, lines: [] };
+                } else if (current) {
+                    current.lines.push(line);
+                }
+            }
+            if (current) sections.push(current);
+            return sections;
+        }
+
+        function splitIntoSectionsAMPOL(raw) {
+            const lines = raw.split(/\r?\n/);
+            const sections = [];
+            let current = null;
+            const isMarker = (ln) => /logReceipt|startPrintReceipt:|===\s*RECEIPT\s*START/i.test(ln);
+            const isEnd = (ln) => /===\s*RECEIPT\s*END/i.test(ln);
+            const tsLike = /^\d{2}:\d{2}:\d{2}(\.\d+)?/;
+
+            for (const rawLine of lines) {
+                const line = rawLine;
+
+                // If we see an explicit end marker, close the current section (don't include the marker).
+                if (isEnd(line)) {
+                    if (current) {
+                        sections.push(current);
+                        current = null;
+                    }
+                    continue;
+                }
+
+                if (isMarker(line)) {
+                    if (current) sections.push(current);
+                    current = { header: line, lines: [] };
+                    continue;
+                }
+
+                // Start a new section when line looks like a timestamped header (fallback)
+                if (!current && tsLike.test(line)) {
+                    current = { header: line, lines: [] };
+                    continue;
+                }
+
+                if (current) {
+                    // treat an empty line as end-of-section
+                    if (line.trim() === "") {
+                        sections.push(current);
+                        current = null;
+                        continue;
+                    }
+                    current.lines.push(line.replace(/^\s+/, "").replace(/\u00A0/g, " "));
+                }
+            }
+
+            if (current) sections.push(current);
+            return sections;
+        }
+
+        function splitIntoSections(raw, format = "CBA") {
+            return format === "AMPOL" ? splitIntoSectionsAMPOL(raw) : splitIntoSectionsCBA(raw);
         }
         /*
                 function splitIntoSections(raw) {
@@ -1047,6 +1116,43 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                     continue;
                 }
 
+
+                if (format === "CBA") {
+                    const leftTrimmed = rawLine.replace(/^[ ]+/, "");
+                    if (/^[\t\u00A0\u2002-\u200A].*[\t\u00A0\u2002-\u200A]$/.test(leftTrimmed)) {
+                        console.log("CBA"); // Add this line
+                        const content = stripBookendWides(rawLine);
+                        if (content.length > 0) {
+                            wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
+                            continue;
+                        }
+
+                    }
+
+                    const cols = splitColumns(rawLine);
+                    if (cols) {
+
+                        // normalize into a single object; mid may be undefined
+                        parsedLines.push({ type: "split", left: cols.left || "", mid: cols.mid !== undefined ? cols.mid : undefined, right: cols.right || "" });
+                        console.log("TEST"); // Add this line
+                        continue;
+
+                    }
+
+
+                    const startsWide = startsWithWideAfterIndent(rawLine);
+                    const endsWide = endsWithWideBeforeTrail(rawLine);
+
+                    if ((startsWide || endsWide) && stripBookendWides(rawLine).length > 0) {
+                        console.log("CBA"); // Add this line
+                        const content = stripBookendWides(rawLine);
+                        wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
+                        continue;
+
+                    }
+
+
+                }
                 /*
                 const cols = splitColumns(rawLine);
                 if (cols) {
@@ -1056,6 +1162,7 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                 */
                 // AMPOL-specific rule: if a colon is present, split into two columns
                 if (format === "AMPOL") {
+                    console.log("AMPOL"); // Add this line
                     // If the line is a single word, center it
                     const single = ampolHandleSingleWord(rawLine, width);
                     if (single) {
@@ -1089,9 +1196,32 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
 
 
 
-                    if (rawLine.includes("ENTRY") || rawLine.includes("APPROVED") || rawLine.includes("DECLINED")) {
+                    if (rawLine.includes("ENTRY")) {
                         const content = rawLine.replace(/^[\s\u00A0\u2002-\u200A]+/, "").replace(/\u00A0/g, " ").trimEnd();
                         parsedLines.push({ type: "left", content });
+                        continue;
+                    }
+
+                    if (rawLine.includes("APPROVED") || rawLine.includes("DECLINED")) {
+                        const trimmed = rawLine.replace(/^[\s\u00A0\u2002-\u200A]+/, "").replace(/\u00A0/g, " ").trim();
+                        // try to split on 2+ spaces first (common column spacing)
+                        const m = trimmed.match(/^(.*\S)\s{2,}(\S.*)$/);
+                        let left, right;
+                        if (m) {
+                            left = m[1].trim();
+                            right = m[2].trim();
+                        } else {
+                            // fallback: split at last whitespace (keep amounts on right)
+                            const parts = trimmed.split(/\s+/);
+                            if (parts.length >= 2) {
+                                right = parts.pop();
+                                left = parts.join(" ");
+                            } else {
+                                left = trimmed;
+                                right = "";
+                            }
+                        }
+                        parsedLines.push({ type: "split", left, right, bold: true });
                         continue;
                     }
 
@@ -1114,31 +1244,7 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                     }
                 }
 
-                const leftTrimmed = rawLine.replace(/^[ ]+/, "");
-                if (/^[\t\u00A0\u2002-\u200A].*[\t\u00A0\u2002-\u200A]$/.test(leftTrimmed)) {
-                    const content = stripBookendWides(rawLine);
-                    if (content.length > 0) {
-                        wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
-                        continue;
-                    }
-                }
 
-                const cols = splitColumns(rawLine);
-                if (cols) {
-                    // normalize into a single object; mid may be undefined
-                    parsedLines.push({ type: "split", left: cols.left || "", mid: cols.mid !== undefined ? cols.mid : undefined, right: cols.right || "" });
-                    continue;
-                }
-
-
-                const startsWide = startsWithWideAfterIndent(rawLine);
-                const endsWide = endsWithWideBeforeTrail(rawLine);
-
-                if ((startsWide || endsWide) && stripBookendWides(rawLine).length > 0) {
-                    const content = stripBookendWides(rawLine);
-                    wrapSoftByWidth(content, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
-                    continue;
-                }
 
                 /*
                 const leftContent = rawLine.replace(/^[ ]+/, "").trimEnd();
@@ -1149,6 +1255,7 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                 if (format === "AMPOL") {
                     wrapSoftByWidth(leftContent, width).forEach((p) => parsedLines.push({ type: "centered", content: p }));
                 } else {
+                    console.log("CBA"); // Add this line
                     wrapSoftByWidth(leftContent, width).forEach((p) => parsedLines.push({ type: "left", content: p }));
                 }
 
@@ -1196,7 +1303,7 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             }
             try {
                 const selectedFormat = (typeof getSelectedMemoFormat === "function") ? getSelectedMemoFormat() : "CBA";
-                const sections = splitIntoSections(input);
+                const sections = splitIntoSections(input, selectedFormat);
                 if (sections.length === 0) throw new Error('No "startPrintReceipt:" or "=== RECEIPT START" entries found.');
                 let html = "";
                 sections.forEach((sec, idx) => {
@@ -1231,7 +1338,11 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                     case "centered":
                         contentHtml += `<div class="receipt-line line-centered">${escapeHtml(line.content)}</div>`;
                         break;
+
+
                     case "split": {
+
+
                         const hasMid = line.mid !== undefined;
                         const midValue = hasMid ? String(line.mid) : "";
                         const midCls = /^\d+$/.test(midValue.trim()) ? "col-mid-number" : "col-mid";
@@ -1240,7 +1351,10 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
                         const rightHtml = `<span class="col-right">${escapeHtml(line.right || "")}</span>`;
                         contentHtml += `<div class="receipt-line line-split-3">${leftHtml}${midHtml}${rightHtml}</div>`;
                         break;
+
                     }
+
+
                     case "left":
                         contentHtml += `<div class="receipt-line line-left">${escapeHtml(line.content)}</div>`;
                         break;

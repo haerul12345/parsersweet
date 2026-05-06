@@ -398,6 +398,23 @@
             background: color-mix(in srgb, var(--danger-soft) 12%, transparent);
         }
 
+        /* Accessibility: higher-contrast outlines for color-blind users */
+        .btn-outline-warning {
+            color: #b36f00;
+            border-color: #b36f00;
+        }
+
+        .btn-outline-danger-soft {
+            color: #b02a37;
+            border-color: #b02a37;
+        }
+
+        /* Visible focus for keyboard users */
+        .btn:focus-visible {
+            outline: none;
+            box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 40%, black);
+        }
+
         /* Small help text */
         .form-text {
             color: var(--muted) !important;
@@ -912,21 +929,51 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             return sections;
         }
         */
+        /*
+         function splitIntoSectionsCBA(raw) {
+             const lines = raw.split(/\r?\n/);
+             const sections = [];
+             let current = null;
+             for (const line of lines) {
+                 if (line.includes("startPrintReceipt:")) {
+                     if (current) sections.push(current);
+                     current = { header: line, lines: [] };
+                 } else if (current) {
+                     current.lines.push(line);
+                 }
+             }
+             if (current) sections.push(current);
+             return sections;
+         }
+         */
         function splitIntoSectionsCBA(raw) {
             const lines = raw.split(/\r?\n/);
             const sections = [];
             let current = null;
+            const endRe = /END OF REPORT/i;
+
             for (const line of lines) {
                 if (line.includes("startPrintReceipt:")) {
                     if (current) sections.push(current);
                     current = { header: line, lines: [] };
-                } else if (current) {
+                    continue;
+                }
+
+                if (current) {
+                    if (endRe.test(line)) {
+                        sections.push(current);
+                        current = null;
+                        continue;
+                    }
+                    // keep the original line exactly as-is (no replacements)
                     current.lines.push(line);
                 }
             }
+
             if (current) sections.push(current);
             return sections;
         }
+
 
         function splitIntoSectionsAMPOL(raw) {
             const lines = raw.split(/\r?\n/);
@@ -1404,22 +1451,27 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
 
             <!-- Moved buttons here: centered and right under the date -->
             <div class="d-flex justify-content-center gap-2 mt-2">
-                <button class="btn btn-sm btn-outline-primary"
+  <button class="btn btn-sm btn-outline-primary"
           onclick="copyReceiptImageById('${id}', this)"
-          title="Copy receipt image to clipboard">
+          title="Copy receipt image to clipboard"
+          aria-label="Copy receipt ${index} as image">
     <i class="bi bi-clipboard me-1"></i>Copy
   </button>
-              <button class="btn btn-sm btn-outline-warning"
-                      onclick="saveReceiptContentById('${id}')"
-                      title="Save receipt as PNG">
-                <i class="bi bi-download me-1"></i>Save
-              </button>
-              <button class="btn btn-sm btn-outline-danger-soft"
-                      title="Remove this receipt"
-                      onclick="removeThisReceipt(this)">
-                <i class="bi bi-x-circle me-1"></i>Remove
-              </button>
-            </div>
+
+  <button class="btn btn-sm btn-outline-warning"
+          onclick="saveReceiptContentById('${id}')"
+          title="Save receipt as PNG"
+          aria-label="Save receipt ${index} as PNG">
+    <i class="bi bi-download me-1"></i>Save
+  </button>
+
+  <button class="btn btn-sm btn-outline-danger-soft"
+          title="Remove this receipt"
+          onclick="removeThisReceipt(this)"
+          aria-label="Remove receipt ${index}">
+    <i class="bi bi-x-circle me-1"></i>Remove
+  </button>
+</div>
           </div>
         </div>
 

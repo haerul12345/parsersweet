@@ -23,7 +23,7 @@
     Changes:
     - embed this page into parsersweet package
     - add paste from clipboard button
-    - add remove button to remove individual receipt cards
+    - add remove button to remove individual receipt card
 -->
 
 <!-- 
@@ -33,6 +33,7 @@
     Changes:
     - support for AMPOL receipt format (which has slightly different layout and wider paper width)
     - rework layout
+    - add copy button to copy individual receipt
 -->
 
 <html lang="en" data-bs-theme="light">
@@ -443,7 +444,7 @@
 
     <main class="container-xxl my-3 my-md-4">
         <!-- Notice with Bootstrap input-group + copy button -->
-        
+
         <!-- Config + Input -->
         <div class="card panel mb-3">
             <div class="card-header">
@@ -457,9 +458,9 @@
                             value="42" />
                         <div class="form-text">Controls soft wrapping like the EDC printer (default 42).</div>
                         <div class="d-flex gap-2 mt-3">
-                    <button class="btn btn-outline-accent" onclick="applyWidth()"><i
-                            class="bi bi-aspect-ratio me-1"></i>Apply Width</button>
-                </div>
+                            <button class="btn btn-outline-accent" onclick="applyWidth()"><i
+                                    class="bi bi-aspect-ratio me-1"></i>Apply Width</button>
+                        </div>
                     </div>
                     <div class="col-12 col-md-4">
                         <label for="filePatternInput" class="form-label">Receipt filename pattern</label>
@@ -489,25 +490,26 @@
                 </div>
 
                 <div class="card panel mb-3">
-            <div class="card-body">
-                <div class="notice text-center">
-                    <div class="mb-2">
-                        <strong style="color: var(--accent-2);">Use this filter in Android Studio Logcat to capture
-                            printable receipts.</strong>
-                    </div>
-                    <div class="d-flex justify-content-center">
-                        <div class="input-group flex-nowrap" style="width: 600px; max-width: 100%;">
-                            <input id="logcatFilter" class="form-control text-center" type="text" readonly
-                                value="tag:APP_PRINT & printReceiptLog & startPrintReceipt:" />
-                            <button class="btn btn-outline-primary-soft" type="button" id="btnCopyFilter"
-                                title="Copy to clipboard">
-                                <i class="bi bi-clipboard"></i>
-                            </button>
+                    <div class="card-body">
+                        <div class="notice text-center">
+                            <div class="mb-2">
+                                <strong style="color: var(--accent-2);">Use this filter in Android Studio Logcat to
+                                    capture
+                                    printable receipts.</strong>
+                            </div>
+                            <div class="d-flex justify-content-center">
+                                <div class="input-group flex-nowrap" style="width: 600px; max-width: 100%;">
+                                    <input id="logcatFilter" class="form-control text-center" type="text" readonly
+                                        value="tag:APP_PRINT & printReceiptLog & startPrintReceipt:" />
+                                    <button class="btn btn-outline-primary-soft" type="button" id="btnCopyFilter"
+                                        title="Copy to clipboard">
+                                        <i class="bi bi-clipboard"></i>
+                                    </button>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
-        </div>
 
 
                 <hr class="my-4" />
@@ -1402,6 +1404,11 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
 
             <!-- Moved buttons here: centered and right under the date -->
             <div class="d-flex justify-content-center gap-2 mt-2">
+                <button class="btn btn-sm btn-outline-primary"
+          onclick="copyReceiptImageById('${id}', this)"
+          title="Copy receipt image to clipboard">
+    <i class="bi bi-clipboard me-1"></i>Copy
+  </button>
               <button class="btn btn-sm btn-outline-warning"
                       onclick="saveReceiptContentById('${id}')"
                       title="Save receipt as PNG">
@@ -1479,6 +1486,42 @@ Soft wrap: long lines split at the last space on/just past the width limit."></t
             const filename = paper.getAttribute("data-filename") || "receipt.png";
             saveAs(blob, filename);
         }
+
+        async function copyReceiptImageById(receiptPaperId, btn) {
+            const paper = document.getElementById(receiptPaperId);
+            if (!paper) return;
+            try {
+                const canvas = await html2canvas(paper, {
+                    backgroundColor: "#ffffff",
+                    scale: window.devicePixelRatio > 1 ? 2 : 1,
+                    useCORS: true,
+                    logging: false,
+                });
+                const blob = await new Promise((res) => canvas.toBlob(res, "image/png"));
+                if (!blob) throw new Error("Rendering failed");
+
+                if (navigator.clipboard && navigator.clipboard.write && window.ClipboardItem) {
+                    await navigator.clipboard.write([new ClipboardItem({ "image/png": blob })]);
+                    const old = btn.innerHTML;
+                    btn.innerHTML = '<i class="bi bi-clipboard-check"></i> Copied';
+                    setTimeout(() => (btn.innerHTML = old), 1200);
+                } else {
+                    // Fallback: open image in new tab (user can right-click -> Copy image)
+                    const url = URL.createObjectURL(blob);
+                    const w = window.open(url, "_blank");
+                    if (!w) {
+                        // If popup blocked, offer download as last resort
+                        const filename = paper.getAttribute("data-filename") || "receipt.png";
+                        saveAs(blob, filename);
+                    }
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                }
+            } catch (err) {
+                alert("Copy failed — please use Save and then paste the image manually.");
+                console.error(err);
+            }
+        }
+
         async function saveAllReceiptsAsZip() {
             const papers = Array.from(document.querySelectorAll(".receipt-paper"));
             if (papers.length === 0) return;
